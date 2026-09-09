@@ -2216,7 +2216,6 @@ SCREENS.famBasics = () => {
       }}),
       (phoneStarted && !phoneOk ? el("div",{class:"validate"},"Phone number needs 10 digits — parentheses and dashes are fine.") : null),
       qLabel("Email address"),
-      el("p",{class:"hint"},"Optional."),
       qText(f,"email",{type:"text", ph:"name@example.com", oninput:(v,inp)=>{
         inp.classList.toggle("bad", v.trim().length>0 && !emailLooksValid());
       }}),
@@ -3284,16 +3283,18 @@ SCREENS.finish = () => {
     nextLabel:"Print",
     extraNav: el("div",{style:"display:flex; gap:10px; flex-wrap:wrap; align-items:center;"},
       el("button",{class:"btn-ghost", type:"button", onclick:()=>goTo("rosterSelect")},"Edit"),
-      el("button",{class:"btn-ghost", type:"button", disabled: state.submitting,
+      el("button",{class:"btn-primary", type:"button", disabled: state.submitting,
         onclick: async ()=>{
           state.submitting = true;
           state.submitStatus = "Submitting…";
           rerender();
+          const printHtml = buildPrint();
           const payload = {
             family: state.family,
             referral: state.referral,
             members: state.members,
-            submittedAt: new Date().toISOString()
+            submittedAt: new Date().toISOString(),
+            printHtml: printHtml
           };
           const outcome = await submitIntake(payload);
           state.submitting = false;
@@ -3452,6 +3453,7 @@ function buildPrint(){
     (roiHtml || '<div class="p-roi-line">(no completed intakes)</div>')+'</div>';
 
   document.getElementById("printRoot").innerHTML = h;
+  return h;
 }
 
 /* ============ INIT ============ */
