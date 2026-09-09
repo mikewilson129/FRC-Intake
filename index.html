@@ -98,6 +98,7 @@
     .p-line{margin:2.5px 0;}
     .p-line b{font-weight:600;}
     .p-staff{color:#444; border:1px dashed #999; padding:4px 8px; margin:5px 0; font-size:11.5px;}
+    .p-primary{font-weight:700;}
     .p-check{margin:1.5px 0 1.5px 10px;}
     .p-cards{display:flex; flex-wrap:wrap; gap:8px;}
     .p-card{border:1px solid #999; border-radius:6px; padding:6px 8px; width:31%; font-size:10.5px; page-break-inside:avoid;}
@@ -196,6 +197,8 @@ const I18N = { es: {
 "Your family":"Su familia","Family last name":"Apellido de la familia","Last name":"Apellido",
 "Main phone number":"Número de teléfono principal",
 "Phone number needs 10 digits — parentheses and dashes are fine.":"El número de teléfono debe tener 10 dígitos — puede usar paréntesis y guiones.",
+"Email address":"Correo electrónico","Optional.":"Opcional.",
+"That doesn't look like a valid email address.":"Eso no parece ser una dirección de correo electrónico válida.",
 "Which best describes your household?":"¿Cuál describe mejor su hogar?",
 "Single":"Un solo padre o madre","Two-Parent":"Dos padres","Multi-Parent":"Varios padres","Multi-Generational":"Multigeneracional",
 "You're the only caregiver in the home.":"Usted es la única persona a cargo en el hogar.",
@@ -459,6 +462,7 @@ const I18N = { es: {
 "What brings {n} in":"¿Qué trae a {n} hoy?",
 "Mental health referrals":"Referencias de salud mental","Activities":"Actividades","Substance use support":"Apoyo por uso de sustancias",
 "School support":"Apoyo escolar","After-school programs":"Programas después de la escuela","Play group":"Grupo de juego","Job support":"Apoyo para empleo",
+"CRA Support":"Apoyo con CRA",
 "{n} & school":"{n} y la escuela",
 "Educational status":"Situación educativa",
 "Child Currently Enrolled in School":"Actualmente inscrito/a en la escuela","Not school aged":"Aún no tiene edad escolar",
@@ -691,6 +695,8 @@ pt: {
 "Your family":"Sua família","Family last name":"Sobrenome da família","Last name":"Sobrenome",
 "Main phone number":"Telefone principal",
 "Phone number needs 10 digits — parentheses and dashes are fine.":"O telefone precisa ter 10 dígitos — pode usar parênteses e traços.",
+"Email address":"Endereço de e-mail","Optional.":"Opcional.",
+"That doesn't look like a valid email address.":"Isso não parece ser um endereço de e-mail válido.",
 "Which best describes your household?":"O que melhor descreve o seu domicílio?",
 "Single":"Só um pai ou mãe","Two-Parent":"Pai e mãe","Multi-Parent":"Vários pais/mães","Multi-Generational":"Várias gerações",
 "You're the only caregiver in the home.":"Você é a única pessoa responsável pelos cuidados na casa.",
@@ -954,6 +960,7 @@ pt: {
 "What brings {n} in":"O que trouxe {n} aqui",
 "Mental health referrals":"Encaminhamentos de saúde mental","Activities":"Atividades","Substance use support":"Apoio para uso de substâncias",
 "School support":"Apoio escolar","After-school programs":"Programas after-school","Play group":"Grupo de recreação","Job support":"Apoio para emprego",
+"CRA Support":"Apoio com CRA",
 "{n} & school":"{n} e a escola",
 "Educational status":"Situação educacional",
 "Child Currently Enrolled in School":"Atualmente matriculado(a) na escola","Not school aged":"Ainda não está em idade escolar",
@@ -1182,6 +1189,8 @@ ht: {
 "Your family":"Fanmi ou","Family last name":"Siyati fanmi an","Last name":"Siyati",
 "Main phone number":"Telefòn prensipal",
 "Phone number needs 10 digits — parentheses and dashes are fine.":"Nimewo telefòn nan bezwen 10 chif — ou ka itilize parantèz ak tirè.",
+"Email address":"Adrès imèl","Optional.":"Opsyonèl.",
+"That doesn't look like a valid email address.":"Sa a pa sanble yon adrès imèl ki valid.",
 "Which best describes your household?":"Kisa ki dekri kay ou a pi byen?",
 "Single":"Selibatè","Two-Parent":"De paran","Multi-Parent":"Plizyè paran","Multi-Generational":"Plizyè jenerasyon",
 "You're the only caregiver in the home.":"Se ou menm sèl ki responsab swen yo nan kay la.",
@@ -1445,6 +1454,7 @@ ht: {
 "What brings {n} in":"Sa ki mennen {n} isit la",
 "Mental health referrals":"Referans sante mantal","Activities":"Aktivite","Substance use support":"Sipò pou itilizasyon sibstans",
 "School support":"Sipò lekòl","After-school programs":"Pwogram apre lekòl","Play group":"Gwoup jwe","Job support":"Sipò pou travay",
+"CRA Support":"Sipò pou CRA",
 "{n} & school":"{n} ak lekòl la",
 "Educational status":"Estati edikasyonèl",
 "Child Currently Enrolled in School":"Kounye a enskri nan lekòl la","Not school aged":"Poko gen laj lekòl",
@@ -1629,6 +1639,30 @@ ht: {
 /* ============ DATA ============ */
 const TODAY = new Date();
 const TODAY_STR = (TODAY.getMonth()+1)+"/"+TODAY.getDate()+"/"+TODAY.getFullYear();
+
+/* ============ REMOTE SUBMIT (proof of concept — see README) ============
+   Not a BAA-covered channel. Staff-only action; print-and-shred remains
+   the fallback if this fails. */
+const WORKER_URL = "https://frc-intake-poc.mikewilson129.workers.dev/submit";
+const SUBMIT_TOKEN = "WYGZk2kM3o81QczfKbRIIYo2uSthVaVk";
+async function submitIntake(payload){
+  try{
+    const res = await fetch(WORKER_URL, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "X-Submit-Token":SUBMIT_TOKEN },
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json().catch(()=>({}));
+    if(!res.ok || !result.ok){
+      console.error("Remote submission failed:", result);
+      return {success:false, result:result};
+    }
+    return {success:true, result:result};
+  }catch(err){
+    console.error("Network error submitting intake:", err);
+    return {success:false, error: err.message};
+  }
+}
 const COMFORT_TAIL = " If a question doesn't feel comfortable to answer, you're welcome to skip it — you'll still be able to get help from us.";
 function comfort(lead){ return tr(lead) + tr(COMFORT_TAIL); }
 
@@ -1846,6 +1880,13 @@ const AGENCIES = [
  {v:"DYS (Department of Youth Services)"},
  {v:"MassHealth", info:"Check this if MassHealth is your primary or secondary insurance."}];
 
+/* Of the AGENCIES above, only these require a Release of Information (skips DTA/MassHealth). */
+const RELEASE_AGENCIES = [
+ "DCF (Department of Children and Families)",
+ "DDS (Department of Developmental Services)",
+ "DMH (Department of Mental Health)",
+ "DYS (Department of Youth Services)"];
+
 const CIVIC_ADULT = [
  {v:"Civic Organizations", info:"e.g., Rotary Club, Lions Club, a neighborhood association"},
  {v:"Faith Based Organizations", info:"e.g., a church, mosque, synagogue, or temple group or ministry"},
@@ -1928,7 +1969,9 @@ const state = {
   draft:null,      /* person being added — only joins members[] on Save */
   lastDoneAdultId:null,
   showStaffPanel:false,
-  family:{lastName:"", phone:"", householdType:null, living:null, income:null,
+  submitting:false,
+  submitStatus:null,
+  family:{lastName:"", phone:"", email:"", householdType:null, living:null, income:null,
     address:{street:"", street2:"", apt:"", city:"", cityAuto:false, state:"Massachusetts", zip:""}},
   referral:{category:null, value:null},
   members:[]
@@ -1964,6 +2007,7 @@ function displayName(m){ return (m.preferred||m.first||"This person"); }
 function fullName(m){ return (m.first+" "+m.last).trim(); }
 function digitsOf(s){ return (s||"").replace(/\D/g,""); }
 function phoneValid(){ return digitsOf(state.family.phone).length===10; }
+function emailLooksValid(){ const v=(state.family.email||"").trim(); return !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
 function basicsComplete(m){ return !!(m.first.trim() && m.last.trim() && dobValid(m) && m.insurance); }
 
 /* ============ RENDER HELPERS ============ */
@@ -2157,6 +2201,8 @@ SCREENS.famBasics = () => {
   const f = state.family;
   const phoneOk = phoneValid();
   const phoneStarted = digitsOf(f.phone).length>0;
+  const emailOk = emailLooksValid();
+  const emailStarted = (f.email||"").trim().length>0;
   return shell({
     title:"Your family",
     comfort:"Just the basics to get started.",
@@ -2169,6 +2215,12 @@ SCREENS.famBasics = () => {
         const nav=document.querySelector(".btn-primary"); if(nav) nav.disabled = !(f.lastName.trim() && phoneValid());
       }}),
       (phoneStarted && !phoneOk ? el("div",{class:"validate"},"Phone number needs 10 digits — parentheses and dashes are fine.") : null),
+      qLabel("Email address"),
+      el("p",{class:"hint"},"Optional."),
+      qText(f,"email",{type:"text", ph:"name@example.com", oninput:(v,inp)=>{
+        inp.classList.toggle("bad", v.trim().length>0 && !emailLooksValid());
+      }}),
+      (emailStarted && !emailOk ? el("div",{class:"validate"},"That doesn't look like a valid email address.") : null),
       qLabel("Which best describes your household?"),
       qSingleCollapse(HOUSEHOLD_TYPES, ()=>f.householdType, v=>f.householdType=v, {stack:true}),
       (!f.householdType ? skipRow(()=>f.householdType, v=>f.householdType=v) : null)
@@ -2615,10 +2667,13 @@ function ethRaceBlock(m){
 function reasonBlock(m){
   const a=m.a; if(!a.reasonPicks) a.reasonPicks=[];
   const child = isChild(m);
+  const age = ageOf(m);
+  const adultPicks = [...REASON_PICKS_ADULT, "CRA Support"];
+  const childPicks = (age!==null && age>=11) ? [...REASON_PICKS_CHILD, "CRA Support"] : REASON_PICKS_CHILD;
   return [
     qLabel(child ? trn("What brings you in for {n} today?", displayName(m)) : "What brings you in today?"),
     el("p",{class:"hint"},"Tap anything that fits — then add anything else in your own words. A few words is plenty, no story needed."),
-    qMulti(child ? REASON_PICKS_CHILD : REASON_PICKS_ADULT, ()=>a.reasonPicks),
+    qMulti(child ? childPicks : adultPicks, ()=>a.reasonPicks),
     qLabel("Anything else, in your own words"),
     qArea(a,"reasonText",{ph:"e.g., housing, help with my son's school, feeling overwhelmed…", max:300})
   ];
@@ -3042,7 +3097,6 @@ function personSections(m){
     pLine("Birthdate", dobOut(m)) +
     pLine("Services Needed", m.services ? "Yes" : "No");
   if(m.services) fmi += pLine("Initial Contact Date", TODAY_STR);
-  if(m.isSelf) fmi += '<div class="p-staff">Primary Contact: Yes — select in CRM.</div>';
   S.push({title:"Family Member Info", inner:fmi, range:"basics"});
   if(!m.services) return S;
 
@@ -3223,12 +3277,32 @@ SCREENS.finish = () => {
     title:"Next steps",
     body:[
       el("div",{class:"notice"},"Staff: use Print to make the data-entry copy. Nothing is saved on this device — closing or refreshing this page erases everything, so print first."),
+      state.submitStatus ? el("div",{class:"notice"}, state.submitStatus) : null,
     ],
     noBack:true,
     next:()=>{ buildPrint(); window.print(); },
     nextLabel:"Print",
     extraNav: el("div",{style:"display:flex; gap:10px; flex-wrap:wrap; align-items:center;"},
       el("button",{class:"btn-ghost", type:"button", onclick:()=>goTo("rosterSelect")},"Edit"),
+      el("button",{class:"btn-ghost", type:"button", disabled: state.submitting,
+        onclick: async ()=>{
+          state.submitting = true;
+          state.submitStatus = "Submitting…";
+          rerender();
+          const payload = {
+            family: state.family,
+            referral: state.referral,
+            members: state.members,
+            submittedAt: new Date().toISOString()
+          };
+          const outcome = await submitIntake(payload);
+          state.submitting = false;
+          state.submitStatus = outcome.success
+            ? "Submitted (backup id: " + outcome.result.submissionId + "). Still print for the CRM data-entry copy."
+            : "Submission failed — this is only a backup copy, so continue with Print as usual.";
+          rerender();
+        }},
+        state.submitting ? "Submitting…" : "Submit (backup copy)"),
       el("button",{class:"btn-ghost", type:"button",
         onclick:()=>{
           let m1 = "Erase EVERYTHING and start a brand new intake?\n\nThis cannot be undone. Make sure you have printed first.";
@@ -3274,6 +3348,11 @@ function needsFor(m){
   return out;
 }
 
+function formatPhonePrint(phone){
+  const d = digitsOf(phone);
+  return d.length===10 ? (d.slice(0,3)+"-"+d.slice(3,6)+"-"+d.slice(6)) : phone;
+}
+
 function buildPrint(){
   PS_TR = false;                   /* print is ALWAYS English for CRM entry */
   const f = state.family, ad = f.address;
@@ -3284,7 +3363,8 @@ function buildPrint(){
   h += '<div class="p-section"><h3>FAMILY — Family Information</h3>'+
     pLine("Family Last Name", f.lastName) +
     pLine("Household Type", f.householdType) +
-    pFree("Main Phone", f.phone) +
+    pFree("Main Phone", formatPhonePrint(f.phone)) +
+    pFree("Email", f.email) +
     pLine("Your family is", f.living) +
     pLine("What is your total household income?", f.income) +
     pFree("Address 1: Street 1", ad.street) +
@@ -3323,6 +3403,9 @@ function buildPrint(){
         screeningHeaderDone = true;
       }
       h += '<div class="p-section"><h3>'+esc(s.title)+'</h3>'+s.inner+'</div>';
+      if(m.isSelf && s.title==="Family Member Info — Demographics"){
+        h += '<div class="p-section p-primary">Primary Contact: Yes - Select in CRM</div>';
+      }
     }
     h += '</div>';
   }
@@ -3352,7 +3435,18 @@ function buildPrint(){
   let roiHtml = "";
   for(const m of state.members){
     if(!(m.services && m.done)) continue;
-    roiHtml += '<div class="p-roi-line">\u2610 '+esc(fullName(m)||"(no name)")+' - CFFS/JRI</div>';
+    const name = esc(fullName(m)||"(no name)");
+    const a = m.a||{};
+    roiHtml += '<div class="p-roi-line">\u2610 '+name+' - CFFS/JRI</div>';
+    for(const ag of RELEASE_AGENCIES){
+      if((a.agencies||[]).includes(ag)){
+        roiHtml += '<div class="p-roi-line">\u2610 '+name+' - '+esc(ag.split(" ")[0])+'</div>';
+      }
+    }
+    for(const c of (a.community||[])){
+      if(c && c.trim()) roiHtml += '<div class="p-roi-line">\u2610 '+name+' - '+esc(c.trim())+'</div>';
+    }
+    if(isChild(m)) roiHtml += '<div class="p-roi-line">\u2610 '+name+' - School release</div>';
   }
   h += '<div class="p-roi"><h3>RELEASES OF INFORMATION NEEDED</h3>'+
     (roiHtml || '<div class="p-roi-line">(no completed intakes)</div>')+'</div>';
