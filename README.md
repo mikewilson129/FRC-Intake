@@ -86,6 +86,44 @@ Since everything is one file, a few conventions keep it maintainable:
 
 ## Changelog
 
+### Version 11
+
+- **Persistent floating Notes box** — a small "Notes" button, fixed to the
+  bottom-right corner and visible on every screen, expands into a plain-text
+  textarea (no formatting, no character limit, placeholder "Optional — use
+  this space for any additional information"). Collapsed by default on
+  every fresh load; once expanded it stays open across screen navigation
+  until manually closed. Content is a single running note for the whole
+  intake (not per-person, not reset between screens) and is built once
+  outside the normal per-screen render cycle so it isn't recreated on
+  navigation. Included in the printed output as a labeled "NOTES" section
+  near the end when non-empty. Same behavior for everyone (staff or
+  client) — not gated by role. Label/placeholder are translated
+  (Spanish/Portuguese/Haitian Creole).
+- **Fixed: "Continue intake" broke Back navigation.** Resuming an
+  in-progress intake from the family list jumped straight to the saved
+  step, but Back would then skip past all of that person's earlier
+  sections straight to the family list, because Back relied on the
+  browser-style history stack, which only contained the one step actually
+  visited. Back on an intake screen now computes the actual previous step
+  directly (skipping any auto-skipped steps) instead of depending on how
+  the screen was reached, so it works the same whether you arrived via
+  normal sequential navigation, "Continue intake", "Edit info", or Review's
+  per-section "Edit."
+- **Fixed: "Edit info" always exited to the family list.** Editing a
+  household member's basic info (name/DOB/etc.) while their intake was
+  still in progress and hitting Save always returned to the family list,
+  even though the intake itself wasn't finished. Save now resumes the
+  person's intake at whatever step they'd reached, matching "Continue
+  intake." (Editing basics from the completed-intake Review screen still
+  correctly returns to Review, unchanged.)
+- **Fixed: Review's per-section Edit screen had three redundant buttons.**
+  Editing a section from the Review & Edit screen showed "Back," "Back to
+  review," and "Done editing" — all three returned to Review. "Back to
+  review" is now removed entirely; Back navigates to the actual previous
+  section (using the same fix as above), and "Done editing" is the only
+  button that returns to Review.
+
 ### Version 10
 
 - **S3 print/CRM summary reorder** — the printed safety section now lists

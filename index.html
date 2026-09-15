@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 10 — see README.md changelog for what changed in this version -->
+<!-- Version 11 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2199,7 +2199,7 @@ function shell(o){
   for(const b of o.body||[]) if(b) card.appendChild(b);
   const nav = el("div",{class:"nav"});
   nav.appendChild(o.noBack ? el("span") :
-    el("button",{class:"btn-ghost", type:"button", onclick:back},"‹ Back"));
+    el("button",{class:"btn-ghost", type:"button", onclick:o.onBack||back},"‹ Back"));
   const right = el("div",{style:"display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;"});
   if(o.extraNav) right.appendChild(o.extraNav);
   if(o.next){
@@ -2386,6 +2386,8 @@ SCREENS.basics = (ctx) => {
         current.ctx = {mid:m.id, first:ctx.first, returnTo:ctx.returnTo};
       }
       if(state.phase==="build") goTo("anyoneElse");
+      else if(!ctx.draft && m.services && !m.done && (ctx.returnTo||"rosterSelect")==="rosterSelect")
+        goTo("intake",{mid:m.id, step:m.step||0});
       else goTo(ctx.returnTo || "rosterSelect");
     },
     nextLabel:"Save"
@@ -2518,6 +2520,19 @@ SCREENS.rosterSelect = (ctx) => {
 };
 
 /* ---- Intake step engine (supports edit ranges) ---- */
+/* Previous non-auto-skipped step index, or -1 if there is none (i.e. this
+   is the first real step). Used so Back works the same regardless of how
+   this screen was reached (sequential flow, "Continue intake", or an
+   editing "Edit" from Review) instead of depending on the history stack,
+   which only reflects steps actually visited this navigation. */
+function prevStepIndex(steps, m, i){
+  let j = i-1;
+  while(j>=0){
+    if(steps[j](m).autoSkip){ j--; continue; }
+    return j;
+  }
+  return -1;
+}
 SCREENS.intake = (ctx) => {
   const m = state.members.find(x=>x.id===ctx.mid);
   const steps = isChild(m) ? childSteps(m) : adultSteps(m);
@@ -2532,6 +2547,20 @@ SCREENS.intake = (ctx) => {
     comfort: s.comfort,
     body: s.body,
     canNext: s.canNext!==false,
+    onBack: ()=>{
+      const j = prevStepIndex(steps, m, i);
+      if(j<0) back();
+      else {
+        /* Mutate the current history entry in place rather than pushing a
+           new one — Back should retrace steps, not grow the stack, so that
+           eventually stepping back past the first step still lands on
+           whatever screen originally led into this intake (review,
+           rosterSelect, etc.) instead of on an intake step we visited
+           while going backward. */
+        current.ctx = editing ? {mid:m.id, step:j, editEnd:ctx.editEnd} : {mid:m.id, step:j};
+        render(false);
+      }
+    },
     next: ()=>{
       let j = i+1;
       while(j<steps.length){
@@ -2550,8 +2579,7 @@ SCREENS.intake = (ctx) => {
     },
     nextLabel: editing ? (last ? "Done editing" : "Continue") :
       (last ? "Finish this intake" : "Continue"),
-    extraNav: editing ?
-      el("button",{class:"btn-quiet", type:"button", onclick:()=>goTo("review",{mid:m.id})},"Back to review") :
+    extraNav: editing ? null :
       el("button",{class:"btn-quiet", type:"button", onclick:()=>goTo("rosterSelect")},"Family list")
   });
 };
