@@ -119,6 +119,21 @@
     .p-roi h3{font-size:14px; margin-bottom:6px;}
     .p-roi-line{margin:3px 0; font-size:12.5px;}
   }
+  /* ---------- persistent Notes widget ---------- */
+  .notes-fab{position:fixed; right:16px; bottom:16px; z-index:80; background:var(--accent); color:var(--accent-ink);
+    border:none; border-radius:999px; padding:13px 20px; font-size:15.5px; font-weight:600;
+    box-shadow:0 2px 10px rgba(0,0,0,.22); cursor:pointer;}
+  .notes-panel{position:fixed; right:16px; bottom:76px; z-index:80; width:min(340px, calc(100vw - 32px));
+    max-height:min(60vh, 420px); background:#fff; border:1.5px solid var(--line); border-radius:14px;
+    box-shadow:0 4px 18px rgba(0,0,0,.22); padding:14px; display:none; flex-direction:column;}
+  .notes-panel.open{display:flex;}
+  .notes-panel-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;
+    font-weight:650; font-size:16.5px;}
+  .notes-panel-head button{background:none; border:none; font-size:20px; line-height:1; color:var(--soft);
+    cursor:pointer; padding:2px 4px;}
+  .notes-panel textarea{flex:1; min-height:150px; width:100%; resize:vertical; font:inherit;
+    padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink);}
+  @media print{ .notes-fab, .notes-panel{ display:none !important; } }
 </style>
 </head>
 <body>
@@ -165,6 +180,7 @@ const I18N = { es: {
 "Print":"Imprimir","Yes":"Sí","No":"No","Did not answer":"No contestó",
 "Submit":"Enviar","Submitting…":"Enviando…","Submitted.":"Enviado.",
 "Submission failed — please try again or download/print a copy to send to the FRC.":"Error al enviar — intente de nuevo o descargue/imprima una copia para enviar al FRC.",
+"Notes":"Notas","Optional — use this space for any additional information":"Opcional — use este espacio para cualquier información adicional",
 /* --- welcome --- */
 "Welcome":"Bienvenido/a",
 "This will walk you through our intake, one small step at a time.":"Este formulario le guiará por nuestra admisión, paso a paso.",
@@ -664,6 +680,7 @@ pt: {
 "Print":"Imprimir","Yes":"Sim","No":"Não","Did not answer":"Não respondeu",
 "Submit":"Enviar","Submitting…":"Enviando…","Submitted.":"Enviado.",
 "Submission failed — please try again or download/print a copy to send to the FRC.":"Envio falhou — tente novamente ou baixe/imprima uma cópia para enviar ao FRC.",
+"Notes":"Notas","Optional — use this space for any additional information":"Opcional — use este espaço para qualquer informação adicional",
 "Next steps":"Próximos passos",
 /* --- welcome --- */
 "Welcome":"Bem-vindo(a)",
@@ -1161,6 +1178,7 @@ ht: {
 "Print":"Enprime","Yes":"Wi","No":"Non","Did not answer":"Pa reponn",
 "Submit":"Soumèt","Submitting…":"N ap soumèt…","Submitted.":"Soumèt.",
 "Submission failed — please try again or download/print a copy to send to the FRC.":"Soumisyon echwe — eseye ankò oswa telechaje/enprime yon kopi pou voye bay FRC a.",
+"Notes":"Nòt","Optional — use this space for any additional information":"Opsyonèl — itilize espas sa a pou nenpòt enfòmasyon adisyonèl",
 "Next steps":"Pwochen etap yo",
 /* --- welcome --- */
 "Welcome":"Byenveni",
@@ -1981,6 +1999,7 @@ const state = {
   showStaffPanel:false,
   submitting:false,
   submitStatus:null,
+  notesText:"",    /* single running note, shown via the persistent floating Notes panel */
   family:{lastName:"", phone:"", email:"", householdType:null, living:null, income:null,
     address:{street:"", street2:"", apt:"", city:"", cityAuto:false, state:"Massachusetts", zip:""}},
   referral:{category:null, value:null},
@@ -2147,6 +2166,7 @@ function back(){ if(history.length>1){ history.pop(); current = history[history.
 function rerender(){ render(true); }   /* preserve scroll on in-place updates */
 function render(preserveScroll){
   const x = window.scrollX, y = window.scrollY;
+  syncNotesI18n();
   app.innerHTML = "";
   /* Language options: [code, native self-label, beta?]. Add new languages here only. */
   const LANG_OPTIONS = [
@@ -3492,9 +3512,38 @@ function buildPrint(){
   h += '<div class="p-roi"><h3>RELEASES OF INFORMATION NEEDED</h3>'+
     (roiHtml || '<div class="p-roi-line">(no completed intakes)</div>')+'</div>';
 
+  if((state.notesText||"").trim()){
+    h += '<div class="p-section"><h3>NOTES</h3><div class="p-line">'+
+      esc(state.notesText).replace(/\n/g,'<br>')+'</div></div>';
+  }
+
   document.getElementById("printRoot").innerHTML = h;
   return h;
 }
+
+/* ============ NOTES WIDGET (persistent floating note, all screens) ============
+   Built once, outside the #app render cycle, so it survives every screen
+   navigation untouched. State lives in state.notesText; open/closed state
+   is plain DOM (not reset by navigation) and starts collapsed. */
+const notesTextarea = el("textarea",{id:"notesTextarea"});
+notesTextarea.value = state.notesText;
+notesTextarea.addEventListener("input", ()=>{ state.notesText = notesTextarea.value; });
+const notesFab = el("button",{class:"notes-fab", type:"button",
+  onclick:()=>{ notesPanel.classList.add("open"); notesFab.style.display="none"; notesTextarea.focus(); }});
+const notesHeadLabel = el("span");
+const notesCloseBtn = el("button",{type:"button", "aria-label":"Close",
+  onclick:()=>{ notesPanel.classList.remove("open"); notesFab.style.display=""; }}, "✕");
+const notesPanel = el("div",{class:"notes-panel"},
+  el("div",{class:"notes-panel-head"}, notesHeadLabel, notesCloseBtn),
+  notesTextarea);
+document.body.appendChild(notesFab);
+document.body.appendChild(notesPanel);
+function syncNotesI18n(){
+  notesFab.textContent = tr("Notes");
+  notesHeadLabel.textContent = tr("Notes");
+  notesTextarea.placeholder = tr("Optional — use this space for any additional information");
+}
+syncNotesI18n();
 
 /* ============ INIT ============ */
 goTo("welcome");
