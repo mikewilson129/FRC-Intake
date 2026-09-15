@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Version 10 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -112,7 +113,7 @@
     .p-needs li{margin:2px 0;}
     .p-needs li::before{content:"\2610  ";}
     .p-needs li.b{font-weight:700;}
-    .p-needs .cra-flag{font-weight:700; font-size:12.5px; margin:2px 0 4px;}
+    .p-needs .cra-flag{font-weight:700; font-size:12.5px; margin:2px 0 4px; padding-left:8px;}
     .p-mfb{border:2px dashed #000; padding:6px 9px; margin-top:8px; font-size:12.5px; color:#000;}
     .p-roi{border:2px solid #000; border-radius:6px; padding:10px 12px; margin-top:10px; font-weight:700; page-break-inside:avoid;}
     .p-roi h3{font-size:14px; margin-bottom:6px;}
@@ -2829,6 +2830,14 @@ function parentReasonPicks(){
   const self = state.members.find(x=>x.isSelf);
   return (self && self.a && self.a.reasonPicks) ? self.a.reasonPicks : [];
 }
+function parentWantsFood(){
+  const self = state.members.find(x=>x.isSelf);
+  return !!(self && self.a && self.a.s4food==="Yes");
+}
+function parentWantsClothing(){
+  const self = state.members.find(x=>x.isSelf);
+  return !!(self && self.a && self.a.s4clothing==="Yes");
+}
 function notSchoolAged(a){ return a.eduStatus==="Not school aged"; }
 function childSteps(m){
   const a = m.a;
@@ -2954,8 +2963,10 @@ function childSteps(m){
       ynd(()=>a.doctor12, v=>a.doctor12=v),
       qLabel(trn("Has {n} seen a dentist in the last 12 months?", kid())),
       ynd(()=>a.dentist12, v=>a.dentist12=v),
-      qLabel(trn("Do you have any concerns about alcohol or drug use for {n}?", kid())),
-      ynd(()=>a.substance, v=>a.substance=v),
+      ...((age()!==null && age()<11) ? [] : [
+        qLabel(trn("Do you have any concerns about alcohol or drug use for {n}?", kid())),
+        ynd(()=>a.substance, v=>a.substance=v)
+      ]),
       qLabel(trn("Has {n} ever used mobile crisis teams?", kid()),"The team that comes out when someone is having a mental health crisis."),
       ynd(()=>a.mobileCrisis, v=>a.mobileCrisis=v),
       qLabel(trn("Has {n} ever been hospitalized for mental health reasons?", kid())),
@@ -2964,7 +2975,16 @@ function childSteps(m){
       ynd(()=>a.rules, v=>a.rules=v)
     ], canNext:true }),
   /* 9: safety gate */
-  (m)=>({ title:trn("A few questions for {n}", kid()),
+  (m)=>{
+    const ag = age();
+    if(ag!==null && ag<11){
+      a.childPresent="No"; a.childPresentAuto=true;
+      a.safeHome="Did not answer"; a.safeSchool="Did not answer"; a.safeStreets="Did not answer";
+      a.witnessed="Did not answer"; a.exploited="Did not answer"; a.gang="Did not answer";
+      return {autoSkip:true, title:"", body:[]};
+    }
+    a.childPresentAuto=false;
+    return { title:trn("A few questions for {n}", kid()),
     comfort:"It's okay if they're not here or would rather not.",
     body:[
       qLabel(trn("Is {n} present and able to answer a few questions directly?", kid())),
@@ -2976,7 +2996,7 @@ function childSteps(m){
           if(a.safeStreets==="Did not answer")a.safeStreets=null; if(a.witnessed==="Did not answer")a.witnessed=null;
           if(a.exploited==="Did not answer")a.exploited=null; if(a.gang==="Did not answer")a.gang=null; }
       }, {toggle:false})
-    ], canNext: !!a.childPresent }),
+    ], canNext: !!a.childPresent };},
   /* 10: child-answered safety */
   (m)=>{
     if(a.childPresent!=="Yes") return {autoSkip:true, title:"", body:[]};
@@ -2997,7 +3017,7 @@ function childSteps(m){
   (m)=>({ title:trn("Court & safety history for {n}", kid()),
     comfort:comfort("Answer however you're comfortable."),
     body:[
-      qLabel(trn("Is {n} involved in court?", kid())),
+      qLabel(trn("Is {n} involved in court?", kid()), "For Care and Protection, CRA, criminal charges, etc."),
       ynd(()=>a.court, v=>a.court=v),
       (a.court==="Yes" ? el("div",null, qLabel("Which court?"), qText(a,"courtWhich",{ph:"e.g., Essex Juvenile Salem"})) : null),
       qLabel(trn("Has {n} ever been detained by the police or arrested?", kid())),
@@ -3015,8 +3035,8 @@ function childSteps(m){
   /* 12: S4 living + needs */
   (m)=>{
     const picks = new Set([...(a.reasonPicks||[]), ...parentReasonPicks()]);
-    const foodAuto = picks.has("Food resources");
-    const clothAuto = picks.has("Clothing resources");
+    const foodAuto = picks.has("Food resources") || parentWantsFood();
+    const clothAuto = picks.has("Clothing resources") || parentWantsClothing();
     if(foodAuto) a.s4food="Yes";
     if(clothAuto) a.s4clothing="Yes";
     return { title:trn("Where {n} lives", kid()),
@@ -3188,18 +3208,19 @@ function personSections(m){
       s2 += pFree("Conditions", c.length?c.join("; "):"(none listed)"); }
     s2 += pLine("Seen a doctor or nurse practitioner in the last 12 months?", a.doctor12) +
       pLine("Seen a dentist in the last 12 months?", a.dentist12) +
-      pLine("Concerns about alcohol or drug use for this child/youth?", a.substance) +
+      (ag!==null && ag<11
+        ? '<div class="p-staff">Alcohol/drug question skipped (under 11).</div>'
+        : pLine("Concerns about alcohol or drug use for this child/youth?", a.substance)) +
       pLine("Has this child ever used mobile crisis teams?", a.mobileCrisis) +
       pLine("Ever been hospitalized for mental health reasons?", a.hospMH) +
       pLine("Difficulty following rules?", a.rules);
     S.push({title:"S2 — Physical and Mental Health", range:[7,8], inner:s2});
     let s3 = pLine("Child present to answer directly?", a.childPresent) +
+      (a.childPresentAuto ? '<div class="p-staff">Auto-set to No (under 11).</div>' : '') +
       pLine("This child/youth feels safe in his/her home", a.safeHome) +
       pLine("This child/youth feels safe in his/her school", a.safeSchool) +
       pLine("This child/youth feels safe on the streets in his/her neighborhood", a.safeStreets) +
       pLine("Has this child/youth witnessed violence?", a.witnessed) +
-      pLine("Exploited (has been or is being)?", a.exploited) +
-      pLine("Involved with a gang?", a.gang) +
       pLine("Is this child/youth involved in court", a.court);
     if(a.court==="Yes") s3 += pFree("Which court? (also enter in S5)", a.courtWhich);
     s3 += pLine("Ever been detained by the police or arrested?", a.detained);
@@ -3207,6 +3228,8 @@ function personSections(m){
     s3 += pLine("Ever run away?", a.ranAway);
     if(a.ranAway==="Yes") s3 += pFree("How many times?", a.ranTimes) +
       pFree("When was the last time?", a.ranWhen) + pFree("For how long?", a.ranHowLong);
+    s3 += pLine("Exploited (has been or is being)?", a.exploited) +
+      pLine("Involved with a gang?", a.gang);
     S.push({title:"S3 — Safety", range:[9,11], inner:s3});
     let s4 = pLine("Is this child/youth currently living with their family?", a.livingWithFamily);
     if(a.livingWithFamily==="No"){
@@ -3279,31 +3302,32 @@ SCREENS.finish = () => {
       state.submitStatus ? el("div",{class:"notice"}, state.submitStatus) : null,
     ],
     noBack:true,
-    next:()=>{ buildPrint(); window.print(); },
-    nextLabel:"Print",
+    next: async ()=>{
+      state.submitting = true;
+      state.submitStatus = "Submitting…";
+      rerender();
+      const printHtml = buildPrint();
+      const payload = {
+        family: state.family,
+        referral: state.referral,
+        members: state.members,
+        submittedAt: new Date().toISOString(),
+        printHtml: printHtml
+      };
+      const outcome = await submitIntake(payload);
+      state.submitting = false;
+      state.submitStatus = outcome.success
+        ? "Submitted."
+        : "Submission failed — please try again or download/print a copy to send to the FRC.";
+      rerender();
+    },
+    nextLabel: state.submitting ? "Submitting…" : "Submit",
+    canNext: !state.submitting,
     extraNav: el("div",{style:"display:flex; gap:10px; flex-wrap:wrap; align-items:center;"},
       el("button",{class:"btn-ghost", type:"button", onclick:()=>goTo("rosterSelect")},"Edit"),
-      el("button",{class:"btn-primary", type:"button", disabled: state.submitting,
-        onclick: async ()=>{
-          state.submitting = true;
-          state.submitStatus = "Submitting…";
-          rerender();
-          const printHtml = buildPrint();
-          const payload = {
-            family: state.family,
-            referral: state.referral,
-            members: state.members,
-            submittedAt: new Date().toISOString(),
-            printHtml: printHtml
-          };
-          const outcome = await submitIntake(payload);
-          state.submitting = false;
-          state.submitStatus = outcome.success
-            ? "Submitted (backup id: " + outcome.result.submissionId + "). Still print for the CRM data-entry copy."
-            : "Submission failed — this is only a backup copy, so continue with Print as usual.";
-          rerender();
-        }},
-        state.submitting ? "Submitting…" : "Submit (backup copy)"),
+      el("button",{class:"btn-ghost", type:"button",
+        onclick:()=>{ buildPrint(); window.print(); }},
+        "Print"),
       el("button",{class:"btn-ghost", type:"button",
         onclick:()=>{
           let m1 = "Erase EVERYTHING and start a brand new intake?\n\nThis cannot be undone. Make sure you have printed first.";

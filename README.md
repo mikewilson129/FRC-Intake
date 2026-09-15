@@ -45,6 +45,10 @@ required for the core flow — everything lives in one file.
   the comment directly above `submitIntake()`. Print-and-shred remains the
   fallback path if remote submission fails or is unavailable, and staff
   should treat remote submission as best-effort only.
+- As of Version 10, **Submit is the primary button** on the finish screen
+  (Print is now the secondary, plain-text action next to it). This is a
+  UI change only — Print is still required for CRM data entry, and the
+  underlying submission is still non-BAA/proof-of-concept as noted above.
 - `SUBMIT_TOKEN` is a plain static token embedded in client-side code. It
   should be rotated whenever it may have leaked (e.g. after sharing the file,
   a public commit, or a compromised tablet), and should not be treated as a
@@ -79,6 +83,48 @@ Since everything is one file, a few conventions keep it maintainable:
 5. Since there's no build step, test changes by opening `index.html` directly
    in a browser and clicking through the flow (including Print preview) in
    at least English and one other language before committing.
+
+## Changelog
+
+### Version 10
+
+- **S3 print/CRM summary reorder** — the printed safety section now lists
+  Violence, Court, Detained, Run away, Exploited, Gang in that order. This
+  is a print-output change only; the on-screen question flow and gating
+  (e.g. Violence/Exploited/Gang only shown if the child is present to
+  self-report) are unchanged.
+- **CRA flag indent fix** — the "IDENTIFIED AS CRA — PRESENT TO CLINICIAN"
+  line in the printed Needs & Follow-ups box now aligns with the other
+  checkbox items instead of sitting flush left.
+- **Food/clothing needs now pull through from the parent's direct answer
+  too** — previously a child's intake only auto-filled "Yes" for food/
+  clothing help if the parent picked "Food resources"/"Clothing resources"
+  in their reason-for-visit. Now it also picks up the parent's answer to
+  the separate direct yes/no question later in their intake.
+- **Under-11 child intake shortcuts** — for children age 10 and younger,
+  the "is the child present to answer directly" question is skipped and
+  automatically set to No, and the "concerns about alcohol or drug use"
+  question is skipped entirely. Ages 11+ are unaffected.
+- **Court question info blurb (children only)** — the child's "involved in
+  court?" question now includes the hint "For Care and Protection, CRA,
+  criminal charges, etc." Not added to the adult version.
+- **Finish screen changes**:
+  - Removed "(backup copy)" wording from the Submit button and status
+    messages.
+  - Success message simplified to "Submitted." (no longer includes the
+    backup submission id).
+  - Failure message changed to "Submission failed — please try again or
+    download/print a copy to send to the FRC."
+  - Submit and Print swapped positions: Submit is now the primary
+    (bold/colored) button in the main action position; Print is now a
+    plain text-link style button, matching "Start over (erase all)".
+
+### Cloudflare Worker (`frc-intake-poc`, separate deploy — not in this repo)
+
+- Removed the unused email-notification code path (Resend integration).
+  Submissions were never actually being emailed in practice — only stored
+  in D1 — so this just removes dead code and the now-unneeded
+  `RESEND_API_KEY` / `STAFF_EMAIL_TO` / `STAFF_EMAIL_FROM` secrets.
 
 ## Repo layout
 
