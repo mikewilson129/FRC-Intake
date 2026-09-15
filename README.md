@@ -103,13 +103,15 @@ Since everything is one file, a few conventions keep it maintainable:
 - **Fixed: "Continue intake" broke Back navigation.** Resuming an
   in-progress intake from the family list jumped straight to the saved
   step, but Back would then skip past all of that person's earlier
-  sections straight to the family list, because Back relied on the
-  browser-style history stack, which only contained the one step actually
-  visited. Back on an intake screen now computes the actual previous step
-  directly (skipping any auto-skipped steps) instead of depending on how
-  the screen was reached, so it works the same whether you arrived via
-  normal sequential navigation, "Continue intake", "Edit info", or Review's
-  per-section "Edit."
+  sections straight to the family list, because Back relies on the
+  navigation history stack, which only contained the one step actually
+  visited. Entry points that jump into the middle of an intake ("Continue
+  intake" resuming a saved step, "Edit info" resuming, and Review's
+  per-section "Edit") now seed the history stack with an entry for every
+  earlier non-auto-skipped step via a new `enterIntakeAt()` helper, the
+  same as if the user had actually clicked through them — so the ordinary
+  Back button (unchanged) naturally lands on the right previous step no
+  matter how the screen was reached.
 - **Fixed: "Edit info" always exited to the family list.** Editing a
   household member's basic info (name/DOB/etc.) while their intake was
   still in progress and hitting Save always returned to the family list,
