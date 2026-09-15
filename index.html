@@ -163,6 +163,8 @@ const I18N = { es: {
 "Category:":"Categoría:","Edit":"Editar","Edit info":"Editar información","Review & edit":"Revisar y editar",
 "Start intake":"Comenzar admisión","Continue intake":"Continuar admisión","Looks good":"Todo está bien",
 "Print":"Imprimir","Yes":"Sí","No":"No","Did not answer":"No contestó",
+"Submit":"Enviar","Submitting…":"Enviando…","Submitted.":"Enviado.",
+"Submission failed — please try again or download/print a copy to send to the FRC.":"Error al enviar — intente de nuevo o descargue/imprima una copia para enviar al FRC.",
 /* --- welcome --- */
 "Welcome":"Bienvenido/a",
 "This will walk you through our intake, one small step at a time.":"Este formulario le guiará por nuestra admisión, paso a paso.",
@@ -514,6 +516,7 @@ const I18N = { es: {
 "This is kept confidential — we're only asking so we can offer the right support.":"Esto se mantiene confidencial — solo preguntamos para poder ofrecer el apoyo adecuado.",
 "Court & safety history for {n}":"Historial de corte y seguridad de {n}",
 "Is {n} involved in court?":"¿Tiene {n} un caso abierto en la corte?",
+"For Care and Protection, CRA, criminal charges, etc.":"Por ejemplo, casos de Care and Protection (Cuidado y Protección), CRA, cargos penales, etc.",
 "e.g., Essex Juvenile Salem":"p. ej., Corte de Menores de Essex en Salem",
 "Has {n} ever been detained by the police or arrested?":"¿Ha sido {n} alguna vez detenido/a por la policía o arrestado/a?",
 "Detained for what reason?":"¿Detenido/a por qué razón?",
@@ -659,6 +662,8 @@ pt: {
 "Category:":"Categoria:","Edit":"Editar","Edit info":"Editar informações","Review & edit":"Revisar e editar",
 "Start intake":"Começar admissão","Continue intake":"Continuar admissão","Looks good":"Está tudo certo",
 "Print":"Imprimir","Yes":"Sim","No":"Não","Did not answer":"Não respondeu",
+"Submit":"Enviar","Submitting…":"Enviando…","Submitted.":"Enviado.",
+"Submission failed — please try again or download/print a copy to send to the FRC.":"Envio falhou — tente novamente ou baixe/imprima uma cópia para enviar ao FRC.",
 "Next steps":"Próximos passos",
 /* --- welcome --- */
 "Welcome":"Bem-vindo(a)",
@@ -1011,6 +1016,7 @@ pt: {
 "This is kept confidential — we're only asking so we can offer the right support.":"Isto é mantido em sigilo — só perguntamos para poder oferecer o apoio certo.",
 "Court & safety history for {n}":"Histórico de tribunal e segurança de {n}",
 "Is {n} involved in court?":"{n} tem um processo aberto no tribunal?",
+"For Care and Protection, CRA, criminal charges, etc.":"Por exemplo, casos de Care and Protection (Cuidado e Proteção), CRA, acusações criminais, etc.",
 "e.g., Essex Juvenile Salem":"p. ex., Tribunal de Menores de Essex em Salem",
 "Has {n} ever been detained by the police or arrested?":"{n} já foi detido(a) pela polícia ou preso(a)?",
 "Detained for what reason?":"Detido(a) por qual motivo?",
@@ -1153,6 +1159,8 @@ ht: {
 "Category:":"Kategori:","Edit":"Modifye","Edit info":"Modifye enfòmasyon","Review & edit":"Revize epi modifye",
 "Start intake":"Kòmanse admisyon","Continue intake":"Kontinye admisyon","Looks good":"Tout bagay anfòm",
 "Print":"Enprime","Yes":"Wi","No":"Non","Did not answer":"Pa reponn",
+"Submit":"Soumèt","Submitting…":"N ap soumèt…","Submitted.":"Soumèt.",
+"Submission failed — please try again or download/print a copy to send to the FRC.":"Soumisyon echwe — eseye ankò oswa telechaje/enprime yon kopi pou voye bay FRC a.",
 "Next steps":"Pwochen etap yo",
 /* --- welcome --- */
 "Welcome":"Byenveni",
@@ -1505,6 +1513,7 @@ ht: {
 "This is kept confidential — we're only asking so we can offer the right support.":"Sa rete konfidansyèl — nou mande sèlman pou nou ka ofri bon sipò a.",
 "Court & safety history for {n}":"Istwa tribinal ak sekirite pou {n}",
 "Is {n} involved in court?":"Èske {n} gen yon ka nan tribinal la?",
+"For Care and Protection, CRA, criminal charges, etc.":"Pa egzanp, ka Care and Protection (Swen ak Pwoteksyon), CRA, chaj kriminèl, elatriye.",
 "e.g., Essex Juvenile Salem":"pa egzanp, Tribinal Jivenil Essex nan Salem",
 "Has {n} ever been detained by the police or arrested?":"Èske lapolis te janm arete {n}?",
 "Detained for what reason?":"Arete pou ki rezon?",
@@ -3104,7 +3113,7 @@ function ethOut(a){
 }
 
 /* returns [{title, inner, range:[start,end] | "basics"}] */
-function personSections(m){
+function personSections(m, printOrder){
   const child = isChild(m), a = m.a||{};
   const S = [];
   let fmi = pLine("Full name", fullName(m)) +
@@ -3219,17 +3228,24 @@ function personSections(m){
       (a.childPresentAuto ? '<div class="p-staff">Auto-set to No (under 11).</div>' : '') +
       pLine("This child/youth feels safe in his/her home", a.safeHome) +
       pLine("This child/youth feels safe in his/her school", a.safeSchool) +
-      pLine("This child/youth feels safe on the streets in his/her neighborhood", a.safeStreets) +
-      pLine("Has this child/youth witnessed violence?", a.witnessed) +
-      pLine("Is this child/youth involved in court", a.court);
-    if(a.court==="Yes") s3 += pFree("Which court? (also enter in S5)", a.courtWhich);
-    s3 += pLine("Ever been detained by the police or arrested?", a.detained);
-    if(a.detained==="Yes") s3 += pLine("Detained for what reason?", a.detainedReason);
-    s3 += pLine("Ever run away?", a.ranAway);
-    if(a.ranAway==="Yes") s3 += pFree("How many times?", a.ranTimes) +
+      pLine("This child/youth feels safe on the streets in his/her neighborhood", a.safeStreets);
+    /* Violence/Court/Detained/Ran away/Exploited/Gang: on-screen order stays as-is
+       (Violence, Exploited, Gang, then Court/Detained/Ran away). Print output uses
+       a different order (Violence, Court, Detained, Ran away, Exploited, Gang) per
+       staff request — see personSections(m, printOrder). */
+    const violenceLine = pLine("Has this child/youth witnessed violence?", a.witnessed);
+    const exploitedLine = pLine("Exploited (has been or is being)?", a.exploited);
+    const gangLine = pLine("Involved with a gang?", a.gang);
+    let courtBlock = pLine("Is this child/youth involved in court", a.court);
+    if(a.court==="Yes") courtBlock += pFree("Which court? (also enter in S5)", a.courtWhich);
+    let detainedBlock = pLine("Ever been detained by the police or arrested?", a.detained);
+    if(a.detained==="Yes") detainedBlock += pLine("Detained for what reason?", a.detainedReason);
+    let ranAwayBlock = pLine("Ever run away?", a.ranAway);
+    if(a.ranAway==="Yes") ranAwayBlock += pFree("How many times?", a.ranTimes) +
       pFree("When was the last time?", a.ranWhen) + pFree("For how long?", a.ranHowLong);
-    s3 += pLine("Exploited (has been or is being)?", a.exploited) +
-      pLine("Involved with a gang?", a.gang);
+    s3 += printOrder
+      ? (violenceLine + courtBlock + detainedBlock + ranAwayBlock + exploitedLine + gangLine)
+      : (violenceLine + exploitedLine + gangLine + courtBlock + detainedBlock + ranAwayBlock);
     S.push({title:"S3 — Safety", range:[9,11], inner:s3});
     let s4 = pLine("Is this child/youth currently living with their family?", a.livingWithFamily);
     if(a.livingWithFamily==="No"){
@@ -3417,7 +3433,7 @@ function buildPrint(){
     const child = isChild(m);
     h += '<div class="p-person">';
     h += '<div class="p-title">'+esc(fullName(m)||"(no name)")+(m.isSelf?" (completed own intake)":"")+(child?" — CHILD":" — ADULT")+'</div>';
-    const secs = personSections(m);
+    const secs = personSections(m, true);
     let screeningHeaderDone = false;
     for(const s of secs){
       /* insert screening header before S1 */
