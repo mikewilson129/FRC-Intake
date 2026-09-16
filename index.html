@@ -2452,12 +2452,12 @@ function rosterList(withActions, suggestId){
    relying on whatever happens to already be on the history stack. */
 function enterIntakeAt(m, targetIdx, editEnd){
   const steps = isChild(m) ? childSteps(m) : adultSteps(m);
+  const mkCtx = (idx)=> editEnd!==undefined ? {mid:m.id, step:idx, editEnd:editEnd} : {mid:m.id, step:idx};
   for(let idx=0; idx<targetIdx; idx++){
     if(steps[idx](m).autoSkip) continue;
-    const ctx = editEnd!==undefined ? {mid:m.id, step:idx, editEnd:editEnd} : {mid:m.id, step:idx};
-    history.push({id:"intake", ctx:ctx});
+    history.push({id:"intake", ctx:mkCtx(idx)});
   }
-  goTo("intake", editEnd!==undefined ? {mid:m.id, step:targetIdx, editEnd:editEnd} : {mid:m.id, step:targetIdx});
+  goTo("intake", mkCtx(targetIdx));
 }
 function startIntake(m){
   const anyDone = state.members.some(x=>x.done);
