@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 10 — see README.md changelog for what changed in this version -->
+<!-- Version 11 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -119,6 +119,21 @@
     .p-roi h3{font-size:14px; margin-bottom:6px;}
     .p-roi-line{margin:3px 0; font-size:12.5px;}
   }
+  /* ---------- persistent Notes widget ---------- */
+  .notes-fab{position:fixed; right:16px; bottom:16px; z-index:80; background:var(--accent); color:var(--accent-ink);
+    border:none; border-radius:999px; padding:13px 20px; font-size:15.5px; font-weight:600;
+    box-shadow:0 2px 10px rgba(0,0,0,.22); cursor:pointer;}
+  .notes-panel{position:fixed; right:16px; bottom:76px; z-index:80; width:min(340px, calc(100vw - 32px));
+    max-height:min(60vh, 420px); background:#fff; border:1.5px solid var(--line); border-radius:14px;
+    box-shadow:0 4px 18px rgba(0,0,0,.22); padding:14px; display:none; flex-direction:column;}
+  .notes-panel.open{display:flex;}
+  .notes-panel-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;
+    font-weight:650; font-size:16.5px;}
+  .notes-panel-head button{background:none; border:none; font-size:20px; line-height:1; color:var(--soft);
+    cursor:pointer; padding:2px 4px;}
+  .notes-panel textarea{flex:1; min-height:150px; width:100%; resize:vertical; font:inherit;
+    padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink);}
+  @media print{ .notes-fab, .notes-panel{ display:none !important; } }
 </style>
 </head>
 <body>
@@ -163,6 +178,9 @@ const I18N = { es: {
 "Category:":"Categoría:","Edit":"Editar","Edit info":"Editar información","Review & edit":"Revisar y editar",
 "Start intake":"Comenzar admisión","Continue intake":"Continuar admisión","Looks good":"Todo está bien",
 "Print":"Imprimir","Yes":"Sí","No":"No","Did not answer":"No contestó",
+"Submit":"Enviar","Submitting…":"Enviando…","Submitted.":"Enviado.",
+"Submission failed — please try again or download/print a copy to send to the FRC.":"Error al enviar — intente de nuevo o descargue/imprima una copia para enviar al FRC.",
+"Notes":"Notas","Optional — use this space for any additional information":"Opcional — use este espacio para cualquier información adicional",
 /* --- welcome --- */
 "Welcome":"Bienvenido/a",
 "This will walk you through our intake, one small step at a time.":"Este formulario le guiará por nuestra admisión, paso a paso.",
@@ -514,6 +532,7 @@ const I18N = { es: {
 "This is kept confidential — we're only asking so we can offer the right support.":"Esto se mantiene confidencial — solo preguntamos para poder ofrecer el apoyo adecuado.",
 "Court & safety history for {n}":"Historial de corte y seguridad de {n}",
 "Is {n} involved in court?":"¿Tiene {n} un caso abierto en la corte?",
+"For Care and Protection, CRA, criminal charges, etc.":"Por ejemplo, casos de Care and Protection (Cuidado y Protección), CRA, cargos penales, etc.",
 "e.g., Essex Juvenile Salem":"p. ej., Corte de Menores de Essex en Salem",
 "Has {n} ever been detained by the police or arrested?":"¿Ha sido {n} alguna vez detenido/a por la policía o arrestado/a?",
 "Detained for what reason?":"¿Detenido/a por qué razón?",
@@ -659,6 +678,9 @@ pt: {
 "Category:":"Categoria:","Edit":"Editar","Edit info":"Editar informações","Review & edit":"Revisar e editar",
 "Start intake":"Começar admissão","Continue intake":"Continuar admissão","Looks good":"Está tudo certo",
 "Print":"Imprimir","Yes":"Sim","No":"Não","Did not answer":"Não respondeu",
+"Submit":"Enviar","Submitting…":"Enviando…","Submitted.":"Enviado.",
+"Submission failed — please try again or download/print a copy to send to the FRC.":"Envio falhou — tente novamente ou baixe/imprima uma cópia para enviar ao FRC.",
+"Notes":"Notas","Optional — use this space for any additional information":"Opcional — use este espaço para qualquer informação adicional",
 "Next steps":"Próximos passos",
 /* --- welcome --- */
 "Welcome":"Bem-vindo(a)",
@@ -1011,6 +1033,7 @@ pt: {
 "This is kept confidential — we're only asking so we can offer the right support.":"Isto é mantido em sigilo — só perguntamos para poder oferecer o apoio certo.",
 "Court & safety history for {n}":"Histórico de tribunal e segurança de {n}",
 "Is {n} involved in court?":"{n} tem um processo aberto no tribunal?",
+"For Care and Protection, CRA, criminal charges, etc.":"Por exemplo, casos de Care and Protection (Cuidado e Proteção), CRA, acusações criminais, etc.",
 "e.g., Essex Juvenile Salem":"p. ex., Tribunal de Menores de Essex em Salem",
 "Has {n} ever been detained by the police or arrested?":"{n} já foi detido(a) pela polícia ou preso(a)?",
 "Detained for what reason?":"Detido(a) por qual motivo?",
@@ -1153,6 +1176,9 @@ ht: {
 "Category:":"Kategori:","Edit":"Modifye","Edit info":"Modifye enfòmasyon","Review & edit":"Revize epi modifye",
 "Start intake":"Kòmanse admisyon","Continue intake":"Kontinye admisyon","Looks good":"Tout bagay anfòm",
 "Print":"Enprime","Yes":"Wi","No":"Non","Did not answer":"Pa reponn",
+"Submit":"Soumèt","Submitting…":"N ap soumèt…","Submitted.":"Soumèt.",
+"Submission failed — please try again or download/print a copy to send to the FRC.":"Soumisyon echwe — eseye ankò oswa telechaje/enprime yon kopi pou voye bay FRC a.",
+"Notes":"Nòt","Optional — use this space for any additional information":"Opsyonèl — itilize espas sa a pou nenpòt enfòmasyon adisyonèl",
 "Next steps":"Pwochen etap yo",
 /* --- welcome --- */
 "Welcome":"Byenveni",
@@ -1505,6 +1531,7 @@ ht: {
 "This is kept confidential — we're only asking so we can offer the right support.":"Sa rete konfidansyèl — nou mande sèlman pou nou ka ofri bon sipò a.",
 "Court & safety history for {n}":"Istwa tribinal ak sekirite pou {n}",
 "Is {n} involved in court?":"Èske {n} gen yon ka nan tribinal la?",
+"For Care and Protection, CRA, criminal charges, etc.":"Pa egzanp, ka Care and Protection (Swen ak Pwoteksyon), CRA, chaj kriminèl, elatriye.",
 "e.g., Essex Juvenile Salem":"pa egzanp, Tribinal Jivenil Essex nan Salem",
 "Has {n} ever been detained by the police or arrested?":"Èske lapolis te janm arete {n}?",
 "Detained for what reason?":"Arete pou ki rezon?",
@@ -1972,6 +1999,7 @@ const state = {
   showStaffPanel:false,
   submitting:false,
   submitStatus:null,
+  notesText:"",    /* single running note, shown via the persistent floating Notes panel */
   family:{lastName:"", phone:"", email:"", householdType:null, living:null, income:null,
     address:{street:"", street2:"", apt:"", city:"", cityAuto:false, state:"Massachusetts", zip:""}},
   referral:{category:null, value:null},
@@ -2138,6 +2166,7 @@ function back(){ if(history.length>1){ history.pop(); current = history[history.
 function rerender(){ render(true); }   /* preserve scroll on in-place updates */
 function render(preserveScroll){
   const x = window.scrollX, y = window.scrollY;
+  syncNotesI18n();
   app.innerHTML = "";
   /* Language options: [code, native self-label, beta?]. Add new languages here only. */
   const LANG_OPTIONS = [
@@ -2357,6 +2386,8 @@ SCREENS.basics = (ctx) => {
         current.ctx = {mid:m.id, first:ctx.first, returnTo:ctx.returnTo};
       }
       if(state.phase==="build") goTo("anyoneElse");
+      else if(!ctx.draft && m.services && !m.done && (ctx.returnTo||"rosterSelect")==="rosterSelect")
+        enterIntakeAt(m, m.step||0);
       else goTo(ctx.returnTo || "rosterSelect");
     },
     nextLabel:"Save"
@@ -2412,6 +2443,22 @@ function rosterList(withActions, suggestId){
   return items;
 }
 
+/* Seed history with entries for every non-auto-skipped step from 0 up to
+   (not including) targetIdx, then land on targetIdx — so Back can just
+   pop the stack normally and land on the right previous step, the same
+   way it does after real sequential forward navigation. Used by every
+   entry point that jumps straight into the middle of an intake (Continue
+   intake, Edit info resuming, Review's per-section Edit) instead of
+   relying on whatever happens to already be on the history stack. */
+function enterIntakeAt(m, targetIdx, editEnd){
+  const steps = isChild(m) ? childSteps(m) : adultSteps(m);
+  const mkCtx = (idx)=> editEnd!==undefined ? {mid:m.id, step:idx, editEnd:editEnd} : {mid:m.id, step:idx};
+  for(let idx=0; idx<targetIdx; idx++){
+    if(steps[idx](m).autoSkip) continue;
+    history.push({id:"intake", ctx:mkCtx(idx)});
+  }
+  goTo("intake", mkCtx(targetIdx));
+}
 function startIntake(m){
   const anyDone = state.members.some(x=>x.done);
   if(isChild(m) && !anyDone){
@@ -2419,7 +2466,7 @@ function startIntake(m){
   } else {
     if(!isChild(m) && !state.members.some(x=>x.isSelf)) m.isSelf = true;
     m.services = true;
-    goTo("intake",{mid:m.id, step:m.step||0});
+    enterIntakeAt(m, m.step||0);
   }
 }
 
@@ -2434,7 +2481,7 @@ SCREENS.redirect = (ctx) => {
     next:()=>{ back(); },
     nextLabel:"Okay — I'll do mine first",
     extraNav: el("button",{class:"btn-quiet", type:"button",
-      onclick:()=>{ m.services=true; history.pop(); goTo("intake",{mid:m.id, step:m.step||0}); }},
+      onclick:()=>{ m.services=true; history.pop(); enterIntakeAt(m, m.step||0); }},
       trn("Continue with {n} anyway", displayName(m)))
   });
 };
@@ -2521,8 +2568,7 @@ SCREENS.intake = (ctx) => {
     },
     nextLabel: editing ? (last ? "Done editing" : "Continue") :
       (last ? "Finish this intake" : "Continue"),
-    extraNav: editing ?
-      el("button",{class:"btn-quiet", type:"button", onclick:()=>goTo("review",{mid:m.id})},"Back to review") :
+    extraNav: editing ? null :
       el("button",{class:"btn-quiet", type:"button", onclick:()=>goTo("rosterSelect")},"Family list")
   });
 };
@@ -3104,7 +3150,7 @@ function ethOut(a){
 }
 
 /* returns [{title, inner, range:[start,end] | "basics"}] */
-function personSections(m){
+function personSections(m, printOrder){
   const child = isChild(m), a = m.a||{};
   const S = [];
   let fmi = pLine("Full name", fullName(m)) +
@@ -3219,17 +3265,24 @@ function personSections(m){
       (a.childPresentAuto ? '<div class="p-staff">Auto-set to No (under 11).</div>' : '') +
       pLine("This child/youth feels safe in his/her home", a.safeHome) +
       pLine("This child/youth feels safe in his/her school", a.safeSchool) +
-      pLine("This child/youth feels safe on the streets in his/her neighborhood", a.safeStreets) +
-      pLine("Has this child/youth witnessed violence?", a.witnessed) +
-      pLine("Is this child/youth involved in court", a.court);
-    if(a.court==="Yes") s3 += pFree("Which court? (also enter in S5)", a.courtWhich);
-    s3 += pLine("Ever been detained by the police or arrested?", a.detained);
-    if(a.detained==="Yes") s3 += pLine("Detained for what reason?", a.detainedReason);
-    s3 += pLine("Ever run away?", a.ranAway);
-    if(a.ranAway==="Yes") s3 += pFree("How many times?", a.ranTimes) +
+      pLine("This child/youth feels safe on the streets in his/her neighborhood", a.safeStreets);
+    /* Violence/Court/Detained/Ran away/Exploited/Gang: on-screen order stays as-is
+       (Violence, Exploited, Gang, then Court/Detained/Ran away). Print output uses
+       a different order (Violence, Court, Detained, Ran away, Exploited, Gang) per
+       staff request — see personSections(m, printOrder). */
+    const violenceLine = pLine("Has this child/youth witnessed violence?", a.witnessed);
+    const exploitedLine = pLine("Exploited (has been or is being)?", a.exploited);
+    const gangLine = pLine("Involved with a gang?", a.gang);
+    let courtBlock = pLine("Is this child/youth involved in court", a.court);
+    if(a.court==="Yes") courtBlock += pFree("Which court? (also enter in S5)", a.courtWhich);
+    let detainedBlock = pLine("Ever been detained by the police or arrested?", a.detained);
+    if(a.detained==="Yes") detainedBlock += pLine("Detained for what reason?", a.detainedReason);
+    let ranAwayBlock = pLine("Ever run away?", a.ranAway);
+    if(a.ranAway==="Yes") ranAwayBlock += pFree("How many times?", a.ranTimes) +
       pFree("When was the last time?", a.ranWhen) + pFree("For how long?", a.ranHowLong);
-    s3 += pLine("Exploited (has been or is being)?", a.exploited) +
-      pLine("Involved with a gang?", a.gang);
+    s3 += printOrder
+      ? (violenceLine + courtBlock + detainedBlock + ranAwayBlock + exploitedLine + gangLine)
+      : (violenceLine + exploitedLine + gangLine + courtBlock + detainedBlock + ranAwayBlock);
     S.push({title:"S3 — Safety", range:[9,11], inner:s3});
     let s4 = pLine("Is this child/youth currently living with their family?", a.livingWithFamily);
     if(a.livingWithFamily==="No"){
@@ -3264,7 +3317,7 @@ SCREENS.review = (ctx) => {
       el("button",{class:"btn-quiet", type:"button", style:"padding:8px 14px; font-size:14px;",
         onclick:()=>{
           if(s.range==="basics") goTo("basics",{mid:m.id, returnTo:"review", returnMid:m.id});
-          else goTo("intake",{mid:m.id, step:s.range[0], editEnd:s.range[1]});
+          else enterIntakeAt(m, s.range[0], s.range[1]);
         }},"Edit"));
     const sec = el("div",{class:"rev-section"});
     sec.appendChild(head);
@@ -3417,7 +3470,7 @@ function buildPrint(){
     const child = isChild(m);
     h += '<div class="p-person">';
     h += '<div class="p-title">'+esc(fullName(m)||"(no name)")+(m.isSelf?" (completed own intake)":"")+(child?" — CHILD":" — ADULT")+'</div>';
-    const secs = personSections(m);
+    const secs = personSections(m, true);
     let screeningHeaderDone = false;
     for(const s of secs){
       /* insert screening header before S1 */
@@ -3476,9 +3529,38 @@ function buildPrint(){
   h += '<div class="p-roi"><h3>RELEASES OF INFORMATION NEEDED</h3>'+
     (roiHtml || '<div class="p-roi-line">(no completed intakes)</div>')+'</div>';
 
+  if((state.notesText||"").trim()){
+    h += '<div class="p-section"><h3>NOTES</h3><div class="p-line">'+
+      esc(state.notesText).replace(/\n/g,'<br>')+'</div></div>';
+  }
+
   document.getElementById("printRoot").innerHTML = h;
   return h;
 }
+
+/* ============ NOTES WIDGET (persistent floating note, all screens) ============
+   Built once, outside the #app render cycle, so it survives every screen
+   navigation untouched. State lives in state.notesText; open/closed state
+   is plain DOM (not reset by navigation) and starts collapsed. */
+const notesTextarea = el("textarea",{id:"notesTextarea"});
+notesTextarea.value = state.notesText;
+notesTextarea.addEventListener("input", ()=>{ state.notesText = notesTextarea.value; });
+const notesFab = el("button",{class:"notes-fab", type:"button",
+  onclick:()=>{ notesPanel.classList.add("open"); notesFab.style.display="none"; notesTextarea.focus(); }});
+const notesHeadLabel = el("span");
+const notesCloseBtn = el("button",{type:"button", "aria-label":"Close",
+  onclick:()=>{ notesPanel.classList.remove("open"); notesFab.style.display=""; }}, "✕");
+const notesPanel = el("div",{class:"notes-panel"},
+  el("div",{class:"notes-panel-head"}, notesHeadLabel, notesCloseBtn),
+  notesTextarea);
+document.body.appendChild(notesFab);
+document.body.appendChild(notesPanel);
+function syncNotesI18n(){
+  notesFab.textContent = tr("Notes");
+  notesHeadLabel.textContent = tr("Notes");
+  notesTextarea.placeholder = tr("Optional — use this space for any additional information");
+}
+syncNotesI18n();
 
 /* ============ INIT ============ */
 goTo("welcome");
