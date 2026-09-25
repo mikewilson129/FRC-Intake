@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 11 — see README.md changelog for what changed in this version -->
+<!-- Version 12 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -15,7 +15,8 @@
   *{box-sizing:border-box; margin:0; padding:0;}
   html,body{background:var(--bg); color:var(--ink);
     font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    font-size:17px; line-height:1.45; -webkit-font-smoothing:antialiased;}
+    font-size:17px; line-height:1.45; -webkit-font-smoothing:antialiased;
+    overscroll-behavior-y:none;} /* blocks pull-down-to-refresh (Chrome/Android; recent Safari) */
   #app{max-width:720px; margin:0 auto; padding:20px 16px 60px;}
   .brand{font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--soft); margin:6px 2px 14px;}
   .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
@@ -23,6 +24,12 @@
   h1{font-size:24px; font-weight:650; margin-bottom:6px;}
   h2{font-size:20px; font-weight:650; margin-bottom:4px;}
   .comfort{font-style:italic; color:var(--soft); font-size:15px; margin:2px 0 18px;}
+  .progress{margin:0 2px 12px;}
+  .progress-row{display:flex; justify-content:space-between; align-items:baseline; gap:10px;
+    font-size:14px; font-weight:600; color:var(--accent);}
+  .progress-pct{font-variant-numeric:tabular-nums; color:var(--soft); font-weight:600;}
+  .progress-track{height:8px; background:var(--accent-soft); border-radius:999px; margin-top:6px; overflow:hidden;}
+  .progress-fill{height:100%; background:var(--accent); border-radius:999px; transition:width .25s ease;}
   .q{margin:22px 0 8px; font-weight:600; font-size:17px;}
   .q:first-of-type{margin-top:14px;}
   .hint{color:var(--soft); font-size:14.5px; margin:-2px 0 10px;}
@@ -123,15 +130,15 @@
   .notes-fab{position:fixed; right:16px; bottom:16px; z-index:80; background:var(--accent); color:var(--accent-ink);
     border:none; border-radius:999px; padding:13px 20px; font-size:15.5px; font-weight:600;
     box-shadow:0 2px 10px rgba(0,0,0,.22); cursor:pointer;}
-  .notes-panel{position:fixed; right:16px; bottom:76px; z-index:80; width:min(340px, calc(100vw - 32px));
-    max-height:min(60vh, 420px); background:#fff; border:1.5px solid var(--line); border-radius:14px;
+  .notes-panel{position:fixed; right:16px; bottom:76px; z-index:80; width:min(480px, calc(100vw - 32px));
+    max-height:min(75vh, 560px); background:#fff; border:1.5px solid var(--line); border-radius:14px;
     box-shadow:0 4px 18px rgba(0,0,0,.22); padding:14px; display:none; flex-direction:column;}
   .notes-panel.open{display:flex;}
   .notes-panel-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;
     font-weight:650; font-size:16.5px;}
   .notes-panel-head button{background:none; border:none; font-size:20px; line-height:1; color:var(--soft);
     cursor:pointer; padding:2px 4px;}
-  .notes-panel textarea{flex:1; min-height:150px; width:100%; resize:vertical; font:inherit;
+  .notes-panel textarea{flex:1; min-height:260px; width:100%; resize:vertical; font:inherit;
     padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink);}
   @media print{ .notes-fab, .notes-panel{ display:none !important; } }
 </style>
@@ -181,6 +188,21 @@ const I18N = { es: {
 "Submit":"Enviar","Submitting…":"Enviando…","Submitted.":"Enviado.",
 "Submission failed — please try again or download/print a copy to send to the FRC.":"Error al enviar — intente de nuevo o descargue/imprima una copia para enviar al FRC.",
 "Notes":"Notas","Optional — use this space for any additional information":"Opcional — use este espacio para cualquier información adicional",
+/* --- V12 --- */
+"Step {n} of 4":"Paso {n} de 4","Family information":"Información familiar","Your information":"Su información",
+"Other family members":"Otros miembros de la familia","Review & submit":"Revisar y enviar",
+"Housed/sheltered":"Con vivienda/albergada","Unhoused/unsheltered":"Sin vivienda/sin albergue",
+"Which fits best?":"¿Cuál describe mejor su situación?",
+"Living in your own apartment or home (owned or rented)":"Viviendo en su propio apartamento o casa (propia o rentada)",
+"Household & income":"Hogar e ingresos",
+"Which best describes the caregivers living in your household?":"¿Qué describe mejor a los cuidadores que viven en su hogar?",
+"Is there an active CRA for {n}?":"¿Hay un CRA activo para {n}?",
+"Any other races {n} identifies as? (check all that apply)":"¿Con qué otras razas se identifica {n}? (marque todo lo que aplique)",
+"Are you involved with any other community agencies or town/city resources?":"¿Está involucrado/a con otras agencias comunitarias o recursos de la ciudad/pueblo?",
+"Is {n} involved with any other community agencies or town/city resources?":"¿Está {n} involucrado/a con otras agencias comunitarias o recursos de la ciudad/pueblo?",
+"Check this if your family receives EBT/SNAP, cash assistance, or a child care voucher.":"Marque esto si su familia recibe EBT/SNAP, asistencia en efectivo o un vale de cuidado infantil.",
+"Check this if MassHealth is the primary or secondary insurance.":"Marque esto si MassHealth es el seguro principal o secundario.",
+"The name you like to be called. It's fine to leave this blank.":"El nombre por el que le gusta que le llamen. Puede dejarlo en blanco.",
 /* --- welcome --- */
 "Welcome":"Bienvenido/a",
 "This will walk you through our intake, one small step at a time.":"Este formulario le guiará por nuestra admisión, paso a paso.",
@@ -219,7 +241,7 @@ const I18N = { es: {
 "Email address":"Correo electrónico","Optional.":"Opcional.",
 "That doesn't look like a valid email address.":"Eso no parece ser una dirección de correo electrónico válida.",
 "Which best describes your household?":"¿Cuál describe mejor su hogar?",
-"Single":"Un solo padre o madre","Two-Parent":"Dos padres","Multi-Parent":"Varios padres","Multi-Generational":"Multigeneracional",
+"Single":"Soltero/a","Single (household type)":"Un solo padre o madre","Two-Parent":"Dos padres","Multi-Parent":"Varios padres","Multi-Generational":"Multigeneracional",
 "You're the only caregiver in the home.":"Usted es la única persona a cargo en el hogar.",
 "Two parents or caregivers share the home and caregiving.":"Dos padres o cuidadores comparten el hogar y el cuidado de los niños.",
 "More than two parents or caregivers share the home (for example, a parent and step-parent both living with the family).":"Más de dos padres o cuidadores comparten el hogar (por ejemplo, un padre y un padrastro que viven con la familia).",
@@ -681,6 +703,21 @@ pt: {
 "Submit":"Enviar","Submitting…":"Enviando…","Submitted.":"Enviado.",
 "Submission failed — please try again or download/print a copy to send to the FRC.":"Envio falhou — tente novamente ou baixe/imprima uma cópia para enviar ao FRC.",
 "Notes":"Notas","Optional — use this space for any additional information":"Opcional — use este espaço para qualquer informação adicional",
+/* --- V12 --- */
+"Step {n} of 4":"Etapa {n} de 4","Family information":"Informações da família","Your information":"Suas informações",
+"Other family members":"Outros membros da família","Review & submit":"Revisar e enviar",
+"Housed/sheltered":"Com moradia/abrigada","Unhoused/unsheltered":"Sem moradia/sem abrigo",
+"Which fits best?":"Qual descreve melhor a sua situação?",
+"Living in your own apartment or home (owned or rented)":"Morando no seu próprio apartamento ou casa (próprio ou alugado)",
+"Household & income":"Domicílio e renda",
+"Which best describes the caregivers living in your household?":"O que melhor descreve os cuidadores que moram no seu domicílio?",
+"Is there an active CRA for {n}?":"Existe um CRA ativo para {n}?",
+"Any other races {n} identifies as? (check all that apply)":"Com quais outras raças {n} se identifica? (marque tudo o que se aplica)",
+"Are you involved with any other community agencies or town/city resources?":"Você está envolvido(a) com outras agências comunitárias ou recursos da cidade?",
+"Is {n} involved with any other community agencies or town/city resources?":"{n} está envolvido(a) com outras agências comunitárias ou recursos da cidade?",
+"Check this if your family receives EBT/SNAP, cash assistance, or a child care voucher.":"Marque isto se a sua família recebe EBT/SNAP, assistência em dinheiro ou vale-creche.",
+"Check this if MassHealth is the primary or secondary insurance.":"Marque isto se o MassHealth for o seguro principal ou secundário.",
+"The name you like to be called. It's fine to leave this blank.":"O nome pelo qual você gosta de ser chamado(a). Pode deixar em branco.",
 "Next steps":"Próximos passos",
 /* --- welcome --- */
 "Welcome":"Bem-vindo(a)",
@@ -721,7 +758,7 @@ pt: {
 "Email address":"Endereço de e-mail","Optional.":"Opcional.",
 "That doesn't look like a valid email address.":"Isso não parece ser um endereço de e-mail válido.",
 "Which best describes your household?":"O que melhor descreve o seu domicílio?",
-"Single":"Só um pai ou mãe","Two-Parent":"Pai e mãe","Multi-Parent":"Vários pais/mães","Multi-Generational":"Várias gerações",
+"Single":"Solteiro(a)","Single (household type)":"Só um pai ou mãe","Two-Parent":"Pai e mãe","Multi-Parent":"Vários pais/mães","Multi-Generational":"Várias gerações",
 "You're the only caregiver in the home.":"Você é a única pessoa responsável pelos cuidados na casa.",
 "Two parents or caregivers share the home and caregiving.":"Dois pais ou cuidadores dividem a casa e os cuidados.",
 "More than two parents or caregivers share the home (for example, a parent and step-parent both living with the family).":"Mais de dois pais ou cuidadores dividem a casa (por exemplo, um pai e um padrasto morando com a família).",
@@ -1179,6 +1216,21 @@ ht: {
 "Submit":"Soumèt","Submitting…":"N ap soumèt…","Submitted.":"Soumèt.",
 "Submission failed — please try again or download/print a copy to send to the FRC.":"Soumisyon echwe — eseye ankò oswa telechaje/enprime yon kopi pou voye bay FRC a.",
 "Notes":"Nòt","Optional — use this space for any additional information":"Opsyonèl — itilize espas sa a pou nenpòt enfòmasyon adisyonèl",
+/* --- V12 --- */
+"Step {n} of 4":"Etap {n} nan 4","Family information":"Enfòmasyon sou fanmi an","Your information":"Enfòmasyon ou",
+"Other family members":"Lòt manm fanmi an","Review & submit":"Revize epi soumèt",
+"Housed/sheltered":"Gen kay/abrite","Unhoused/unsheltered":"San kay/pa abrite",
+"Which fits best?":"Kiyès ki dekri sitiyasyon ou pi byen?",
+"Living in your own apartment or home (owned or rented)":"Ap viv nan pwòp apatman oswa kay ou (ou posede l oswa w lwe l)",
+"Household & income":"Kay ak revni",
+"Which best describes the caregivers living in your household?":"Kisa ki pi byen dekri moun k ap okipe timoun yo ki rete lakay ou?",
+"Is there an active CRA for {n}?":"Èske gen yon CRA aktif pou {n}?",
+"Any other races {n} identifies as? (check all that apply)":"Ki lòt ras {n} idantifye ak yo? (tcheke tout sa ki aplike)",
+"Are you involved with any other community agencies or town/city resources?":"Èske w enplike nan lòt ajans kominotè oswa resous vil la?",
+"Is {n} involved with any other community agencies or town/city resources?":"Èske {n} enplike nan lòt ajans kominotè oswa resous vil la?",
+"Check this if your family receives EBT/SNAP, cash assistance, or a child care voucher.":"Tcheke sa a si fanmi ou ap resevwa EBT/SNAP, asistans lajan kach, oswa yon bon gadri.",
+"Check this if MassHealth is the primary or secondary insurance.":"Tcheke sa a si MassHealth se asirans prensipal oswa segondè a.",
+"The name you like to be called. It's fine to leave this blank.":"Non ou renmen yo rele w. Ou ka kite sa vid.",
 "Next steps":"Pwochen etap yo",
 /* --- welcome --- */
 "Welcome":"Byenveni",
@@ -1219,7 +1271,7 @@ ht: {
 "Email address":"Adrès imèl","Optional.":"Opsyonèl.",
 "That doesn't look like a valid email address.":"Sa a pa sanble yon adrès imèl ki valid.",
 "Which best describes your household?":"Kisa ki dekri kay ou a pi byen?",
-"Single":"Selibatè","Two-Parent":"De paran","Multi-Parent":"Plizyè paran","Multi-Generational":"Plizyè jenerasyon",
+"Single":"Selibatè","Single (household type)":"Yon sèl paran","Two-Parent":"De paran","Multi-Parent":"Plizyè paran","Multi-Generational":"Plizyè jenerasyon",
 "You're the only caregiver in the home.":"Se ou menm sèl ki responsab swen yo nan kay la.",
 "Two parents or caregivers share the home and caregiving.":"De paran oswa moun k ap bay swen pataje kay la ak swen timoun yo.",
 "More than two parents or caregivers share the home (for example, a parent and step-parent both living with the family).":"Plis pase de paran oswa moun k ap bay swen pataje kay la (pa egzanp, yon paran ak yon bèl paran k ap viv ak fanmi an).",
@@ -1746,15 +1798,20 @@ const GENDER_OPTS = ["Male","Female","Non-Binary, Gender Fluid","Questioning/Not
 const PRONOUN_OPTS = ["He/Him/His","She/Her/Hers","They/Them/Theirs","Ze/Zir/Zirs","I Prefer Not to Answer","Tell Us in Your Own Words"];
 const INSURANCE_OPTS = ["Yes","No","Did not answer"];
 const HOUSEHOLD_TYPES = [
-  {v:"Single", info:"You're the only caregiver in the home."},
+  {v:"Single", trKey:"Single (household type)", info:"You're the only caregiver in the home."},
   {v:"Two-Parent", info:"Two parents or caregivers share the home and caregiving."},
   {v:"Multi-Parent", info:"More than two parents or caregivers share the home (for example, a parent and step-parent both living with the family)."},
   {v:"Multi-Generational", info:"More than one generation of adults lives in the home together (for example, a parent and grandparent both caring for the children)."}];
-const LIVING_OPTS = [
-  {v:"Living in their own apartment or home (owned or rented)"},
-  {v:"Homeless and Not Sheltered", info:"No steady place to stay (like staying outside or in a car)."},
-  {v:"Homeless but Sheltered", info:"Staying in a shelter, motel placement, or doubled-up with others."},
-  {v:"Not Answered"}];
+/* Two-level housing question. Stored values (v) are the exact CRM values;
+   label is only what the client sees. "Homeless but Sheltered" is offered
+   under both groups on purpose — it's the gray-area answer. */
+const LIV_OWN = {v:"Living in their own apartment or home (owned or rented)", label:"Living in your own apartment or home (owned or rented)"};
+const LIV_SHELTERED = {v:"Homeless but Sheltered", info:"Staying in a shelter, motel placement, or doubled-up with others."};
+const LIV_UNSHELTERED = {v:"Homeless and Not Sheltered", info:"No steady place to stay (like staying outside or in a car)."};
+const LIVING_GROUPS = [
+  {v:"Housed/sheltered", items:[LIV_OWN, LIV_SHELTERED]},
+  {v:"Unhoused/unsheltered", items:[LIV_UNSHELTERED, LIV_SHELTERED]},
+  {v:"Decline to answer", items:null}];
 const INCOME_OPTS = ["Less than $10,000","$10,000 to $19,999","$20,000 to $29,999","$30,000 to $39,999",
   "$40,000 to $49,999","$50,000 to $59,999","$60,000 to $69,999","$70,000 to $79,999","$80,000 to $89,999",
   "$90,000 to $99,999","$100,000 to $149,999","$150,000 or more"];
@@ -1904,9 +1961,9 @@ const AGENCIES = [
  {v:"DCF (Department of Children and Families)"},
  {v:"DDS (Department of Developmental Services)"},
  {v:"DMH (Department of Mental Health)"},
- {v:"DTA (Department of Transitional Assistance)", info:"Check this if you're receiving EBT/SNAP, cash assistance, or a child care voucher."},
+ {v:"DTA (Department of Transitional Assistance)", info:"Check this if your family receives EBT/SNAP, cash assistance, or a child care voucher."},
  {v:"DYS (Department of Youth Services)"},
- {v:"MassHealth", info:"Check this if MassHealth is your primary or secondary insurance."}];
+ {v:"MassHealth", info:"Check this if MassHealth is the primary or secondary insurance."}];
 
 /* Of the AGENCIES above, only these require a Release of Information (skips DTA/MassHealth). */
 const RELEASE_AGENCIES = [
@@ -2000,7 +2057,7 @@ const state = {
   submitting:false,
   submitStatus:null,
   notesText:"",    /* single running note, shown via the persistent floating Notes panel */
-  family:{lastName:"", phone:"", email:"", householdType:null, living:null, income:null,
+  family:{lastName:"", phone:"", email:"", householdType:null, livingGroup:null, living:null, income:null,
     address:{street:"", street2:"", apt:"", city:"", cityAuto:false, state:"Massachusetts", zip:""}},
   referral:{category:null, value:null},
   members:[]
@@ -2071,14 +2128,22 @@ function qLabel(text, info){
   else wrap.appendChild(q);
   return wrap;
 }
+/* Option display text. trKey lets an option with the same English word as
+   another question (e.g. household "Single" vs. marital "Single") carry
+   its own translation without changing the English. */
+function optText(item){
+  if(item.trKey && LANG!=="en"){ const D = I18N[LANG]; if(D && D[item.trKey]) return D[item.trKey]; }
+  return item.label||item.v;
+}
 function qSingle(opts, get, set, o){
   o = o||{};
   const wrap = el("div",{class:"opts"+(o.stack?" stack":"")});
   for(const raw of opts){
     const item = typeof raw==="string" ? {v:raw} : raw;
+    const shown = optText(item);
     const b = el("button",{class:"opt"+(get()===item.v?" sel":""), type:"button",
       onclick:()=>{ set(get()===item.v && o.toggle!==false ? null : item.v); rerender(); }},
-      item.v, item.ex?el("span",{class:"ex"}, item.ex):null);
+      o.bold ? el("b",null,shown) : shown, item.ex?el("span",{class:"ex"}, item.ex):null);
     if(item.info){ const i=infoBtn(item.info); b.appendChild(i.btn); wrap.appendChild(b); wrap.appendChild(i.box); }
     else wrap.appendChild(b);
   }
@@ -2089,7 +2154,8 @@ function qSingleCollapse(opts, get, set, o){
   o=o||{};
   const v = get();
   if(v){
-    const label = (v==="Did not answer") ? "Skipped — will print as Did Not Answer" : v;
+    const item = opts.map(r=> typeof r==="string" ? {v:r} : r).find(i=>i.v===v) || {v:v};
+    const label = (v==="Did not answer") ? "Skipped — will print as Did Not Answer" : optText(item);
     return el("div",{class:"notice"},"Selected: ", el("b",null,label), " ",
       el("button",{class:"skiplink", type:"button", onclick:()=>{set(null); rerender();}},"change"));
   }
@@ -2187,10 +2253,53 @@ function render(preserveScroll){
     el("div",{class:"brand"},"Family Intake"),
     langSel);
   app.appendChild(head);
+  const prog = progressBar(progressInfo(current.id, current.ctx||{}));
+  if(prog) app.appendChild(prog);
   const scr = SCREENS[current.id](current.ctx);
   app.appendChild(scr);
   if(preserveScroll) window.scrollTo(x, y);
   else window.scrollTo(0,0);
+}
+
+/* ---- 4-step progress indicator (approximate by design) ----
+   Step 1 family info (through building the household list), Step 2 the
+   parent's own intake, Step 3 other family members (the list itself shows
+   no %; an individual's intake shows its own %), Step 4 review & submit. */
+const STEP1_SCREENS = ["famBasics","famHome","famHousehold","refSource","basics","anyoneElse"];
+const STEP_LABELS = ["Family information","Your information","Other family members","Review & submit"];
+function progressInfo(id, ctx){
+  if(id==="welcome") return null;
+  const anyDone = state.members.some(x=>x.done);
+  const listStep = anyDone ? 3 : 2;
+  if(id==="finish") return {step:4, pct:null};
+  if(state.phase==="build" && STEP1_SCREENS.includes(id)){
+    /* adding extra household members loops basics <-> anyoneElse; hold the bar steady */
+    const pos = (id==="basics" && !ctx.first) ? "anyoneElse" : id;
+    return {step:1, pct:Math.round(STEP1_SCREENS.indexOf(pos)/STEP1_SCREENS.length*100)};
+  }
+  if(id==="intake" || id==="intakeDone"){
+    const m = state.members.find(x=>x.id===ctx.mid);
+    if(!m) return {step:listStep, pct:null};
+    const step = m.isSelf ? 2 : 3;
+    if(ctx.editEnd!==undefined) return {step:listStep, pct:null};
+    if(id==="intakeDone") return {step:step, pct:100};
+    const n = (isChild(m) ? childSteps(m) : adultSteps(m)).length;
+    return {step:step, pct:Math.round(Math.min(ctx.step||0, n)/n*100)};
+  }
+  return {step:listStep, pct:null};
+}
+function progressBar(p){
+  if(!p) return null;
+  const wrap = el("div",{class:"progress"});
+  const row = el("div",{class:"progress-row"},
+    el("span",null, trn("Step {n} of 4", p.step), ": ", STEP_LABELS[p.step-1]),
+    p.pct!==null ? el("span",{class:"progress-pct"}, p.pct+"%") : null);
+  wrap.appendChild(row);
+  if(p.pct!==null){
+    const fill = el("div",{class:"progress-fill"}); fill.style.width = p.pct+"%";
+    wrap.appendChild(el("div",{class:"progress-track"}, fill));
+  }
+  return wrap;
 }
 function shell(o){
   const card = el("div",{class:"card"});
@@ -2249,38 +2358,37 @@ SCREENS.famBasics = () => {
       qText(f,"email",{type:"text", ph:"name@example.com", oninput:(v,inp)=>{
         inp.classList.toggle("bad", v.trim().length>0 && !emailLooksValid());
       }}),
-      (emailStarted && !emailOk ? el("div",{class:"validate"},"That doesn't look like a valid email address.") : null),
-      qLabel("Which best describes your household?"),
-      qSingleCollapse(HOUSEHOLD_TYPES, ()=>f.householdType, v=>f.householdType=v, {stack:true}),
-      (!f.householdType ? skipRow(()=>f.householdType, v=>f.householdType=v) : null)
+      (emailStarted && !emailOk ? el("div",{class:"validate"},"That doesn't look like a valid email address.") : null)
     ],
     canNext: !!(f.lastName.trim() && phoneOk),
     next:()=>goTo("famHome")
   });
 };
 
+/* Housing (two-level, like the referral question) + address */
 SCREENS.famHome = () => {
   const f = state.family;
+  const a = f.address;
+  const grp = LIVING_GROUPS.find(g=>g.v===f.livingGroup);
+  const housing = [qLabel("Your family is:")];
+  if(!grp){
+    housing.push(qSingle(LIVING_GROUPS, ()=>f.livingGroup, v=>{
+      f.livingGroup=v; f.living = (v==="Decline to answer") ? "Not Answered" : null;
+    }, {stack:true, toggle:false}));
+  } else {
+    housing.push(el("div",{class:"notice"}, el("b",null,grp.v), " ",
+      el("button",{class:"skiplink", type:"button",
+        onclick:()=>{ f.livingGroup=null; f.living=null; rerender(); }},"change")));
+    if(grp.items){
+      housing.push(el("p",{class:"hint"},"Which fits best?"));
+      housing.push(qSingle(grp.items, ()=>f.living, v=>f.living=v, {stack:true, toggle:false}));
+    }
+  }
   return shell({
     title:"Your home",
     comfort:comfort("These are just for information."),
     body:[
-      qLabel("Your family is:"),
-      qSingle(LIVING_OPTS, ()=>f.living, v=>f.living=v, {stack:true, toggle:false}),
-      qLabel("What is your total household income?", "Your best guess is fine. This is optional and doesn't affect services."),
-      qSingleCollapse(INCOME_OPTS, ()=>f.income, v=>f.income=v),
-      (!f.income ? skipRow(()=>f.income, v=>f.income=v) : null)
-    ],
-    canNext: !!f.living,
-    next:()=>goTo("famAddress")
-  });
-};
-
-SCREENS.famAddress = () => {
-  const a = state.family.address;
-  return shell({
-    title:"Your address",
-    body:[
+      ...housing,
       qLabel("Street address"),
       qText(a,"street",{ph:"Street address"}),
       el("div",{class:"row2"},
@@ -2300,6 +2408,24 @@ SCREENS.famAddress = () => {
           i.id="cityInp"; return i; })())),
       el("p",{class:"subtle"},"State: Massachusetts (tell a staff member if that's not right)")
     ],
+    canNext: !!f.living,
+    next:()=>goTo("famHousehold")
+  });
+};
+
+SCREENS.famHousehold = () => {
+  const f = state.family;
+  return shell({
+    title:"Household & income",
+    comfort:comfort("These are just for information."),
+    body:[
+      qLabel("Which best describes the caregivers living in your household?"),
+      qSingleCollapse(HOUSEHOLD_TYPES, ()=>f.householdType, v=>f.householdType=v, {stack:true}),
+      (!f.householdType ? skipRow(()=>f.householdType, v=>f.householdType=v) : null),
+      qLabel("What is your total household income?", "Your best guess is fine. This is optional and doesn't affect services."),
+      qSingleCollapse(INCOME_OPTS, ()=>f.income, v=>f.income=v),
+      (!f.income ? skipRow(()=>f.income, v=>f.income=v) : null)
+    ],
     next:()=>goTo("refSource")
   });
 };
@@ -2312,7 +2438,7 @@ SCREENS.refSource = () => {
   if(!cat){
     body.push(el("p",{class:"hint"},"First, what kind of person or place told you about us? Pick the closest fit — a staff member can help if you're not sure."));
     body.push(qSingle(REFERRAL_CATS.map(c=>({v:c.cat, ex:c.ex})), ()=>r.category,
-      v=>{ r.category=v; r.value=null; }, {stack:true, toggle:false}));
+      v=>{ r.category=v; r.value=null; }, {stack:true, toggle:false, bold:true}));
   } else {
     body.push(el("div",{class:"notice"},"Category: ", el("b",null,cat.cat), " ",
       el("button",{class:"skiplink", type:"button",
@@ -2351,15 +2477,19 @@ SCREENS.basics = (ctx) => {
     }});
   return shell({
     title:title,
-    comfort:comfort(firstEver ?
-      "We'll add everyone in your household — starting with you. We do need a name, date of birth, and the insurance answer." :
-      "We do need a name, date of birth, and the insurance answer."),
+    comfort:el("span",null,
+      el("b",{style:"color:var(--ink);"}, firstEver ?
+        "We'll add everyone in your household — starting with you. We do need a name, date of birth, and the insurance answer." :
+        "We do need a name, date of birth, and the insurance answer."),
+      COMFORT_TAIL),
     body:[
       qLabel("First name"),
       qText(m,"first",{ph:"First name", oninput:()=>{const nav=document.querySelector(".btn-primary"); if(nav) nav.disabled=!basicsComplete(m);}}),
       qLabel("Last name"),
       qText(m,"last",{ph:"Last name", oninput:()=>{const nav=document.querySelector(".btn-primary"); if(nav) nav.disabled=!basicsComplete(m);}}),
-      qLabel("Preferred name (if different)","The name they like to be called. It's fine to leave this blank."),
+      qLabel("Preferred name (if different)", firstEver ?
+        "The name you like to be called. It's fine to leave this blank." :
+        "The name they like to be called. It's fine to leave this blank."),
       qText(m,"preferred",{ph:"Preferred name"}),
       qLabel("Date of birth"),
       el("div",{class:"row3"},
@@ -2659,9 +2789,9 @@ function conditionsBlock(a){
   }
   return wrap;
 }
-function communityBlock(a){
+function communityBlock(a, label){
   const wrap=el("div");
-  wrap.appendChild(qLabel("Involved with any other community agencies or town/city resources?",
+  wrap.appendChild(qLabel(label,
     "Examples: mental health agencies, food pantries, housing authority, substance use programs."));
   wrap.appendChild(qSingle(["Yes","No"], ()=>a.communityFlag, v=>a.communityFlag=v));
   if(a.communityFlag==="Yes"){
@@ -2703,7 +2833,8 @@ function ethRaceBlock(m){
     qMulti(["Other","Choose Not to Answer"],
       ()=>a.ethnicity, {stack:true, onchange:()=>{ a.hispUnchecked=false; syncHisp(); }}),
     (a.ethnicity.includes("Other")? qText(a,"ethnicityOther",{ph:"Ethnicity — in your own words"}):null),
-    qLabel("Any other races you identify as? (check all that apply)"),
+    qLabel(isChild(m) ? trn("Any other races {n} identifies as? (check all that apply)", displayName(m)) :
+      "Any other races you identify as? (check all that apply)"),
     qMulti(["White","Black/African American","American Indian","Asian Indian","Japanese","Native Hawaiian",
       "Chinese","Korean","Guamanian","Filipino","Vietnamese","Samoan","Hispanic/Latino","Other","Choose Not to Answer"],
       ()=>a.race, {onchange:(v)=>{ if(v==="Hispanic/Latino"){ a.hispAuto=false; a.hispUnchecked=!a.race.includes("Hispanic/Latino"); } }}),
@@ -2858,7 +2989,7 @@ function adultSteps(m){
     body:[
       qLabel("Are you involved with any of the following agencies? (check all that apply)"),
       qMulti(AGENCIES, ()=>a.agencies, {stack:true}),
-      communityBlock(a)
+      communityBlock(a, "Are you involved with any other community agencies or town/city resources?")
     ], canNext:true };},
   /* 13 */
   (m)=>{ if(!a.civic)a.civic=[];
@@ -2898,7 +3029,7 @@ function childSteps(m){
     return { title:trn("Court status for {n}", kid()),
     comfort:"If you're not sure, a staff member can help.",
     body:[
-      qLabel("Is there an active CRA for this child?","CRA stands for Child Requiring Assistance — a type of juvenile court case, sometimes filed by a parent or a school."),
+      qLabel(trn("Is there an active CRA for {n}?", kid()),"CRA stands for Child Requiring Assistance — a type of juvenile court case, sometimes filed by a parent or a school."),
       qSingle(["Yes","No"], ()=>a.craActive, v=>a.craActive=v, {toggle:false}),
       (a.craActive==="Yes" ? el("div",null,
         qLabel("Who filed the CRA application?"),
@@ -3104,7 +3235,7 @@ function childSteps(m){
       qLabel(trn("Is {n} involved with any of the following agencies? (check all that apply)", kid())),
       qMulti(AGENCIES, ()=>a.agencies, {stack:true}),
       (a.court==="Yes" ? el("div",{class:"notice"}, trn("Court involvement: already noted ({n}) — no need to repeat it here.", a.courtWhich||tr("court name not given"))) : null),
-      communityBlock(a)
+      communityBlock(a, trn("Is {n} involved with any other community agencies or town/city resources?", kid()))
     ], canNext:true };},
   /* 14: civic */
   (m)=>{ if(!a.civic)a.civic=[];
@@ -3389,7 +3520,7 @@ SCREENS.finish = () => {
             m1 += "\n\n¿BORRAR TODO y comenzar una admisión completamente nueva?\n\nEsto no se puede deshacer. Asegúrese de haber impreso primero.";
             m2 += "\n\n¿Está seguro/a? Todas las respuestas se borrarán permanentemente.";
           }
-          if(confirm(m1)){ if(confirm(m2)) location.reload(); }
+          if(confirm(m1)){ if(confirm(m2)){ allowLeave = true; location.reload(); } }
         }},
         "Start over (erase all)")
     )
@@ -3561,6 +3692,21 @@ function syncNotesI18n(){
   notesTextarea.placeholder = tr("Optional — use this space for any additional information");
 }
 syncNotesI18n();
+
+/* ============ LEAVE-PAGE WARNING ============
+   Nothing is saved on the device, so warn before a refresh/close once any
+   data has been entered. Browsers show their own generic wording; iOS
+   Safari often skips this prompt entirely. "Start over" sets allowLeave. */
+let allowLeave = false;
+function hasEnteredData(){
+  const f = state.family;
+  return !!(f.lastName || f.phone || f.email || state.members.length || state.draft || (state.notesText||"").trim());
+}
+window.addEventListener("beforeunload", (e)=>{
+  if(allowLeave || !hasEnteredData()) return;
+  e.preventDefault();
+  e.returnValue = "";
+});
 
 /* ============ INIT ============ */
 goTo("welcome");

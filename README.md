@@ -61,6 +61,11 @@ required for the core flow — everything lives in one file.
   Staff must print (or successfully remote-submit) before closing the page.
 - Keep this in mind when testing: a refresh mid-test loses your progress,
   same as it would for a client.
+- Once anything has been entered, the page asks the browser to warn before
+  a refresh or close, and pull-down-to-refresh is disabled. Browsers show
+  their own generic wording for the warning, and **iPhone/iPad Safari often
+  skips it**, so this reduces accidental data loss but can't fully prevent
+  it on Apple devices. The "Start over" button deliberately skips the warning.
 
 ## Making changes
 
@@ -84,7 +89,60 @@ Since everything is one file, a few conventions keep it maintainable:
    in a browser and clicking through the flow (including Print preview) in
    at least English and one other language before committing.
 
+## Future ideas (not built yet)
+
+- **Save progress (internal vs. external).** Clients may fill this out on
+  their own iPhones at home, where Safari often skips the leave-page
+  warning, so an accidental refresh can still erase everything. Saving
+  progress on the device would fix that, but conflicts with the no-saving
+  privacy choice on the shared Android tablets at the FRC. A likely shape:
+  an "external" (client's own phone) mode that saves progress, and an
+  "internal" (shared tablet) mode that keeps today's no-saving behavior.
+- **More personalized wording on the printout.** The printed/CRM copy
+  intentionally keeps the CRM's own wording (e.g. "This child/youth feels
+  safe in his/her home") so staff can match it to CRM fields. Making it more
+  personal (names, they/them, etc.) needs a decision about how far it can
+  drift from the CRM field labels.
+
 ## Changelog
+
+### Version 12
+
+- **Reordered the family screens:** (1) Your family — last name, phone,
+  email; (2) Your home — housing question, then address; (3) Household &
+  income — household type, then income; then "How did you hear about us."
+- **Two-level housing question** ("Your family is:"), like the referral
+  question: Housed/sheltered, Unhoused/unsheltered, or Decline to answer,
+  then the specific answer. "Homeless but Sheltered" is offered under both
+  groups on purpose (it's the gray-area answer). The screen shows "Living in
+  *your* own apartment…", but the printout keeps the CRM wording ("…*their*
+  own…"); "Decline to answer" records the CRM value "Not Answered."
+- **Household question reworded** to "Which best describes the caregivers
+  living in your household?"
+- **4-step progress bar** at the top of every screen after Welcome:
+  Step 1 Family information (through adding household members), Step 2 Your
+  information (the parent's own intake), Step 3 Other family members, Step 4
+  Review & submit. The percentage restarts within each step and is
+  approximate by design. The family list in Steps 2/3 and the Step 4 screen
+  show the step with no percentage; another person's intake shows its own %.
+- **Notes box enlarged** (about 480px wide, 260px-tall text area).
+- **Bolded the instructions** on "First, about you" and the other
+  household-member screens, and the **category titles** on "How did you
+  hear about us."
+- **Leave-page warning + pull-to-refresh block** (see Privacy above for the
+  iPhone limitation).
+- **Wording consistency pass (on-screen only; printout untouched):** the CRA
+  question now uses the child's name; the child's race question reads
+  "…{name} identifies as"; the "other community agencies" question is a
+  full question for both adults and children; the DTA/MassHealth hints no
+  longer say "you/your" on children's screens; the preferred-name hint says
+  "you" on "First, about you."
+- **Translations** (Spanish/Portuguese/Haitian Creole) added for every new
+  or changed string. Also fixed a translation bug: the word "Single" was
+  shared by the household-type and marital-status questions, so Spanish and
+  Portuguese marital status showed "single parent" and Haitian Creole
+  household type showed "unmarried." Each now translates correctly; the
+  English and stored CRM values are unchanged.
 
 ### Version 11
 
