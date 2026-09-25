@@ -117,6 +117,9 @@ Since everything is one file, a few conventions keep it maintainable:
   groups on purpose (it's the gray-area answer). The screen shows "Living in
   *your* own apartment…", but the printout keeps the CRM wording ("…*their*
   own…"); "Decline to answer" records the CRM value "Not Answered."
+  After a group is picked it shrinks to a small tag (with "change"), and
+  "Which fits best?" is shown as a bold question, so it's clear a second
+  answer is still needed.
 - **Household question reworded** to "Which best describes the caregivers
   living in your household?"
 - **4-step progress bar** at the top of every screen after Welcome:
