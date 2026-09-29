@@ -106,6 +106,21 @@ Since everything is one file, a few conventions keep it maintainable:
 
 ## Changelog
 
+### Version 13
+
+- **Fixed: blank page after editing basic info from Review.** On a
+  person's Review screen, tapping Edit on the basic-info section (name,
+  date of birth, etc.) and then Save left the page blank under the header.
+  Save now returns to that person's Review.
+- **Safety net for screen errors.** If a screen ever fails to load, the
+  page no longer goes blank. It shows "Something went wrong on this
+  screen" with a note that answers are still saved, a **Go back** button
+  (returns to the previous screen), and a staff-only **Staff: print what's
+  been entered** button. The error is also logged to the browser console
+  ("Screen failed: …") to help with troubleshooting. The message and
+  "Go back" are translated (Spanish/Portuguese/Haitian Creole); the staff
+  print button stays English only.
+
 ### Version 12
 
 - **Reordered the family screens:** (1) Your family — last name, phone,
