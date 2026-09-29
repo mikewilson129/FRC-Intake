@@ -690,7 +690,11 @@ const I18N = { es: {
 "If no, who is the child/youth living with?":"Si dijo no, ¿con quién vive?",
 "Court":"Corte","Which court? (from S3)":"¿Qué corte? (de S3)",
 "(no name)":"(sin nombre)","(none listed)":"(ninguna indicada)","Yes (checked)":"Sí (marcado)",
-"None selected":"Ninguna seleccionada"
+"None selected":"Ninguna seleccionada",
+/* --- safety-net screen --- */
+"Something went wrong on this screen":"Algo salió mal en esta pantalla",
+"Your answers are still saved on this page. Tap Go back to return to the last screen. Please do not refresh or close this page.":"Sus respuestas siguen guardadas en esta página. Toque Regresar para volver a la pantalla anterior. Por favor, no actualice ni cierre esta página.",
+"Go back":"Regresar"
 },
 pt: {
 /* --- chrome / navigation --- */
@@ -1203,7 +1207,11 @@ pt: {
 "If no, who is the child/youth living with?":"Se não, com quem está morando?",
 "Court":"Tribunal","Which court? (from S3)":"Qual tribunal? (da S3)",
 "(no name)":"(sem nome)","(none listed)":"(nenhuma informada)","Yes (checked)":"Sim (marcado)",
-"None selected":"Nenhuma selecionada"
+"None selected":"Nenhuma selecionada",
+/* --- safety-net screen --- */
+"Something went wrong on this screen":"Algo deu errado nesta tela",
+"Your answers are still saved on this page. Tap Go back to return to the last screen. Please do not refresh or close this page.":"Suas respostas continuam salvas nesta página. Toque em Voltar para retornar à tela anterior. Por favor, não atualize nem feche esta página.",
+"Go back":"Voltar"
 },
 ht: {
 /* --- chrome / navigation --- */
@@ -1716,7 +1724,11 @@ ht: {
 "If no, who is the child/youth living with?":"Si non, ak kilès l ap viv?",
 "Court":"Tribinal","Which court? (from S3)":"Ki tribinal? (nan S3)",
 "(no name)":"(pa gen non)","(none listed)":"(pa gen okenn endike)","Yes (checked)":"Wi (tcheke)",
-"None selected":"Pa gen anyen chwazi"
+"None selected":"Pa gen anyen chwazi",
+/* --- safety-net screen --- */
+"Something went wrong on this screen":"Gen yon pwoblèm sou ekran sa a",
+"Your answers are still saved on this page. Tap Go back to return to the last screen. Please do not refresh or close this page.":"Repons ou yo toujou anrejistre sou paj sa a. Tape Retounen pou w tounen nan dènye ekran an. Tanpri pa rafrechi ni fèmen paj sa a.",
+"Go back":"Retounen"
 }
 };
 /* ============ DATA ============ */
@@ -2258,10 +2270,28 @@ function render(preserveScroll){
   app.appendChild(head);
   const prog = progressBar(progressInfo(current.id, current.ctx||{}));
   if(prog) app.appendChild(prog);
-  const scr = SCREENS[current.id](current.ctx);
+  let scr;
+  try{ scr = SCREENS[current.id](current.ctx); }
+  catch(err){ console.error("Screen failed:", current.id, err); PS_TR = false; scr = crashScreen(); }
   app.appendChild(scr);
   if(preserveScroll) window.scrollTo(x, y);
   else window.scrollTo(0,0);
+}
+
+/* ---- Safety net: shown if a screen fails to build (never leaves a blank page) ---- */
+function crashScreen(){
+  return el("div",{class:"card", style:"padding:18px;"},
+    el("h2",null,tr("Something went wrong on this screen")),
+    el("p",null,tr("Your answers are still saved on this page. Tap Go back to return to the last screen. Please do not refresh or close this page.")),
+    el("div",{style:"display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;"},
+      el("button",{class:"btn-primary", type:"button", onclick:()=>{
+        if(history.length>1){ history.pop(); current = history[history.length-1]; render(false); }
+      }}, tr("Go back")),
+      el("button",{class:"btn-ghost", type:"button", onclick:()=>{
+        try{ buildPrint(); }
+        catch(e){ const r=document.getElementById("printRoot"); r.style.whiteSpace="pre-wrap"; r.textContent=JSON.stringify(state,null,2); }
+        window.print();
+      }}, "Staff: print what's been entered")));
 }
 
 /* ---- 4-step progress indicator (approximate by design) ----
@@ -2521,6 +2551,7 @@ SCREENS.basics = (ctx) => {
       if(state.phase==="build") goTo("anyoneElse");
       else if(!ctx.draft && m.services && !m.done && (ctx.returnTo||"rosterSelect")==="rosterSelect")
         enterIntakeAt(m, m.step||0);
+      else if(ctx.returnTo==="review") goTo("review",{mid:ctx.returnMid||m.id});
       else goTo(ctx.returnTo || "rosterSelect");
     },
     nextLabel:"Save"
