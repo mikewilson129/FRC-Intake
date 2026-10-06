@@ -59,6 +59,26 @@ loads and are never saved; they can be combined.
 - "Start over" reloads the same address, so a `?cra` / `?lang=` link keeps
   its mode and language for the next family.
 
+### Staff links
+
+The live form is at `https://mikewilson129.github.io/FRC-Intake/`. Copy the
+link that fits the family:
+
+| Use | Link |
+|---|---|
+| Standard (English) | `https://mikewilson129.github.io/FRC-Intake/` |
+| Spanish | `https://mikewilson129.github.io/FRC-Intake/?lang=es` |
+| Portuguese | `https://mikewilson129.github.io/FRC-Intake/?lang=pt` |
+| Haitian Creole | `https://mikewilson129.github.io/FRC-Intake/?lang=ht` |
+| CRA (English) | `https://mikewilson129.github.io/FRC-Intake/?cra` |
+| CRA — Spanish | `https://mikewilson129.github.io/FRC-Intake/?cra&lang=es` |
+| CRA — Portuguese | `https://mikewilson129.github.io/FRC-Intake/?cra&lang=pt` |
+| CRA — Haitian Creole | `https://mikewilson129.github.io/FRC-Intake/?cra&lang=ht` |
+
+On the language links the family can still switch languages from the
+dropdown. On the CRA links, CRA mode stays on and can't be turned off on
+screen.
+
 ## Remote submission (proof of concept)
 
 - `WORKER_URL` / `SUBMIT_TOKEN` and `submitIntake()` post the completed
