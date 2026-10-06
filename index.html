@@ -2170,12 +2170,16 @@ const state = {
 };
 
 /* ============ URL TAGS ============
-   Read once at load (never stored): ?cra turns CRA mode on and locks it
-   for the session — the link staff send to CRA families. */
+   Read once at load (never stored):
+   ?cra       CRA mode on and locked for the session (the link staff send to CRA families)
+   ?lang=xx   start in es, pt or ht; anything else starts in English
+   They combine: ?cra&lang=es */
 const URL_TAGS = new URLSearchParams(location.search);
 function urlTag(name){ for(const [k,v] of URL_TAGS) if(k.toLowerCase()===name) return v; return null; }
 const CRA_LOCKED = urlTag("cra")!==null;
 state.cra = CRA_LOCKED;
+const URL_LANG = (urlTag("lang")||"").trim().toLowerCase();
+if(hasOwn(I18N, URL_LANG)) LANG = URL_LANG;   /* set before the first render */
 
 let nextId = 1;
 function newMember(){
