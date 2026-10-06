@@ -36,6 +36,29 @@ required for the core flow — everything lives in one file.
   dictionary will silently display in English, so watch for that during
   testing after adding new questions.
 
+## Links (URL tags)
+
+Add these to the end of the page address. They're read once when the page
+loads and are never saved; they can be combined.
+
+| Tag | What it does | Example |
+|---|---|---|
+| `?cra` | **CRA mode, locked on** for the whole session. This is the link staff send to CRA families. Welcome shows a "CRA mode" label that can't be tapped off. | `index.html?cra` |
+| `?lang=es` / `?lang=pt` / `?lang=ht` | Starts in Spanish / Portuguese / Haitian Creole (the dropdown shows it selected and still works). Anything else starts in English. | `index.html?lang=es` |
+| both | CRA mode in Spanish | `index.html?cra&lang=es` |
+
+- Without `?cra`, staff can turn CRA mode on or off with the small, quiet
+  "CRA mode" button on the Welcome screen (off by default; English only,
+  since it's staff-facing).
+- **CRA mode** is for families coming in for a CRA (open, or at risk of
+  one). Staff decide which families are CRA; families aren't asked. In CRA
+  mode, "No one else — finish up" needs a completed adult intake **and** a
+  completed child intake (one child is enough). Until then the household
+  screen explains that both are needed, and the printout shows a "CRA mode"
+  line near the top. Nothing else about the form changes.
+- "Start over" reloads the same address, so a `?cra` / `?lang=` link keeps
+  its mode and language for the next family.
+
 ## Remote submission (proof of concept)
 
 - `WORKER_URL` / `SUBMIT_TOKEN` and `submitIntake()` post the completed
@@ -116,12 +139,14 @@ Since everything is one file, a few conventions keep it maintainable:
   link: "Is there an active CRA for {name}?" (ages 12+), "Is {name} present
   and able to answer a few questions directly?" (ages 11+), and "Is {name}
   currently living with their family?" (all ages). Decide whether each
-  should stay required, get a Skip / "Not sure" option, or change with the
-  planned CRA mode.
-- **CRA mode / finishing with a child's intake.** "No one else — finish up"
-  turns on once at least one *adult's* intake is complete. The planned CRA
-  mode should also allow finishing with a child's intake. Today a household
-  with no adults entered (e.g. a youth on their own) can't finish.
+  should stay required or get a Skip / "Not sure" option. (CRA mode, added
+  in Version 15, doesn't change them.)
+- **Households with no adult.** "No one else — finish up" needs a completed
+  adult intake (plus a child's in CRA mode), so a household with no adults
+  entered (e.g. a youth on their own) can't finish.
+- **CRA mode — possible next steps (left out of Version 15 on purpose):** a
+  CRA screening question, a "which child is this visit about" step, an "at
+  risk of a CRA" answer, and a staff override for the finish rule.
 - **More personalized wording on the printout.** The printed/CRM copy
   intentionally keeps the CRM's own wording (e.g. "This child/youth feels
   safe in his/her home") so staff can match it to CRM fields. Making it more
@@ -129,6 +154,45 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 15
+
+- **CRA mode.** For families coming in for a CRA (open, or at risk of one),
+  who need both an adult and a child intake. Turn it on with the `?cra` link
+  (locked on for the session) or the quiet "CRA mode" button on Welcome (off
+  by default; English only). In CRA mode:
+  - "No one else — finish up" also needs at least one completed child
+    intake (under 18), on top of the completed adult intake. One child is
+    enough even if the household has several. Unfinished extra intakes
+    still get the Version 14 "finish without completing theirs?" pop-up.
+  - Until that's met, the household screen shows "For this visit we need
+    an intake for you and for your child. Please complete both before
+    finishing.", plus "If your child isn't listed yet, tap '+ Add a
+    household member'." when no child is listed. The line under the
+    greyed-out button reads "This button turns on once an adult's intake
+    and a child's intake are both complete."
+  - Hidden (they contradict the rule): the "Complete an intake for a child
+    when they need direct referrals…" hint, and the "…covered by your
+    intake — you don't need one for your child…" note under the adult.
+  - The printout shows "CRA mode — this visit required an adult intake and
+    a child intake." near the top.
+  - No change to any question, its wording, or the under-12 CRA auto-skip.
+- **Housing question is one list again** ("Your family is:", as in
+  Version 11): Living in your own apartment or home (owned or rented);
+  Homeless but Sheltered; Homeless and Not Sheltered; Decline to answer.
+  Stored values are unchanged from Version 12 (the first stores the CRM
+  wording "…their own…"; Decline stores "Not Answered"); info blurbs stay
+  on the two homeless answers; still required. Removed the group step and
+  its strings ("Housed/sheltered", "Unhoused/unsheltered", "Which fits
+  best?"). Note: the submitted JSON no longer includes
+  `family.livingGroup`.
+- **Language link.** `?lang=es`, `?lang=pt` or `?lang=ht` starts the form
+  in that language; anything else starts in English. Combines with CRA mode
+  (`?cra&lang=es`). See "Links (URL tags)" above.
+- **Translations:** the three new household-screen strings in Spanish,
+  Portuguese and Haitian Creole (drafts — review with bilingual staff).
+  Spanish V14 wording updated after staff review: "respuesta sobre el
+  seguro médico".
 
 ### Version 14
 
