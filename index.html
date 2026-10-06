@@ -70,6 +70,10 @@
     box-shadow:0 6px 24px rgba(0,0,0,.25);}
   .modal p{font-size:17px; margin-bottom:18px;}
   .modal-actions{display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap;}
+  .cra-row{margin-top:16px;}
+  .cra-off{background:none; border:none; color:var(--soft); font-size:13px; text-decoration:underline; padding:6px 2px; opacity:.75;}
+  .cra-tag{display:inline-block; background:var(--accent-soft); border:1.5px solid var(--accent); border-radius:999px;
+    color:var(--accent); font-size:13px; font-weight:700; padding:4px 12px;}
   .btn-ghost{background:none; border:none; color:var(--soft); font-size:16px; padding:12px 8px; text-decoration:underline;}
   .btn-quiet{background:var(--chip); border:1.5px solid var(--line); border-radius:12px; padding:12px 18px; font-size:16px;}
   .skiplink{background:none; border:none; color:var(--soft); font-size:14.5px; text-decoration:underline; padding:6px 2px; display:inline-block;}
@@ -136,6 +140,7 @@
     .p-roi{border:2px solid #000; border-radius:6px; padding:10px 12px; margin-top:10px; font-weight:700; page-break-inside:avoid;}
     .p-roi h3{font-size:14px; margin-bottom:6px;}
     .p-roi-line{margin:3px 0; font-size:12.5px;}
+    .p-cra{display:inline-block; border:2px solid #000; border-radius:6px; padding:4px 10px; margin:0 0 10px; font-weight:700; font-size:12.5px;}
   }
   /* ---------- persistent Notes widget ---------- */
   .notes-fab{position:fixed; right:16px; bottom:16px; z-index:80; background:var(--accent); color:var(--accent-ink);
@@ -723,7 +728,11 @@ const I18N = { es: {
 "Own words (blank)":"En sus propias palabras (en blanco)",
 "Other (?)":"Otra (?)",
 "Other (Not school aged)":"Otra (aún no tiene edad escolar)",
-"N/A (not school aged)":"N/C (aún no tiene edad escolar)"
+"N/A (not school aged)":"N/C (aún no tiene edad escolar)",
+/* --- V15: CRA mode (hub notice) --- */
+"For this visit we need an intake for you and for your child. Please complete both before finishing.":"Para esta visita necesitamos una admisión para usted y otra para su hijo/a. Por favor, complete ambas antes de terminar.",
+"If your child isn't listed yet, tap “+ Add a household member”.":"Si su hijo/a todavía no aparece en la lista, toque “+ Agregar un miembro del hogar”.",
+"This button turns on once an adult's intake and a child's intake are both complete.":"Este botón se activa cuando la admisión de un adulto y la de un niño/a estén completas."
 },
 pt: {
 /* --- chrome / navigation --- */
@@ -1262,7 +1271,11 @@ pt: {
 "Own words (blank)":"Com suas próprias palavras (em branco)",
 "Other (?)":"Outra (?)",
 "Other (Not school aged)":"Outra (ainda não está em idade escolar)",
-"N/A (not school aged)":"N/A (ainda não está em idade escolar)"
+"N/A (not school aged)":"N/A (ainda não está em idade escolar)",
+/* --- V15: CRA mode (hub notice) --- */
+"For this visit we need an intake for you and for your child. Please complete both before finishing.":"Para esta visita, precisamos de uma admissão para você e outra para seu filho. Por favor, complete as duas antes de finalizar.",
+"If your child isn't listed yet, tap “+ Add a household member”.":"Se seu filho ainda não estiver na lista, toque em “+ Adicionar um membro do domicílio”.",
+"This button turns on once an adult's intake and a child's intake are both complete.":"Este botão fica disponível quando a admissão de um adulto e a de uma criança estiverem completas."
 },
 ht: {
 /* --- chrome / navigation --- */
@@ -1801,7 +1814,11 @@ ht: {
 "Own words (blank)":"Nan pwòp mo ou (vid)",
 "Other (?)":"Lòt (?)",
 "Other (Not school aged)":"Lòt (poko gen laj lekòl)",
-"N/A (not school aged)":"N/A (poko gen laj lekòl)"
+"N/A (not school aged)":"N/A (poko gen laj lekòl)",
+/* --- V15: CRA mode (hub notice) --- */
+"For this visit we need an intake for you and for your child. Please complete both before finishing.":"Pou vizit sa a, nou bezwen yon admisyon pou ou ak youn pou pitit ou. Tanpri konplete toude anvan ou fini.",
+"If your child isn't listed yet, tap “+ Add a household member”.":"Si pitit ou a poko sou lis la, touche “+ Ajoute yon manm nan kay la”.",
+"This button turns on once an adult's intake and a child's intake are both complete.":"Bouton sa a ap mache lè admisyon yon granmoun ak admisyon yon timoun fini."
 }
 };
 /* ============ DATA ============ */
@@ -2160,8 +2177,18 @@ const state = {
   family:{lastName:"", phone:"", email:"", householdType:null, livingGroup:null, living:null, income:null,
     address:{street:"", street2:"", apt:"", city:"", cityAuto:false, state:"Massachusetts", zip:""}},
   referral:{category:null, value:null},
-  members:[]
+  members:[],
+  cra:false        /* CRA mode: finishing needs a completed adult AND child intake */
 };
+
+/* ============ URL TAGS ============
+   Read once at load (never stored): ?cra turns CRA mode on and locks it
+   for the session — the link staff send to CRA families. */
+const URL_TAGS = new URLSearchParams(location.search);
+function urlTag(name){ for(const [k,v] of URL_TAGS) if(k.toLowerCase()===name) return v; return null; }
+const CRA_LOCKED = urlTag("cra")!==null;
+state.cra = CRA_LOCKED;
+
 let nextId = 1;
 function newMember(){
   return {id:nextId++, isSelf:false, first:"", last:"", preferred:"",
@@ -2517,10 +2544,20 @@ SCREENS.welcome = () => shell({
     el("p",null,"This will walk you through our intake, one small step at a time."),
     el("div",{class:"notice"},"A staff member is nearby if anything is confusing — just ask. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us."),
     el("p",{class:"subtle"},"You can change the language at any time using the dropdown in the top corner."),
-    el("p",{class:"subtle"},"Nothing is saved on this tablet. When this page is closed, everything on it is erased.")
+    el("p",{class:"subtle"},"Nothing is saved on this tablet. When this page is closed, everything on it is erased."),
+    craControl()
   ],
   next:()=>goTo("famBasics"), nextLabel:"Start"
 });
+/* Staff-facing CRA mode switch on Welcome. English only: the text node
+   skips tr(), so it never picks up a translation. On the ?cra link it's
+   locked on and shown as a plain label. */
+function craControl(){
+  const txt = ()=>document.createTextNode("CRA mode");
+  if(CRA_LOCKED) return el("div",{class:"cra-row"}, el("span",{class:"cra-tag"}, txt()));
+  return el("div",{class:"cra-row"}, el("button",{type:"button", class:state.cra ? "cra-tag" : "cra-off",
+    "aria-pressed":String(state.cra), onclick:()=>{ state.cra = !state.cra; rerender(); }}, txt()));
+}
 
 /* ---- Family phase ---- */
 SCREENS.famBasics = () => {
@@ -2796,7 +2833,7 @@ function rosterList(withActions, suggestId){
     if(suggested) left.appendChild(el("span",{class:"suggest-badge"},"★ Is this you? Start here"));
     left.appendChild(el("div",{class:"roster-name"}, fullName(m)||"(no name yet)"));
     left.appendChild(el("div",{class:"roster-sub"}, sub.join(" · ")));
-    if(withActions && m.done && !isChild(m) && m.id===state.lastDoneAdultId){
+    if(withActions && !state.cra && m.done && !isChild(m) && m.id===state.lastDoneAdultId){
       left.appendChild(el("div",{class:"roster-sub", style:"margin-top:4px; color:var(--accent);"},
         "Food, clothing, basic needs, and child care requests are covered by your intake — you don't need one for your child for those."));
     }
@@ -2869,6 +2906,9 @@ SCREENS.intakeDone = (ctx) => {
 SCREENS.rosterSelect = (ctx) => {
   const anyDone = state.members.some(m=>m.done);
   const adultDone = state.members.some(m=>m.done && !isChild(m));
+  const childDone = state.members.some(m=>m.done && isChild(m));
+  /* CRA mode: this visit needs a finished adult AND a finished child intake (one child is enough) */
+  const canFinish = adultDone && (!state.cra || childDone);
   const suggestId = !anyDone ? ((state.members.find(x=>!isChild(x))||{}).id||null) : null;
   const body = [];
   if(!anyDone){
@@ -2877,7 +2917,12 @@ SCREENS.rosterSelect = (ctx) => {
   }
   if(anyDone){
     body.push(qLabel("Do you need to complete an intake for anyone else in your family today?"));
-    body.push(el("p",{class:"hint"},"Complete an intake for a child when they need direct referrals of their own, such as mental health services or extracurricular activities."));
+    if(!state.cra) body.push(el("p",{class:"hint"},"Complete an intake for a child when they need direct referrals of their own, such as mental health services or extracurricular activities."));
+  }
+  if(state.cra && !canFinish){
+    body.push(el("div",{class:"notice", style:"font-weight:600;"},
+      "For this visit we need an intake for you and for your child. Please complete both before finishing.",
+      (!state.members.some(isChild) ? el("div",{style:"margin-top:6px;"},"If your child isn't listed yet, tap \u201C+ Add a household member\u201D.") : null)));
   }
   body.push(el("p",{class:"hint"},"A green check means that person's intake is complete."));
   body.push(rosterList(true, suggestId));
@@ -2892,9 +2937,10 @@ SCREENS.rosterSelect = (ctx) => {
     title:"Your household",
     noBack:true,
     body:body,
-    /* one finished adult intake is enough; unfinished ones get a confirm */
-    canNext: adultDone,
-    why:"This button turns on once at least one adult's intake is complete.",
+    /* one finished adult intake is enough (plus a child in CRA mode); unfinished ones get a confirm */
+    canNext: canFinish,
+    why: state.cra ? "This button turns on once an adult's intake and a child's intake are both complete."
+      : "This button turns on once at least one adult's intake is complete.",
     next:()=>{
       const open = state.members.filter(m=>m.services && !m.done);
       if(!open.length) return goTo("finish");
@@ -3840,6 +3886,7 @@ function buildPrint(){
   const kids = state.members.filter(m=>isChild(m)).length;
   let h = '<div class="p-title">Family Intake — '+esc(f.lastName||"(no family name)")+'</div>';
   h += '<div class="p-meta">Completed '+todayStr()+' · Printed from the intake tablet · Enter into CRM, then shred.</div>';
+  if(state.cra) h += '<div class="p-cra">CRA mode — this visit required an adult intake and a child intake.</div>';
 
   h += '<div class="p-section"><h3>FAMILY — Family Information</h3>'+
     pLine("Family Last Name", f.lastName) +
