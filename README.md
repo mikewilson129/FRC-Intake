@@ -120,7 +120,9 @@ Since everything is one file, a few conventions keep it maintainable:
    out). Text boxes that affect the button call `setNext(ok, why)` as the
    person types instead of re-rendering — don't look the button up with
    `document.querySelector(".btn-primary")`.
-7. **Age-dependent questions:** if a question only applies at certain ages
+7. **Finish requirements live in `finishRule()`** — change the rule there,
+   not in the household screen or Submit button separately.
+8. **Age-dependent questions:** if a question only applies at certain ages
    and is auto-answered otherwise, also clear the auto-answer when it stops
    applying (see the `craUnder12`, `childPresentAuto` and `hasJobAuto` flags),
    so a corrected date of birth asks the question for real.
@@ -165,10 +167,12 @@ Since everything is one file, a few conventions keep it maintainable:
     intake (under 18), on top of the completed adult intake. One child is
     enough even if the household has several. Unfinished extra intakes
     still get the Version 14 "finish without completing theirs?" pop-up.
-  - Until that's met, the household screen shows "For this visit we need
-    an intake for you and for your child. Please complete both before
-    finishing.", plus "If your child isn't listed yet, tap '+ Add a
-    household member'." when no child is listed. The line under the
+  - Until that's met, the household screen shows "We need to have a full
+    intake for you and for your child that was referred to us. Please
+    complete both before finishing. We only need name, DOB, and health
+    insurance indicator for other members of the family.", plus "If your
+    child isn't listed yet, tap '+ Add a household member'." when no child
+    is listed. The line under the
     greyed-out button reads "This button turns on once an adult's intake
     and a child's intake are both complete."
   - Hidden (they contradict the rule): the "Complete an intake for a child
@@ -177,6 +181,13 @@ Since everything is one file, a few conventions keep it maintainable:
   - The printout shows "CRA mode — this visit required an adult intake and
     a child intake." near the top.
   - No change to any question, its wording, or the under-12 CRA auto-skip.
+- **Finish rule in one place (`finishRule()`).** The household screen's
+  "No one else — finish up" and the staff **Submit** button both check it,
+  so an intake that doesn't meet the rule can't be submitted by any path.
+  (Version 13 let a household finish with only a child's intake — even with
+  no adult listed at all; Version 14 started requiring a finished adult.)
+  When no one 18+ is on the household list, it now also says "If you're not
+  on this list yet, tap '+ Add a household member' to add yourself."
 - **Housing question is one list again** ("Your family is:", as in
   Version 11): Living in your own apartment or home (owned or rented);
   Homeless but Sheltered; Homeless and Not Sheltered; Decline to answer.
@@ -189,7 +200,7 @@ Since everything is one file, a few conventions keep it maintainable:
 - **Language link.** `?lang=es`, `?lang=pt` or `?lang=ht` starts the form
   in that language; anything else starts in English. Combines with CRA mode
   (`?cra&lang=es`). See "Links (URL tags)" above.
-- **Translations:** the three new household-screen strings in Spanish,
+- **Translations:** the new household-screen strings in Spanish,
   Portuguese and Haitian Creole (drafts — review with bilingual staff).
   Spanish V14 wording updated after staff review: "respuesta sobre el
   seguro médico".

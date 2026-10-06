@@ -725,7 +725,8 @@ const I18N = { es: {
 "Other (Not school aged)":"Otra (aún no tiene edad escolar)",
 "N/A (not school aged)":"N/C (aún no tiene edad escolar)",
 /* --- V15: CRA mode (hub notice) --- */
-"For this visit we need an intake for you and for your child. Please complete both before finishing.":"Para esta visita necesitamos una admisión para usted y otra para su hijo/a. Por favor, complete ambas antes de terminar.",
+"We need to have a full intake for you and for your child that was referred to us. Please complete both before finishing. We only need name, DOB, and health insurance indicator for other members of the family.":"Necesitamos una admisión completa para usted y para su hijo/a que nos fue referido/a. Por favor, complete ambas antes de terminar. Para los demás miembros de la familia solo necesitamos el nombre, la fecha de nacimiento y si tienen seguro médico.",
+"If you're not on this list yet, tap “+ Add a household member” to add yourself.":"Si usted todavía no aparece en la lista, toque “+ Agregar un miembro del hogar” para agregarse.",
 "If your child isn't listed yet, tap “+ Add a household member”.":"Si su hijo/a todavía no aparece en la lista, toque “+ Agregar un miembro del hogar”.",
 "This button turns on once an adult's intake and a child's intake are both complete.":"Este botón se activa cuando la admisión de un adulto y la de un niño/a estén completas."
 },
@@ -1266,7 +1267,8 @@ pt: {
 "Other (Not school aged)":"Outra (ainda não está em idade escolar)",
 "N/A (not school aged)":"N/A (ainda não está em idade escolar)",
 /* --- V15: CRA mode (hub notice) --- */
-"For this visit we need an intake for you and for your child. Please complete both before finishing.":"Para esta visita, precisamos de uma admissão para você e outra para seu filho. Por favor, complete as duas antes de finalizar.",
+"We need to have a full intake for you and for your child that was referred to us. Please complete both before finishing. We only need name, DOB, and health insurance indicator for other members of the family.":"Precisamos de uma admissão completa para você e para o seu filho que foi encaminhado para nós. Por favor, complete as duas antes de finalizar. Para os outros membros da família, só precisamos do nome, da data de nascimento e se têm seguro de saúde.",
+"If you're not on this list yet, tap “+ Add a household member” to add yourself.":"Se você ainda não estiver na lista, toque em “+ Adicionar um membro do domicílio” para se adicionar.",
 "If your child isn't listed yet, tap “+ Add a household member”.":"Se seu filho ainda não estiver na lista, toque em “+ Adicionar um membro do domicílio”.",
 "This button turns on once an adult's intake and a child's intake are both complete.":"Este botão fica disponível quando a admissão de um adulto e a de uma criança estiverem completas."
 },
@@ -1807,7 +1809,8 @@ ht: {
 "Other (Not school aged)":"Lòt (poko gen laj lekòl)",
 "N/A (not school aged)":"N/A (poko gen laj lekòl)",
 /* --- V15: CRA mode (hub notice) --- */
-"For this visit we need an intake for you and for your child. Please complete both before finishing.":"Pou vizit sa a, nou bezwen yon admisyon pou ou ak youn pou pitit ou. Tanpri konplete toude anvan ou fini.",
+"We need to have a full intake for you and for your child that was referred to us. Please complete both before finishing. We only need name, DOB, and health insurance indicator for other members of the family.":"Nou bezwen yon admisyon konplè pou ou ak pou pitit ou yo te refere ban nou an. Tanpri konplete toude anvan ou fini. Pou lòt manm fanmi an, nou bezwen sèlman non, dat nesans, ak si yo gen asirans sante.",
+"If you're not on this list yet, tap “+ Add a household member” to add yourself.":"Si ou poko sou lis la, touche “+ Ajoute yon manm nan kay la” pou ajoute tèt ou.",
 "If your child isn't listed yet, tap “+ Add a household member”.":"Si pitit ou a poko sou lis la, touche “+ Ajoute yon manm nan kay la”.",
 "This button turns on once an adult's intake and a child's intake are both complete.":"Bouton sa a ap mache lè admisyon yon granmoun ak admisyon yon timoun fini."
 }
@@ -2880,13 +2883,21 @@ SCREENS.intakeDone = (ctx) => {
   });
 };
 
+/* ---- Finish rule: ONE place, checked by the household list AND by Submit ----
+   Needs a completed adult intake; in CRA mode also a completed child
+   intake (one child is enough). */
+function finishRule(){
+  const adultDone = state.members.some(m=>m.done && !isChild(m));
+  const childDone = state.members.some(m=>m.done && isChild(m));
+  return { ok: adultDone && (!state.cra || childDone),
+    why: state.cra ? "This button turns on once an adult's intake and a child's intake are both complete."
+      : "This button turns on once at least one adult's intake is complete." };
+}
+
 /* ---- Roster select (main phase hub) ---- */
 SCREENS.rosterSelect = (ctx) => {
   const anyDone = state.members.some(m=>m.done);
-  const adultDone = state.members.some(m=>m.done && !isChild(m));
-  const childDone = state.members.some(m=>m.done && isChild(m));
-  /* CRA mode: this visit needs a finished adult AND a finished child intake (one child is enough) */
-  const canFinish = adultDone && (!state.cra || childDone);
+  const rule = finishRule();
   const suggestId = !anyDone ? ((state.members.find(x=>!isChild(x))||{}).id||null) : null;
   const body = [];
   if(!anyDone){
@@ -2897,10 +2908,14 @@ SCREENS.rosterSelect = (ctx) => {
     body.push(qLabel("Do you need to complete an intake for anyone else in your family today?"));
     if(!state.cra) body.push(el("p",{class:"hint"},"Complete an intake for a child when they need direct referrals of their own, such as mental health services or extracurricular activities."));
   }
-  if(state.cra && !canFinish){
+  if(state.cra && !rule.ok){
     body.push(el("div",{class:"notice", style:"font-weight:600;"},
-      "For this visit we need an intake for you and for your child. Please complete both before finishing.",
+      "We need to have a full intake for you and for your child that was referred to us. Please complete both before finishing. We only need name, DOB, and health insurance indicator for other members of the family.",
       (!state.members.some(isChild) ? el("div",{style:"margin-top:6px;"},"If your child isn't listed yet, tap \u201C+ Add a household member\u201D.") : null)));
+  }
+  /* nobody 18+ on the list (e.g. only the child was entered): say how to add yourself */
+  if(!state.members.some(m=>!isChild(m))){
+    body.push(el("div",{class:"notice", style:"font-weight:600;"},"If you're not on this list yet, tap \u201C+ Add a household member\u201D to add yourself."));
   }
   body.push(el("p",{class:"hint"},"A green check means that person's intake is complete."));
   body.push(rosterList(true, suggestId));
@@ -2915,10 +2930,9 @@ SCREENS.rosterSelect = (ctx) => {
     title:"Your household",
     noBack:true,
     body:body,
-    /* one finished adult intake is enough (plus a child in CRA mode); unfinished ones get a confirm */
-    canNext: canFinish,
-    why: state.cra ? "This button turns on once an adult's intake and a child's intake are both complete."
-      : "This button turns on once at least one adult's intake is complete.",
+    /* see finishRule(); unfinished extra intakes get a confirm */
+    canNext: rule.ok,
+    why: rule.why,
     next:()=>{
       const open = state.members.filter(m=>m.services && !m.done);
       if(!open.length) return goTo("finish");
@@ -3771,6 +3785,7 @@ SCREENS.finish = () => {
     ],
     noBack:true,
     next: async ()=>{
+      if(!finishRule().ok){ goTo("rosterSelect"); return; }   /* never send an intake that doesn't meet the rule */
       state.submitting = true;
       state.submitStatus = "Submitting…";
       rerender();
@@ -3800,7 +3815,8 @@ SCREENS.finish = () => {
       rerender();
     },
     nextLabel: state.submitting ? "Submitting…" : (state.submitted ? "Submitted ✓" : "Submit"),
-    canNext: !state.submitting && !state.submitted,
+    canNext: !state.submitting && !state.submitted && finishRule().ok,
+    why: finishRule().ok ? undefined : finishRule().why,
     extraNav: el("div",{style:"display:flex; gap:10px; flex-wrap:wrap; align-items:center;"},
       /* editing after a submit re-opens Submit so the updated answers can be sent */
       el("button",{class:"btn-ghost", type:"button", disabled:state.submitting,
