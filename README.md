@@ -36,6 +36,29 @@ required for the core flow — everything lives in one file.
   dictionary will silently display in English, so watch for that during
   testing after adding new questions.
 
+## Links (URL tags)
+
+Add these to the end of the page address. They're read once when the page
+loads and are never saved; they can be combined.
+
+| Tag | What it does | Example |
+|---|---|---|
+| `?cra` | **CRA mode, locked on** for the whole session. This is the link staff send to CRA families. Welcome shows a "CRA mode" label that can't be tapped off. | `index.html?cra` |
+| `?lang=es` / `?lang=pt` / `?lang=ht` | Starts in Spanish / Portuguese / Haitian Creole (the dropdown shows it selected and still works). Anything else starts in English. | `index.html?lang=es` |
+| both | CRA mode in Spanish | `index.html?cra&lang=es` |
+
+- Without `?cra`, staff can turn CRA mode on or off with the small, quiet
+  "CRA mode" button on the Welcome screen (off by default; English only,
+  since it's staff-facing).
+- **CRA mode** is for families coming in for a CRA (open, or at risk of
+  one). Staff decide which families are CRA; families aren't asked. In CRA
+  mode, "No one else — finish up" needs a completed adult intake **and** a
+  completed child intake (one child is enough). Until then the household
+  screen explains that both are needed, and the printout shows a "CRA mode"
+  line near the top. Nothing else about the form changes.
+- "Start over" reloads the same address, so a `?cra` / `?lang=` link keeps
+  its mode and language for the next family.
+
 ## Remote submission (proof of concept)
 
 - `WORKER_URL` / `SUBMIT_TOKEN` and `submitIntake()` post the completed
@@ -49,6 +72,10 @@ required for the core flow — everything lives in one file.
   (Print is now the secondary, plain-text action next to it). This is a
   UI change only — Print is still required for CRM data entry, and the
   underlying submission is still non-BAA/proof-of-concept as noted above.
+- Submit gives up after 30 seconds (`SUBMIT_TIMEOUT_MS`) and shows "Submission
+  timed out — please submit again…", so a bad connection can't leave the
+  button stuck on "Submitting…". A timed-out request may still have reached
+  the server, so submitting again can occasionally store a duplicate copy.
 - `SUBMIT_TOKEN` is a plain static token embedded in client-side code. It
   should be rotated whenever it may have leaked (e.g. after sharing the file,
   a public commit, or a compromised tablet), and should not be treated as a
@@ -88,6 +115,17 @@ Since everything is one file, a few conventions keep it maintainable:
 5. Since there's no build step, test changes by opening `index.html` directly
    in a browser and clicking through the flow (including Print preview) in
    at least English and one other language before committing.
+6. **A greyed-out button should say why.** Screens with required answers
+   pass `why` to `shell()` (shown under the button only while it's greyed
+   out). Text boxes that affect the button call `setNext(ok, why)` as the
+   person types instead of re-rendering — don't look the button up with
+   `document.querySelector(".btn-primary")`.
+7. **Finish requirements live in `finishRule()`** — change the rule there,
+   not in the household screen or Submit button separately.
+8. **Age-dependent questions:** if a question only applies at certain ages
+   and is auto-answered otherwise, also clear the auto-answer when it stops
+   applying (see the `craUnder12`, `childPresentAuto` and `hasJobAuto` flags),
+   so a corrected date of birth asks the question for real.
 
 ## Future ideas (not built yet)
 
@@ -98,6 +136,19 @@ Since everything is one file, a few conventions keep it maintainable:
   privacy choice on the shared Android tablets at the FRC. A likely shape:
   an "external" (client's own phone) mode that saves progress, and an
   "internal" (shared tablet) mode that keeps today's no-saving behavior.
+- **Child questions that can't be skipped (to review).** Three child-intake
+  questions must be answered before Continue turns on, and have no Skip
+  link: "Is there an active CRA for {name}?" (ages 12+), "Is {name} present
+  and able to answer a few questions directly?" (ages 11+), and "Is {name}
+  currently living with their family?" (all ages). Decide whether each
+  should stay required or get a Skip / "Not sure" option. (CRA mode, added
+  in Version 15, doesn't change them.)
+- **Households with no adult.** "No one else — finish up" needs a completed
+  adult intake (plus a child's in CRA mode), so a household with no adults
+  entered (e.g. a youth on their own) can't finish.
+- **CRA mode — possible next steps (left out of Version 15 on purpose):** a
+  CRA screening question, a "which child is this visit about" step, an "at
+  risk of a CRA" answer, and a staff override for the finish rule.
 - **More personalized wording on the printout.** The printed/CRM copy
   intentionally keeps the CRM's own wording (e.g. "This child/youth feels
   safe in his/her home") so staff can match it to CRM fields. Making it more
@@ -105,6 +156,110 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 15
+
+- **CRA mode.** For families coming in for a CRA (open, or at risk of one),
+  who need both an adult and a child intake. Turn it on with the `?cra` link
+  (locked on for the session) or the quiet "CRA mode" button on Welcome (off
+  by default; English only). In CRA mode:
+  - "No one else — finish up" also needs at least one completed child
+    intake (under 18), on top of the completed adult intake. One child is
+    enough even if the household has several. Unfinished extra intakes
+    still get the Version 14 "finish without completing theirs?" pop-up.
+  - Until that's met, the household screen shows "We need to have a full
+    intake for you and for your child who was referred to us. Please
+    complete both before finishing. For other members of the family, we
+    only need their name, date of birth, and whether they have health
+    insurance.", plus "If your
+    child isn't listed yet, tap '+ Add a household member'." when no child
+    is listed. The line under the
+    greyed-out button reads "This button turns on once an adult's intake
+    and a child's intake are both complete."
+  - Hidden (they contradict the rule): the "Complete an intake for a child
+    when they need direct referrals…" hint, and the "…covered by your
+    intake — you don't need one for your child…" note under the adult.
+  - The printout shows "CRA mode — this visit required an adult intake and
+    a child intake." near the top.
+  - No change to any question, its wording, or the under-12 CRA auto-skip.
+- **Finish rule in one place (`finishRule()`).** The household screen's
+  "No one else — finish up" and the staff **Submit** button both check it,
+  so an intake that doesn't meet the rule can't be submitted by any path.
+  (Version 13 let a household finish with only a child's intake — even with
+  no adult listed at all; Version 14 started requiring a finished adult.)
+  When no one 18+ is on the household list, it now also says "If you're not
+  on this list yet, tap '+ Add a household member' to add yourself."
+- **Housing question is one list again** ("Your family is:", as in
+  Version 11): Living in your own apartment or home (owned or rented);
+  Homeless but Sheltered; Homeless and Not Sheltered; Decline to answer.
+  Stored values are unchanged from Version 12 (the first stores the CRM
+  wording "…their own…"; Decline stores "Not Answered"); info blurbs stay
+  on the two homeless answers; still required. Removed the group step and
+  its strings ("Housed/sheltered", "Unhoused/unsheltered", "Which fits
+  best?"). Note: the submitted JSON no longer includes
+  `family.livingGroup`.
+- **Language link.** `?lang=es`, `?lang=pt` or `?lang=ht` starts the form
+  in that language; anything else starts in English. Combines with CRA mode
+  (`?cra&lang=es`). See "Links (URL tags)" above.
+- **Translations:** the new household-screen strings in Spanish,
+  Portuguese and Haitian Creole (drafts — review with bilingual staff).
+  Spanish V14 wording updated after staff review: "respuesta sobre el
+  seguro médico".
+
+### Version 14
+
+Fixes for the "intake freezes / Continue won't work" reports, plus other
+bugs found while investigating.
+
+- **Fixed: Continue stuck greyed out on "Your family."** The button only
+  re-checked itself when the phone number was typed, so entering the phone
+  before the last name left it greyed out (and erasing the last name
+  afterward left it on). All three fields now update it as you type.
+- **A greyed-out button now says why.** A short line under the button lists
+  what's still needed (e.g. "Still needed: family last name, 10-digit phone
+  number" or "To continue, please answer the question above."). The phone
+  message ("needs 10 digits") and email message now appear while typing;
+  a number entered with a leading 1 gets "Leave off the 1 at the start…".
+- **Finishing with an unfinished intake.** "No one else — finish up" now
+  turns on as soon as one adult's intake is complete (before, any started
+  intake — even one opened by accident — kept it greyed out until finished,
+  with no way to cancel). If anyone's intake is unfinished, a pop-up asks
+  "John's intake isn't complete. Finish without completing theirs?" (Finish
+  anyway / Go back). The family list now shows "Intake in progress" for
+  anyone started. Unfinished intakes still print, marked "INTAKE NOT
+  COMPLETED" with "Services needed: Yes (intake not completed)".
+- **Submit can't get stuck.** It gives up after 30 seconds with "Submission
+  timed out — please submit again, or print a copy to send to the FRC," and
+  any error now releases the button. After a successful submit the button
+  shows "Submitted ✓" (prevents accidental duplicates); tapping Edit
+  re-opens Submit so changed answers can be sent.
+- **Date-of-birth corrections ask the right questions.** If a DOB change
+  moves someone between adult and child questions, or across the child age
+  cut-offs (11 and 12), their intake re-opens with a note explaining why,
+  answers that still apply are kept, and newly relevant questions (e.g.
+  CRA at 12+) are asked instead of keeping an automatic "No." The other
+  set's answers are parked in the background and restored if the DOB is
+  changed back; they're never printed or submitted.
+- **Printed dates use the current date** (the day it's printed/submitted),
+  not the day the page was loaded.
+- **Fixed: Back from "First, about you" erased what was typed** for the
+  first person (same for adding someone else).
+- **Fixed: Review → Edit opened the wrong question** for sections answered
+  automatically (CRA for under-12s; an adult's Basic Needs when food and
+  clothing were picked as reasons). Those sections no longer show Edit.
+- **Wording:** "If a question doesn't feel comfortable to answer, you're
+  welcome to skip it" is now "Most questions can be skipped if you'd rather
+  not answer" (Welcome screen and screen intros), since a few are required.
+- **Translations:** added Spanish/Portuguese/Haitian Creole for all new
+  text, plus strings that were showing in English ("There are no wrong
+  answers." on the child safety screen, the Spanish Welcome-screen language
+  tip, and some Review values like "Own words (blank)"). Removed duplicate
+  Spanish entries ("Preferred name" had two different translations). New
+  translations are drafts — review with bilingual staff.
+- **Minor:** typing certain words (e.g. "constructor") in the role search
+  no longer crashes the screen; the "papa" role shortcut keeps Grandfather.
+- **Unchanged on purpose:** the Notes box — closing it with ✕ uncovers
+  Continue.
 
 ### Version 13
 

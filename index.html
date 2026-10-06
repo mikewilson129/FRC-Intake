@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 13 — see README.md changelog for what changed in this version -->
+<!-- Version 15 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -62,6 +62,18 @@
   .btn-primary{background:var(--accent); color:var(--accent-ink); border:none; border-radius:12px;
     padding:14px 26px; font-size:17px; font-weight:600; min-height:52px;}
   .btn-primary:disabled{opacity:.45; cursor:not-allowed;}
+  .why{font-size:14px; color:#8A4A22; text-align:right; margin-top:8px;}
+  @media(max-width:520px){.why{text-align:left;}}  /* keep clear of the Notes button on phones */
+  .modal-overlay{position:fixed; inset:0; z-index:100; background:rgba(34,48,45,.45);
+    display:flex; align-items:center; justify-content:center; padding:16px;}
+  .modal{background:var(--card); border-radius:var(--radius); padding:22px; width:100%; max-width:440px;
+    box-shadow:0 6px 24px rgba(0,0,0,.25);}
+  .modal p{font-size:17px; margin-bottom:18px;}
+  .modal-actions{display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap;}
+  .cra-row{margin-top:16px;}
+  .cra-off{background:none; border:none; color:var(--soft); font-size:13px; text-decoration:underline; padding:6px 2px; opacity:.75;}
+  .cra-tag{display:inline-block; background:var(--accent-soft); border:1.5px solid var(--accent); border-radius:999px;
+    color:var(--accent); font-size:13px; font-weight:700; padding:4px 12px;}
   .btn-ghost{background:none; border:none; color:var(--soft); font-size:16px; padding:12px 8px; text-decoration:underline;}
   .btn-quiet{background:var(--chip); border:1.5px solid var(--line); border-radius:12px; padding:12px 18px; font-size:16px;}
   .skiplink{background:none; border:none; color:var(--soft); font-size:14.5px; text-decoration:underline; padding:6px 2px; display:inline-block;}
@@ -80,9 +92,6 @@
   .roster-item.suggest{border-color:var(--accent); background:var(--accent-soft); box-shadow:0 0 0 2px rgba(34,104,92,.18);}
   .suggest-badge{display:block; font-size:13.5px; font-weight:700; color:var(--accent); margin-bottom:3px;}
   .divider{border:none; border-top:1px solid var(--line); margin:22px 0;}
-  .picked-tag{display:inline-block; background:var(--accent-soft); border-radius:999px; padding:4px 12px;
-    font-size:14px; color:var(--ink); margin:2px 0 4px;}
-  .picked-tag .skiplink{font-size:13px; padding:2px 2px;}
   .notice{background:var(--accent-soft); border-radius:10px; padding:13px 15px; font-size:15px; margin:14px 0;}
   .subtle{font-size:14px; color:var(--soft);}
   .scale{display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 2px;}
@@ -128,6 +137,7 @@
     .p-roi{border:2px solid #000; border-radius:6px; padding:10px 12px; margin-top:10px; font-weight:700; page-break-inside:avoid;}
     .p-roi h3{font-size:14px; margin-bottom:6px;}
     .p-roi-line{margin:3px 0; font-size:12.5px;}
+    .p-cra{display:inline-block; border:2px solid #000; border-radius:6px; padding:4px 10px; margin:0 0 10px; font-weight:700; font-size:12.5px;}
   }
   /* ---------- persistent Notes widget ---------- */
   .notes-fab{position:fixed; right:16px; bottom:16px; z-index:80; background:var(--accent); color:var(--accent-ink);
@@ -143,7 +153,7 @@
     cursor:pointer; padding:2px 4px;}
   .notes-panel textarea{flex:1; min-height:260px; width:100%; resize:vertical; font:inherit;
     padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink);}
-  @media print{ .notes-fab, .notes-panel{ display:none !important; } }
+  @media print{ .notes-fab, .notes-panel, .modal-overlay{ display:none !important; } }
 </style>
 </head>
 <body>
@@ -158,13 +168,15 @@
    translates its two halves. Strings missing from the dictionary fall
    back to English — note any you spot during testing. */
 let LANG = "en";
+/* own-key lookup only, so text like "constructor" never matches built-in object properties */
+function hasOwn(o, k){ return Object.prototype.hasOwnProperty.call(o, k); }
 function tr(s){
   if(LANG==="en" || typeof s!=="string") return s;
   const D = I18N[LANG]; if(!D) return s;
-  if(D[s]!==undefined) return D[s];
+  if(hasOwn(D, s)) return D[s];
   const trimmed = s.trim();
-  if(trimmed && D[trimmed]!==undefined){
-    return s.replace(trimmed, D[trimmed]);
+  if(trimmed && hasOwn(D, trimmed)){
+    return s.replace(trimmed, ()=>D[trimmed]);
   }
   return s;
 }
@@ -194,8 +206,6 @@ const I18N = { es: {
 /* --- V12 --- */
 "Step {n} of 4":"Paso {n} de 4","Family information":"Información familiar","Your information":"Su información",
 "Other family members":"Otros miembros de la familia","Review & submit":"Revisar y enviar",
-"Housed/sheltered":"Con vivienda/albergada","Unhoused/unsheltered":"Sin vivienda/sin albergue",
-"Which fits best?":"¿Cuál describe mejor su situación?",
 "Living in your own apartment or home (owned or rented)":"Viviendo en su propio apartamento o casa (propia o rentada)",
 "Household & income":"Hogar e ingresos",
 "Which best describes the caregivers living in your household?":"¿Qué describe mejor a los cuidadores que viven en su hogar?",
@@ -209,10 +219,10 @@ const I18N = { es: {
 /* --- welcome --- */
 "Welcome":"Bienvenido/a",
 "This will walk you through our intake, one small step at a time.":"Este formulario le guiará por nuestra admisión, paso a paso.",
-"A staff member is nearby if anything is confusing — just ask. If a question doesn't feel comfortable to answer, you're welcome to skip it — you'll still be able to get help from us.":"Hay un miembro del personal cerca si algo no está claro — solo pregunte. Si no se siente cómodo/a contestando alguna pregunta, puede omitirla — igual podrá recibir nuestra ayuda.",
+"A staff member is nearby if anything is confusing — just ask. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":"Hay un miembro del personal cerca si algo no está claro — solo pregunte. La mayoría de las preguntas se pueden omitir si prefiere no contestarlas — igual podrá recibir nuestra ayuda.",
 "Nothing is saved on this tablet. When this page is closed, everything on it is erased.":"Nada se guarda en esta tableta. Al cerrar esta página, toda la información se borra.",
 /* --- comfort pieces --- */
-" If a question doesn't feel comfortable to answer, you're welcome to skip it — you'll still be able to get help from us.":" Si no se siente cómodo/a contestando alguna pregunta, puede omitirla — igual podrá recibir nuestra ayuda.",
+" Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":" La mayoría de las preguntas se pueden omitir si prefiere no contestarlas — igual podrá recibir nuestra ayuda.",
 "Just the basics to get started.":"Solo lo básico para comenzar.",
 "These are just for information.":"Esto es solo para fines informativos.",
 "This helps us understand who we serve.":"Esto nos ayuda a conocer a las familias que servimos.",
@@ -324,7 +334,7 @@ const I18N = { es: {
 "First, about you":"Primero, sobre usted","About {n}":"Sobre {n}","this person":"esta persona",
 "First name":"Nombre","Preferred name (if different)":"Nombre preferido (si es diferente)",
 "The name they like to be called. It's fine to leave this blank.":"El nombre por el que le gusta que le llamen. Puede dejarlo en blanco.",
-"Preferred name":"Nombre preferido","Date of birth":"Fecha de nacimiento",
+"Date of birth":"Fecha de nacimiento",
 "Month":"Mes","Day":"Día","Year":"Año",
 "That date doesn't look right — please check month, day, and year.":"Esa fecha no parece correcta — revise el mes, el día y el año.",
 "Gender":"Género","Male":"Masculino","Female":"Femenino","Non-Binary, Gender Fluid":"No binario, género fluido",
@@ -354,7 +364,6 @@ const I18N = { es: {
 "If you're staff or have a reason to go in a different order, you can continue anyway.":"Si usted es personal o tiene una razón para seguir otro orden, puede continuar de todos modos.",
 "Okay — I'll do mine first":"Está bien — haré la mía primero",
 "Continue with {n} anyway":"Continuar con {n} de todos modos",
-"Intake complete":"Admisión completa",
 "{n}'s intake is done.":"La admisión de {n} está completa.",
 "This person":"Esta persona",
 "Nice work. Next, let's check whether anyone else in your family needs services today.":"¡Bien hecho! Ahora, veamos si alguien más de su familia necesita servicios hoy.",
@@ -547,7 +556,6 @@ const I18N = { es: {
 "A few questions for {n}":"Unas preguntas para {n}",
 "Is {n} present and able to answer a few questions directly?":"¿Está {n} presente y puede contestar unas preguntas directamente?",
 "Feeling safe — for {n}":"Sentirse seguro/a — para {n}",
-"I feel safe in my home":"Me siento seguro/a en mi casa",
 "I feel safe at my school":"Me siento seguro/a en mi escuela",
 "At any point, have you witnessed violence?":"En algún momento, ¿has sido testigo de violencia?",
 "\u201CWitness\u201D means whatever it means to you — no wrong answer, and you don't need to share what it was.":"\u201CSer testigo\u201D significa lo que sea para ti — no hay respuesta incorrecta, y no necesitas contar qué fue.",
@@ -593,7 +601,6 @@ const I18N = { es: {
 "Please hand the tablet back to a staff member.":"Por favor, devuelva la tableta a un miembro del personal.",
 "Staff: use Print to make the data-entry copy. Nothing is saved on this device — closing or refreshing this page erases everything, so print first.":"Personal: use Imprimir para generar la copia de entrada de datos. Nada se guarda en este dispositivo — cerrar o actualizar esta página borra todo, así que imprima primero.",
 "Start over (erase all)":"Comenzar de nuevo (borrar todo)",
-"Edit":"Editar",
 "This step is no longer available":"Este paso ya no está disponible",
 "Use Back to return to the family list.":"Use Atrás para volver a la lista familiar.",
 /* --- roles (typeahead) --- */
@@ -684,7 +691,6 @@ const I18N = { es: {
 "Is this child/youth involved in court":"¿Tiene este niño/joven un caso abierto en la corte?",
 "Which court? (also enter in S5)":"¿Qué corte? (anotar también en S5)",
 "Ever been detained by the police or arrested?":"¿Alguna vez detenido/a por la policía o arrestado/a?",
-"Detained for what reason?":"¿Detenido/a por qué razón?",
 "Ever run away?":"¿Alguna vez se ha escapado?",
 "Is this child/youth currently living with their family?":"¿Está viviendo actualmente con su familia?",
 "If no, who is the child/youth living with?":"Si dijo no, ¿con quién vive?",
@@ -694,7 +700,35 @@ const I18N = { es: {
 /* --- V13: safety-net screen --- */
 "Something went wrong on this screen":"Algo salió mal en esta pantalla",
 "Your answers are still saved on this page. Tap Go back to return to the last screen. Please do not refresh or close this page.":"Sus respuestas siguen guardadas en esta página. Toque Regresar para volver a la pantalla anterior. Por favor, no actualice ni cierre esta página.",
-"Go back":"Regresar"
+"Go back":"Regresar",
+/* --- V14: Continue-button hints, finish confirm, submit timeout, misc. fixes --- */
+"Still needed:":"Todavía falta:",
+"family last name":"apellido de la familia",
+"10-digit phone number":"número de teléfono de 10 dígitos",
+"first name":"nombre",
+"last name":"apellido",
+"date of birth":"fecha de nacimiento",
+"health insurance answer":"respuesta sobre el seguro médico",
+"To continue, please answer the question above.":"Para continuar, conteste la pregunta de arriba.",
+"This button turns on once at least one adult's intake is complete.":"Este botón se activa cuando la admisión de al menos un adulto esté completa.",
+"Leave off the 1 at the start — just the 10-digit number with area code.":"No incluya el 1 al principio — solo el número de 10 dígitos con el código de área.",
+"{n}'s intake isn't complete. Finish without completing theirs?":"La admisión de {n} no está completa. ¿Terminar sin completarla?",
+"These intakes aren't complete: {n}. Finish without completing them?":"Estas admisiones no están completas: {n}. ¿Terminar sin completarlas?",
+"Finish anyway":"Terminar de todos modos",
+"Submission timed out — please submit again, or print a copy to send to the FRC.":"El envío tardó demasiado — intente enviarlo de nuevo o imprima una copia para enviar al FRC.",
+"Submitted ✓":"Enviado ✓",
+"{n}'s date of birth changed, so some questions are different now. Please go through these questions again — earlier answers are kept where they still apply.":"La fecha de nacimiento de {n} cambió, así que algunas preguntas ahora son diferentes. Por favor, repase estas preguntas de nuevo — las respuestas anteriores se mantienen cuando todavía aplican.",
+"There are no wrong answers.":"No hay respuestas incorrectas.",
+"You can change the language at any time using the dropdown in the top corner.":"Puede cambiar el idioma en cualquier momento con el menú de la esquina superior.",
+"Own words (blank)":"En sus propias palabras (en blanco)",
+"Other (?)":"Otra (?)",
+"Other (Not school aged)":"Otra (aún no tiene edad escolar)",
+"N/A (not school aged)":"N/C (aún no tiene edad escolar)",
+/* --- V15: CRA mode (hub notice) --- */
+"We need to have a full intake for you and for your child who was referred to us. Please complete both before finishing. For other members of the family, we only need their name, date of birth, and whether they have health insurance.":"Necesitamos una admisión completa para usted y para su hijo/a que nos fue referido/a. Por favor, complete ambas antes de terminar. Para los demás miembros de la familia solo necesitamos el nombre, la fecha de nacimiento y si tienen seguro médico.",
+"If you're not on this list yet, tap “+ Add a household member” to add yourself.":"Si usted todavía no aparece en la lista, toque “+ Agregar un miembro del hogar” para agregarse.",
+"If your child isn't listed yet, tap “+ Add a household member”.":"Si su hijo/a todavía no aparece en la lista, toque “+ Agregar un miembro del hogar”.",
+"This button turns on once an adult's intake and a child's intake are both complete.":"Este botón se activa cuando la admisión de un adulto y la de un niño/a estén completas."
 },
 pt: {
 /* --- chrome / navigation --- */
@@ -713,8 +747,6 @@ pt: {
 /* --- V12 --- */
 "Step {n} of 4":"Etapa {n} de 4","Family information":"Informações da família","Your information":"Suas informações",
 "Other family members":"Outros membros da família","Review & submit":"Revisar e enviar",
-"Housed/sheltered":"Com moradia/abrigada","Unhoused/unsheltered":"Sem moradia/sem abrigo",
-"Which fits best?":"Qual descreve melhor a sua situação?",
 "Living in your own apartment or home (owned or rented)":"Morando no seu próprio apartamento ou casa (próprio ou alugado)",
 "Household & income":"Domicílio e renda",
 "Which best describes the caregivers living in your household?":"O que melhor descreve os cuidadores que moram no seu domicílio?",
@@ -729,11 +761,11 @@ pt: {
 /* --- welcome --- */
 "Welcome":"Bem-vindo(a)",
 "This will walk you through our intake, one small step at a time.":"Este formulário vai guiar você pela nossa admissão, um passo de cada vez.",
-"A staff member is nearby if anything is confusing — just ask. If a question doesn't feel comfortable to answer, you're welcome to skip it — you'll still be able to get help from us.":"Um membro da equipe está por perto se algo não estiver claro — é só perguntar. Se você não se sentir à vontade para responder alguma pergunta, pode pulá-la — você ainda poderá receber nossa ajuda.",
+"A staff member is nearby if anything is confusing — just ask. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":"Um membro da equipe está por perto se algo não estiver claro — é só perguntar. A maioria das perguntas pode ser pulada se você preferir não responder — você ainda poderá receber nossa ajuda.",
 "Nothing is saved on this tablet. When this page is closed, everything on it is erased.":"Nada é salvo neste tablet. Quando esta página for fechada, tudo será apagado.",
 "You can change the language at any time using the dropdown in the top corner.":"Você pode mudar o idioma a qualquer momento usando o menu no canto superior.",
 /* --- comfort pieces --- */
-" If a question doesn't feel comfortable to answer, you're welcome to skip it — you'll still be able to get help from us.":" Se você não se sentir à vontade para responder alguma pergunta, pode pulá-la — você ainda poderá receber nossa ajuda.",
+" Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":" A maioria das perguntas pode ser pulada se você preferir não responder — você ainda poderá receber nossa ajuda.",
 "Just the basics to get started.":"Apenas o básico para começar.",
 "These are just for information.":"Isto é apenas para fins informativos.",
 "This helps us understand who we serve.":"Isto nos ajuda a conhecer as famílias que atendemos.",
@@ -1211,7 +1243,34 @@ pt: {
 /* --- V13: safety-net screen --- */
 "Something went wrong on this screen":"Algo deu errado nesta tela",
 "Your answers are still saved on this page. Tap Go back to return to the last screen. Please do not refresh or close this page.":"Suas respostas continuam salvas nesta página. Toque em Voltar para retornar à tela anterior. Por favor, não atualize nem feche esta página.",
-"Go back":"Voltar"
+"Go back":"Voltar",
+/* --- V14: Continue-button hints, finish confirm, submit timeout, misc. fixes --- */
+"Still needed:":"Ainda falta:",
+"family last name":"sobrenome da família",
+"10-digit phone number":"telefone com 10 dígitos",
+"first name":"nome",
+"last name":"sobrenome",
+"date of birth":"data de nascimento",
+"health insurance answer":"resposta sobre seguro de saúde",
+"To continue, please answer the question above.":"Para continuar, responda à pergunta acima.",
+"This button turns on once at least one adult's intake is complete.":"Este botão fica disponível quando a admissão de pelo menos um adulto estiver completa.",
+"Leave off the 1 at the start — just the 10-digit number with area code.":"Não inclua o 1 no início — só o número de 10 dígitos com o código de área.",
+"{n}'s intake isn't complete. Finish without completing theirs?":"A admissão de {n} não está completa. Finalizar sem completá-la?",
+"These intakes aren't complete: {n}. Finish without completing them?":"Estas admissões não estão completas: {n}. Finalizar sem completá-las?",
+"Finish anyway":"Finalizar mesmo assim",
+"Submission timed out — please submit again, or print a copy to send to the FRC.":"O envio demorou demais — tente enviar novamente ou imprima uma cópia para enviar ao FRC.",
+"Submitted ✓":"Enviado ✓",
+"{n}'s date of birth changed, so some questions are different now. Please go through these questions again — earlier answers are kept where they still apply.":"A data de nascimento de {n} mudou, então algumas perguntas agora são diferentes. Por favor, passe por estas perguntas novamente — as respostas anteriores são mantidas quando ainda se aplicam.",
+"There are no wrong answers.":"Não existem respostas erradas.",
+"Own words (blank)":"Com suas próprias palavras (em branco)",
+"Other (?)":"Outra (?)",
+"Other (Not school aged)":"Outra (ainda não está em idade escolar)",
+"N/A (not school aged)":"N/A (ainda não está em idade escolar)",
+/* --- V15: CRA mode (hub notice) --- */
+"We need to have a full intake for you and for your child who was referred to us. Please complete both before finishing. For other members of the family, we only need their name, date of birth, and whether they have health insurance.":"Precisamos de uma admissão completa para você e para o seu filho que foi encaminhado para nós. Por favor, complete as duas antes de finalizar. Para os outros membros da família, só precisamos do nome, da data de nascimento e se têm seguro de saúde.",
+"If you're not on this list yet, tap “+ Add a household member” to add yourself.":"Se você ainda não estiver na lista, toque em “+ Adicionar um membro do domicílio” para se adicionar.",
+"If your child isn't listed yet, tap “+ Add a household member”.":"Se seu filho ainda não estiver na lista, toque em “+ Adicionar um membro do domicílio”.",
+"This button turns on once an adult's intake and a child's intake are both complete.":"Este botão fica disponível quando a admissão de um adulto e a de uma criança estiverem completas."
 },
 ht: {
 /* --- chrome / navigation --- */
@@ -1230,8 +1289,6 @@ ht: {
 /* --- V12 --- */
 "Step {n} of 4":"Etap {n} nan 4","Family information":"Enfòmasyon sou fanmi an","Your information":"Enfòmasyon ou",
 "Other family members":"Lòt manm fanmi an","Review & submit":"Revize epi soumèt",
-"Housed/sheltered":"Gen kay/abrite","Unhoused/unsheltered":"San kay/pa abrite",
-"Which fits best?":"Kiyès ki dekri sitiyasyon ou pi byen?",
 "Living in your own apartment or home (owned or rented)":"Ap viv nan pwòp apatman oswa kay ou (ou posede l oswa w lwe l)",
 "Household & income":"Kay ak revni",
 "Which best describes the caregivers living in your household?":"Kisa ki pi byen dekri moun k ap okipe timoun yo ki rete lakay ou?",
@@ -1246,11 +1303,11 @@ ht: {
 /* --- welcome --- */
 "Welcome":"Byenveni",
 "This will walk you through our intake, one small step at a time.":"Fòm sa a pral gide ou nan admisyon nou an, yon etap alafwa.",
-"A staff member is nearby if anything is confusing — just ask. If a question doesn't feel comfortable to answer, you're welcome to skip it — you'll still be able to get help from us.":"Gen yon manm anplwaye toupre si yon bagay pa klè — jis mande. Si ou pa alèz pou reponn yon kesyon, ou ka sote li — ou ap toujou ka jwenn èd nan men nou.",
+"A staff member is nearby if anything is confusing — just ask. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":"Gen yon manm anplwaye toupre si yon bagay pa klè — jis mande. Ou ka sote pifò kesyon yo si ou pa vle reponn — ou ap toujou ka jwenn èd nan men nou.",
 "Nothing is saved on this tablet. When this page is closed, everything on it is erased.":"Anyen pa anrejistre sou tablèt sa a. Lè paj sa a fèmen, tout bagay efase.",
 "You can change the language at any time using the dropdown in the top corner.":"Ou ka chanje lang lan nenpòt lè avèk meni ki nan kwen anwo a.",
 /* --- comfort pieces --- */
-" If a question doesn't feel comfortable to answer, you're welcome to skip it — you'll still be able to get help from us.":" Si ou pa alèz pou reponn yon kesyon, ou ka sote li — ou ap toujou ka jwenn èd nan men nou.",
+" Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":" Ou ka sote pifò kesyon yo si ou pa vle reponn — ou ap toujou ka jwenn èd nan men nou.",
 "Just the basics to get started.":"Sèlman baz yo pou nou kòmanse.",
 "These are just for information.":"Sa a se sèlman pou enfòmasyon.",
 "This helps us understand who we serve.":"Sa ede nou konnen fanmi nou sèvi yo.",
@@ -1728,24 +1785,57 @@ ht: {
 /* --- V13: safety-net screen --- */
 "Something went wrong on this screen":"Gen yon pwoblèm sou ekran sa a",
 "Your answers are still saved on this page. Tap Go back to return to the last screen. Please do not refresh or close this page.":"Repons ou yo toujou anrejistre sou paj sa a. Tape Retounen pou w tounen nan dènye ekran an. Tanpri pa rafrechi ni fèmen paj sa a.",
-"Go back":"Retounen"
+"Go back":"Retounen",
+/* --- V14: Continue-button hints, finish confirm, submit timeout, misc. fixes --- */
+"Still needed:":"Toujou bezwen:",
+"family last name":"siyati fanmi an",
+"10-digit phone number":"nimewo telefòn 10 chif",
+"first name":"premye non",
+"last name":"siyati",
+"date of birth":"dat nesans",
+"health insurance answer":"repons sou asirans sante",
+"To continue, please answer the question above.":"Pou kontinye, tanpri reponn kesyon ki anwo a.",
+"This button turns on once at least one adult's intake is complete.":"Bouton sa a ap mache lè admisyon omwen yon granmoun fini.",
+"Leave off the 1 at the start — just the 10-digit number with area code.":"Pa mete 1 a nan kòmansman — sèlman nimewo 10 chif la ak kòd zòn nan.",
+"{n}'s intake isn't complete. Finish without completing theirs?":"Admisyon {n} poko fini. Fini san w pa konplete pa l la?",
+"These intakes aren't complete: {n}. Finish without completing them?":"Admisyon sa yo poko fini: {n}. Fini san w pa konplete yo?",
+"Finish anyway":"Fini kanmenm",
+"Submission timed out — please submit again, or print a copy to send to the FRC.":"Soumisyon an pran twòp tan — tanpri soumèt ankò, oswa enprime yon kopi pou voye bay FRC a.",
+"Submitted ✓":"Soumèt ✓",
+"{n}'s date of birth changed, so some questions are different now. Please go through these questions again — earlier answers are kept where they still apply.":"Dat nesans {n} chanje, kidonk kèk kesyon diferan kounye a. Tanpri pase sou kesyon sa yo ankò — repons ou te deja bay yo rete kote yo toujou aplike.",
+"There are no wrong answers.":"Pa gen okenn move repons.",
+"Own words (blank)":"Nan pwòp mo ou (vid)",
+"Other (?)":"Lòt (?)",
+"Other (Not school aged)":"Lòt (poko gen laj lekòl)",
+"N/A (not school aged)":"N/A (poko gen laj lekòl)",
+/* --- V15: CRA mode (hub notice) --- */
+"We need to have a full intake for you and for your child who was referred to us. Please complete both before finishing. For other members of the family, we only need their name, date of birth, and whether they have health insurance.":"Nou bezwen yon admisyon konplè pou ou ak pou pitit ou yo te refere ban nou an. Tanpri konplete toude anvan ou fini. Pou lòt manm fanmi an, nou bezwen sèlman non, dat nesans, ak si yo gen asirans sante.",
+"If you're not on this list yet, tap “+ Add a household member” to add yourself.":"Si ou poko sou lis la, touche “+ Ajoute yon manm nan kay la” pou ajoute tèt ou.",
+"If your child isn't listed yet, tap “+ Add a household member”.":"Si pitit ou a poko sou lis la, touche “+ Ajoute yon manm nan kay la”.",
+"This button turns on once an adult's intake and a child's intake are both complete.":"Bouton sa a ap mache lè admisyon yon granmoun ak admisyon yon timoun fini."
 }
 };
 /* ============ DATA ============ */
-const TODAY = new Date();
-const TODAY_STR = (TODAY.getMonth()+1)+"/"+TODAY.getDate()+"/"+TODAY.getFullYear();
+/* Read the clock each time (not once at page load), so a tablet left open
+   overnight still prints the date the intake was actually printed/submitted. */
+function todayStr(){ const d = new Date(); return (d.getMonth()+1)+"/"+d.getDate()+"/"+d.getFullYear(); }
 
 /* ============ REMOTE SUBMIT (proof of concept — see README) ============
    Not a BAA-covered channel. Staff-only action; print-and-shred remains
    the fallback if this fails. */
 const WORKER_URL = "https://frc-intake-poc.mikewilson129.workers.dev/submit";
 const SUBMIT_TOKEN = "WYGZk2kM3o81QczfKbRIIYo2uSthVaVk";
+/* Give up after this long so a stalled connection can't leave Submit stuck on "Submitting…" */
+const SUBMIT_TIMEOUT_MS = 30000;
 async function submitIntake(payload){
+  const ctrl = new AbortController();
+  const timer = setTimeout(()=>ctrl.abort(), SUBMIT_TIMEOUT_MS);
   try{
     const res = await fetch(WORKER_URL, {
       method:"POST",
       headers:{ "Content-Type":"application/json", "X-Submit-Token":SUBMIT_TOKEN },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: ctrl.signal
     });
     const result = await res.json().catch(()=>({}));
     if(!res.ok || !result.ok){
@@ -1754,11 +1844,17 @@ async function submitIntake(payload){
     }
     return {success:true, result:result};
   }catch(err){
+    if(err.name==="AbortError"){
+      console.error("Submission timed out after "+(SUBMIT_TIMEOUT_MS/1000)+"s");
+      return {success:false, timedOut:true};
+    }
     console.error("Network error submitting intake:", err);
     return {success:false, error: err.message};
+  }finally{
+    clearTimeout(timer);
   }
 }
-const COMFORT_TAIL = " If a question doesn't feel comfortable to answer, you're welcome to skip it — you'll still be able to get help from us.";
+const COMFORT_TAIL = " Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.";
 function comfort(lead){ return tr(lead) + tr(COMFORT_TAIL); }
 
 const REFERRAL_CATS = [
@@ -1817,16 +1913,13 @@ const HOUSEHOLD_TYPES = [
   {v:"Two-Parent", info:"Two parents or caregivers share the home and caregiving."},
   {v:"Multi-Parent", info:"More than two parents or caregivers share the home (for example, a parent and step-parent both living with the family)."},
   {v:"Multi-Generational", info:"More than one generation of adults lives in the home together (for example, a parent and grandparent both caring for the children)."}];
-/* Two-level housing question. Stored values (v) are the exact CRM values;
-   label is only what the client sees. "Homeless but Sheltered" is offered
-   under both groups on purpose — it's the gray-area answer. */
-const LIV_OWN = {v:"Living in their own apartment or home (owned or rented)", label:"Living in your own apartment or home (owned or rented)"};
-const LIV_SHELTERED = {v:"Homeless but Sheltered", info:"Staying in a shelter, motel placement, or doubled-up with others."};
-const LIV_UNSHELTERED = {v:"Homeless and Not Sheltered", info:"No steady place to stay (like staying outside or in a car)."};
-const LIVING_GROUPS = [
-  {v:"Housed/sheltered", items:[LIV_OWN, LIV_SHELTERED]},
-  {v:"Unhoused/unsheltered", items:[LIV_UNSHELTERED, LIV_SHELTERED]},
-  {v:"Decline to answer", items:null}];
+/* Housing ("Your family is:"). Stored values (v) are the exact CRM values;
+   label is only what the client sees. */
+const LIVING_OPTS = [
+  {v:"Living in their own apartment or home (owned or rented)", label:"Living in your own apartment or home (owned or rented)"},
+  {v:"Homeless but Sheltered", info:"Staying in a shelter, motel placement, or doubled-up with others."},
+  {v:"Homeless and Not Sheltered", info:"No steady place to stay (like staying outside or in a car)."},
+  {v:"Not Answered", label:"Decline to answer"}];
 const INCOME_OPTS = ["Less than $10,000","$10,000 to $19,999","$20,000 to $29,999","$30,000 to $39,999",
   "$40,000 to $49,999","$50,000 to $59,999","$60,000 to $69,999","$70,000 to $79,999","$80,000 to $89,999",
   "$90,000 to $99,999","$100,000 to $149,999","$150,000 or more"];
@@ -1858,7 +1951,7 @@ const ROLE_ALIASES = {
  "dad":["Father","Adoptive Parent","Birth Parent","Step-Parent","Foster Parent","Legal Guardian Parent"],
  "daddy":["Father","Birth Parent","Adoptive Parent"],
  "father":["Father","Adoptive Parent","Birth Parent","Step-Parent","Foster Parent","Legal Guardian Parent"],
- "papa":["Father","Birth Parent","Grandfather"],"padre":["Father","Birth Parent","Adoptive Parent"],
+ "padre":["Father","Birth Parent","Adoptive Parent"],
  "parent":["Birth Parent","Adoptive Parent","Foster Parent","Step-Parent","Legal Guardian Parent","Co-partner"],
  "grandma":["Grandmother","Step-Grandparent","Kinship"],"gma":["Grandmother"],"nana":["Grandmother"],
  "grammy":["Grandmother"],"mimi":["Grandmother"],"abuela":["Grandmother","Kinship"],
@@ -1881,7 +1974,7 @@ const ROLE_ALIASES = {
  "wife":["Wife","Ex-Wife","Partner"],"husband":["Husband","Ex-Husband","Partner"],
  "partner":["Partner","Co-partner","Boyfriend/Girlfriend","Fiance"],
  "girlfriend":["Boyfriend/Girlfriend","Partner"],"boyfriend":["Boyfriend/Girlfriend","Partner"],
- "manman":["Mother","Birth Parent","Adoptive Parent"],"papa":["Father","Birth Parent","Adoptive Parent"],
+ "manman":["Mother","Birth Parent","Adoptive Parent"],"papa":["Father","Birth Parent","Adoptive Parent","Grandfather"],
  "pitit":["Child/Youth","Son","Daughter"],"grann":["Grandmother","Kinship"],"granpapa":["Grandfather"],
  "matant":["Aunt"],"tonton":["Uncle"],"kouzen":["Cousin"],"neve":["Nephew"],"nyes":["Niece","Great Niece"],
  "frè":["Brother","Sibling"],"fre":["Brother","Sibling"],"sè":["Sister","Sibling"],"se":["Sister","Sibling"],
@@ -1905,7 +1998,7 @@ const ROLE_ALIASES = {
  "amigo":["Friend","Family Friend"],"amiga":["Friend","Family Friend"],
  "eu":["Self"],
  "tio":["Uncle"],"tia":["Aunt"],"primo":["Cousin"],"prima":["Cousin"],
- "esposo":["Husband","Partner"],"esposa":["Wife","Partner"],
+ "esposa":["Wife","Partner"],
  "novio":["Boyfriend/Girlfriend","Partner","Fiance"],"novia":["Boyfriend/Girlfriend","Partner","Fiance"],
  "sobrino":["Nephew"],"sobrina":["Niece"],
  "hermano":["Brother","Sibling","Half-Sibling","Step-Sibling"],"hermana":["Sister","Sibling","Half-Sibling","Step-Sibling"],
@@ -1914,7 +2007,6 @@ const ROLE_ALIASES = {
  "nieto":["Grandchild"],"nieta":["Grandchild"],
  "suegra":["Mother-In-Law"],"pareja":["Partner","Co-partner","Boyfriend/Girlfriend"],
  "prometido":["Fiance"],"prometida":["Fiance"],
- "cuidador":["Kinship","Foster Parent","Legal Guardian Parent"],"cuidadora":["Kinship","Foster Parent","Legal Guardian Parent"],
  "tutor":["Legal Guardian Parent","Temporary Guardian"],"tutora":["Legal Guardian Parent","Temporary Guardian"],
  "me":["Self"],"myself":["Self"],"self":["Self"],
  "n/a":["__DECLINE__"],"na":["__DECLINE__"],"none":["__DECLINE__"]
@@ -2070,13 +2162,28 @@ const state = {
   lastDoneAdultId:null,
   showStaffPanel:false,
   submitting:false,
+  submitted:false, /* true after a successful Submit; cleared when staff tap Edit */
   submitStatus:null,
   notesText:"",    /* single running note, shown via the persistent floating Notes panel */
-  family:{lastName:"", phone:"", email:"", householdType:null, livingGroup:null, living:null, income:null,
+  family:{lastName:"", phone:"", email:"", householdType:null, living:null, income:null,
     address:{street:"", street2:"", apt:"", city:"", cityAuto:false, state:"Massachusetts", zip:""}},
   referral:{category:null, value:null},
-  members:[]
+  members:[],
+  cra:false        /* CRA mode: finishing needs a completed adult AND child intake */
 };
+
+/* ============ URL TAGS ============
+   Read once at load (never stored):
+   ?cra       CRA mode on and locked for the session (the link staff send to CRA families)
+   ?lang=xx   start in es, pt or ht; anything else starts in English
+   They combine: ?cra&lang=es */
+const URL_TAGS = new URLSearchParams(location.search);
+function urlTag(name){ for(const [k,v] of URL_TAGS) if(k.toLowerCase()===name) return v; return null; }
+const CRA_LOCKED = urlTag("cra")!==null;
+state.cra = CRA_LOCKED;
+const URL_LANG = (urlTag("lang")||"").trim().toLowerCase();
+if(hasOwn(I18N, URL_LANG)) LANG = URL_LANG;   /* set before the first render */
+
 let nextId = 1;
 function newMember(){
   return {id:nextId++, isSelf:false, first:"", last:"", preferred:"",
@@ -2085,22 +2192,23 @@ function newMember(){
     services:false, done:false, step:0, a:{}};
 }
 function dobValid(m){
-  const mo=+m.dobM, d=+m.dobD, y=+m.dobY;
+  const mo=+m.dobM, d=+m.dobD, y=+m.dobY, now=new Date();
   if(!m.dobM||!m.dobD||!m.dobY) return false;
-  if(!(y>=1900 && y<=TODAY.getFullYear())) return false;
+  if(!(y>=1900 && y<=now.getFullYear())) return false;
   if(!(mo>=1&&mo<=12)) return false;
   const dt = new Date(y, mo-1, d);
   if(dt.getFullYear()!==y || dt.getMonth()!==mo-1 || dt.getDate()!==d) return false;
-  if(dt > TODAY) return false;
+  if(dt > now) return false;
   return true;
 }
 function syncDob(m){ m.dob = dobValid(m) ? (m.dobY+"-"+String(m.dobM).padStart(2,"0")+"-"+String(m.dobD).padStart(2,"0")) : ""; }
 function ageOf(m){
   if(!m.dob) return null;
   const d = new Date(m.dob+"T00:00:00"); if(isNaN(d)) return null;
-  let a = TODAY.getFullYear()-d.getFullYear();
-  const md = TODAY.getMonth()-d.getMonth();
-  if(md<0 || (md===0 && TODAY.getDate()<d.getDate())) a--;
+  const now = new Date();
+  let a = now.getFullYear()-d.getFullYear();
+  const md = now.getMonth()-d.getMonth();
+  if(md<0 || (md===0 && now.getDate()<d.getDate())) a--;
   return a;
 }
 function isChild(m){ const a=ageOf(m); return a!==null && a<18; }
@@ -2110,6 +2218,50 @@ function digitsOf(s){ return (s||"").replace(/\D/g,""); }
 function phoneValid(){ return digitsOf(state.family.phone).length===10; }
 function emailLooksValid(){ const v=(state.family.email||"").trim(); return !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
 function basicsComplete(m){ return !!(m.first.trim() && m.last.trim() && dobValid(m) && m.insurance); }
+
+/* ---- Question sets ----
+   A date-of-birth edit can move someone between the adult and child
+   questions, or across the child age cut-offs (11 and 12). Each set's
+   answers are parked in m.stash, so changing the DOB back restores them;
+   answers to questions that are the same for adults and children carry
+   over. The stash is never printed or submitted. */
+function qSetOf(m){
+  const a = ageOf(m);
+  if(a===null || a>=18) return "adult";
+  return a>=12 ? "child12+" : (a>=11 ? "child11" : "childUnder11");
+}
+const SHARED_ANSWER_KEYS = ["role","roleQ","roleDecline","race","raceOther","ethnicity","ethnicityOther",
+  "hispanicOrigin","hispAuto","hispUnchecked","language","languageOther","reasonText","reasonPicks",
+  "disability","disabTypes","overallHealth","condFlag","conditions","doctor12","dentist12",
+  "court","courtWhich","s4food","s4clothing","agencies","communityFlag","community","civic"];
+/* Returns true when the person now needs to go through their questions again. */
+function syncQuestionSet(m){
+  const now = qSetOf(m), was = m.qset;
+  if(!was || was===now){ m.qset = now; return false; }
+  m.stash = m.stash || {};
+  m.stash[was] = {a:m.a, done:m.done, step:m.step};
+  const saved = m.stash[now];
+  if(saved){
+    delete m.stash[now];
+    m.a = saved.a; m.done = saved.done; m.step = saved.step;
+  } else {
+    const copy = JSON.parse(JSON.stringify(m.a));
+    if((was==="adult")===(now==="adult")) m.a = copy;
+    else { m.a = {}; for(const k of SHARED_ANSWER_KEYS) if(copy[k]!==undefined) m.a[k] = copy[k]; }
+    m.done = false; m.step = 0;
+  }
+  m.qset = now;
+  pruneAnswers(m);
+  return !m.done;
+}
+/* drop checked options that aren't offered in this person's question set */
+function pruneAnswers(m){
+  const a = m.a, child = isChild(m);
+  const keep = (k, opts)=>{ if(Array.isArray(a[k])) a[k] = a[k].filter(v=>opts.includes(v)); };
+  keep("reasonPicks", reasonPickOptions(m));
+  keep("disabTypes", child ? DISAB_CHILD : DISAB_ADULT);
+  keep("civic", (child ? CIVIC_CHILD : CIVIC_ADULT).map(o=>o.v));
+}
 
 /* ============ RENDER HELPERS ============ */
 const app = document.getElementById("app");
@@ -2344,13 +2496,37 @@ function shell(o){
     el("button",{class:"btn-ghost", type:"button", onclick:back},"‹ Back"));
   const right = el("div",{style:"display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;"});
   if(o.extraNav) right.appendChild(o.extraNav);
+  const blocked = o.canNext!==undefined && !o.canNext;
   if(o.next){
-    right.appendChild(el("button",{class:"btn-primary", type:"button",
-      disabled:(o.canNext!==undefined && !o.canNext), onclick:o.next}, o.nextLabel||"Continue"));
+    right.appendChild(el("button",{class:"btn-primary", id:"navNext", type:"button",
+      disabled:blocked, onclick:o.next}, o.nextLabel||"Continue"));
   }
   nav.appendChild(right);
   card.appendChild(nav);
+  /* o.why: says what's missing while the main button is greyed out (always
+     created when given — even "" — so setNext() can fill it in later) */
+  if(o.next && o.why!==undefined) card.appendChild(el("div",{id:"navWhy", class:"why", style:blocked?"":"display:none;"}, o.why));
   return card;
+}
+/* Update the main button (and its "why") as someone types, without a
+   re-render that would pull focus out of the text box. */
+function setNext(ok, why){
+  const b = document.getElementById("navNext"); if(b) b.disabled = !ok;
+  const w = document.getElementById("navWhy");
+  if(w){ w.style.display = ok ? "none" : ""; if(why!==undefined) w.textContent = why; }
+}
+/* "Still needed: first name, date of birth" (translated) */
+function stillNeeded(items){ return items.length ? tr("Still needed:")+" "+items.map(tr).join(", ") : ""; }
+/* In-page yes/no box (translatable buttons, unlike window.confirm) */
+function confirmBox(message, yesLabel, noLabel, onYes){
+  const overlay = el("div",{class:"modal-overlay"});
+  const close = ()=>overlay.remove();
+  overlay.appendChild(el("div",{class:"modal", role:"dialog", "aria-modal":"true"},
+    el("p",null,message),
+    el("div",{class:"modal-actions"},
+      el("button",{class:"btn-quiet", type:"button", onclick:close}, noLabel),
+      el("button",{class:"btn-primary", type:"button", onclick:()=>{ close(); onYes(); }}, yesLabel))));
+  document.body.appendChild(overlay);
 }
 
 /* ============ SCREENS ============ */
@@ -2361,67 +2537,85 @@ SCREENS.welcome = () => shell({
   noBack:true,
   body:[
     el("p",null,"This will walk you through our intake, one small step at a time."),
-    el("div",{class:"notice"},"A staff member is nearby if anything is confusing — just ask. If a question doesn't feel comfortable to answer, you're welcome to skip it — you'll still be able to get help from us."),
+    el("div",{class:"notice"},"A staff member is nearby if anything is confusing — just ask. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us."),
     el("p",{class:"subtle"},"You can change the language at any time using the dropdown in the top corner."),
-    el("p",{class:"subtle"},"Nothing is saved on this tablet. When this page is closed, everything on it is erased.")
+    el("p",{class:"subtle"},"Nothing is saved on this tablet. When this page is closed, everything on it is erased."),
+    craControl()
   ],
   next:()=>goTo("famBasics"), nextLabel:"Start"
 });
+/* Staff-facing CRA mode switch on Welcome. English only: the text node
+   skips tr(), so it never picks up a translation. On the ?cra link it's
+   locked on and shown as a plain label. */
+function craControl(){
+  const txt = ()=>document.createTextNode("CRA mode");
+  if(CRA_LOCKED) return el("div",{class:"cra-row"}, el("span",{class:"cra-tag"}, txt()));
+  return el("div",{class:"cra-row"}, el("button",{type:"button", class:state.cra ? "cra-tag" : "cra-off",
+    "aria-pressed":String(state.cra), onclick:()=>{ state.cra = !state.cra; rerender(); }}, txt()));
+}
 
 /* ---- Family phase ---- */
 SCREENS.famBasics = () => {
   const f = state.family;
-  const phoneOk = phoneValid();
-  const phoneStarted = digitsOf(f.phone).length>0;
-  const emailOk = emailLooksValid();
-  const emailStarted = (f.email||"").trim().length>0;
+  /* why the phone is flagged (null = fine or not started yet) */
+  const phoneProblem = ()=>{
+    const d = digitsOf(f.phone);
+    if(!d.length || d.length===10) return null;
+    return (d.length===11 && d[0]==="1") ? "Leave off the 1 at the start — just the 10-digit number with area code."
+      : "Phone number needs 10 digits — parentheses and dashes are fine.";
+  };
+  const missing = ()=>{
+    const out = [];
+    if(!f.lastName.trim()) out.push("family last name");
+    if(!phoneValid()) out.push("10-digit phone number");
+    return out;
+  };
+  const phoneMsg = el("div",{class:"validate"});
+  const emailMsg = el("div",{class:"validate"},"That doesn't look like a valid email address.");
+  const showMsgs = ()=>{
+    const p = phoneProblem();
+    phoneMsg.textContent = p ? tr(p) : ""; phoneMsg.style.display = p ? "" : "none";
+    emailMsg.style.display = emailLooksValid() ? "none" : "";
+  };
+  /* every field re-checks the button — before, only the phone box did, so
+     typing the phone before the last name left Continue stuck greyed out */
+  const refresh = ()=>{ showMsgs(); const miss = missing(); setNext(!miss.length, stillNeeded(miss)); };
+  showMsgs();
   return shell({
     title:"Your family",
     comfort:"Just the basics to get started.",
     body:[
       qLabel("Family last name"),
-      qText(f,"lastName",{ph:"Last name"}),
+      qText(f,"lastName",{ph:"Last name", oninput:refresh}),
       qLabel("Main phone number"),
-      qText(f,"phone",{type:"tel", ph:"(978) 555-0000", oninput:(v,inp)=>{
+      qText(f,"phone",{type:"tel", ph:"(978) 555-0000", bad:!!phoneProblem(), oninput:(v,inp)=>{
         inp.classList.toggle("bad", digitsOf(v).length>0 && digitsOf(v).length!==10);
-        const nav=document.querySelector(".btn-primary"); if(nav) nav.disabled = !(f.lastName.trim() && phoneValid());
+        refresh();
       }}),
-      (phoneStarted && !phoneOk ? el("div",{class:"validate"},"Phone number needs 10 digits — parentheses and dashes are fine.") : null),
+      phoneMsg,
       qLabel("Email address"),
-      qText(f,"email",{type:"text", ph:"name@example.com", oninput:(v,inp)=>{
+      qText(f,"email",{type:"text", ph:"name@example.com", bad:!emailLooksValid(), oninput:(v,inp)=>{
         inp.classList.toggle("bad", v.trim().length>0 && !emailLooksValid());
+        refresh();
       }}),
-      (emailStarted && !emailOk ? el("div",{class:"validate"},"That doesn't look like a valid email address.") : null)
+      emailMsg
     ],
-    canNext: !!(f.lastName.trim() && phoneOk),
+    canNext: !missing().length,
+    why: stillNeeded(missing()),
     next:()=>goTo("famHome")
   });
 };
 
-/* Housing (two-level, like the referral question) + address */
+/* Housing (one list, required) + address */
 SCREENS.famHome = () => {
   const f = state.family;
   const a = f.address;
-  const grp = LIVING_GROUPS.find(g=>g.v===f.livingGroup);
-  const housing = [qLabel("Your family is:")];
-  if(!grp){
-    housing.push(qSingle(LIVING_GROUPS, ()=>f.livingGroup, v=>{
-      f.livingGroup=v; f.living = (v==="Decline to answer") ? "Not Answered" : null;
-    }, {stack:true, toggle:false}));
-  } else {
-    housing.push(el("div",{class:"picked-tag"}, "✓ ", el("b",null,grp.v), " ",
-      el("button",{class:"skiplink", type:"button",
-        onclick:()=>{ f.livingGroup=null; f.living=null; rerender(); }},"change")));
-    if(grp.items){
-      housing.push(qLabel("Which fits best?"));
-      housing.push(qSingle(grp.items, ()=>f.living, v=>f.living=v, {stack:true, toggle:false}));
-    }
-  }
   return shell({
     title:"Your home",
     comfort:comfort("These are just for information."),
     body:[
-      ...housing,
+      qLabel("Your family is:"),
+      qSingle(LIVING_OPTS, ()=>f.living, v=>f.living=v, {stack:true, toggle:false}),
       qLabel("Street address"),
       qText(a,"street",{ph:"Street address"}),
       el("div",{class:"row2"},
@@ -2442,6 +2636,7 @@ SCREENS.famHome = () => {
       el("p",{class:"subtle"},"State: Massachusetts (tell a staff member if that's not right)")
     ],
     canNext: !!f.living,
+    why:"To continue, please answer the question above.",
     next:()=>goTo("famHousehold")
   });
 };
@@ -2483,14 +2678,21 @@ SCREENS.refSource = () => {
     title:"How did you hear about us?",
     body:body,
     canNext: !!r.value,
+    why:"To continue, please answer the question above.",
     next:()=>{
-      if(state.members.length===0){ state.draft = newMember(); goTo("basics",{draft:true, first:true}); }
+      if(state.members.length===0) openDraft({first:true});
       else goTo(state.phase==="build" ? "anyoneElse" : "rosterSelect");
     }
   });
 };
 
 /* ---- Per-person basics (drafts only join the roster on Save) ---- */
+/* Open the add-a-person screen. An unsaved draft is kept, so going Back and
+   then forward again doesn't erase what was already typed. */
+function openDraft(ctx){
+  if(!state.draft) state.draft = newMember();
+  goTo("basics", Object.assign({draft:true}, ctx||{}));
+}
 SCREENS.basics = (ctx) => {
   const m = ctx.draft ? state.draft : state.members.find(x=>x.id===ctx.mid);
   if(!m){
@@ -2502,9 +2704,18 @@ SCREENS.basics = (ctx) => {
     trn("About {n}", m.first?displayName(m):tr("this person"));
   const dobStarted = m.dobM||m.dobD||m.dobY;
   const dobBad = dobStarted && !dobValid(m);
+  const missing = ()=>{
+    const out = [];
+    if(!m.first.trim()) out.push("first name");
+    if(!m.last.trim()) out.push("last name");
+    if(!dobValid(m)) out.push("date of birth");
+    if(!m.insurance) out.push("health insurance answer");
+    return out;
+  };
+  const refresh = ()=>{ const miss = missing(); setNext(!miss.length, stillNeeded(miss)); };
   const dobField = (key, ph, max)=> qText(m, key, {ph:ph, max:max, oninput:()=>{
       syncDob(m);
-      const nav=document.querySelector(".btn-primary"); if(nav) nav.disabled = !basicsComplete(m);
+      refresh();
       const warn=document.getElementById("dobWarn");
       if(warn) warn.style.display = ((m.dobM||m.dobD||m.dobY) && !dobValid(m)) ? "block":"none";
     }});
@@ -2517,9 +2728,9 @@ SCREENS.basics = (ctx) => {
       COMFORT_TAIL),
     body:[
       qLabel("First name"),
-      qText(m,"first",{ph:"First name", oninput:()=>{const nav=document.querySelector(".btn-primary"); if(nav) nav.disabled=!basicsComplete(m);}}),
+      qText(m,"first",{ph:"First name", oninput:refresh}),
       qLabel("Last name"),
-      qText(m,"last",{ph:"Last name", oninput:()=>{const nav=document.querySelector(".btn-primary"); if(nav) nav.disabled=!basicsComplete(m);}}),
+      qText(m,"last",{ph:"Last name", oninput:refresh}),
       qLabel("Preferred name (if different)", firstEver ?
         "The name you like to be called. It's fine to leave this blank." :
         "The name they like to be called. It's fine to leave this blank."),
@@ -2541,6 +2752,7 @@ SCREENS.basics = (ctx) => {
       qSingle(INSURANCE_OPTS, ()=>m.insurance, v=>m.insurance=v, {toggle:false})
     ],
     canNext: basicsComplete(m),
+    why: stillNeeded(missing()),
     next:()=>{ syncDob(m);
       if(ctx.draft){
         state.members.push(m); state.draft = null;
@@ -2548,7 +2760,11 @@ SCREENS.basics = (ctx) => {
            not a stale draft */
         current.ctx = {mid:m.id, first:ctx.first, returnTo:ctx.returnTo};
       }
+      /* a DOB change that switches adult/child (or crosses age 11/12) means a
+         different set of questions — walk through them with answers kept */
+      const redo = !ctx.draft && m.services && syncQuestionSet(m);
       if(state.phase==="build") goTo("anyoneElse");
+      else if(redo) enterIntakeAt(m, 0, undefined, {qsetNotice:true});
       else if(!ctx.draft && m.services && !m.done && (ctx.returnTo||"rosterSelect")==="rosterSelect")
         enterIntakeAt(m, m.step||0);
       else if(ctx.returnTo==="review") goTo("review",{mid:ctx.returnMid||m.id});
@@ -2566,10 +2782,10 @@ SCREENS.anyoneElse = () => shell({
     qLabel("Are there any other people in your house you haven't told us about yet?"),
     el("p",{class:"hint"},"We'd like to include everyone who lives with you — adults and children.")
   ],
-  next:()=>{ state.draft = newMember(); goTo("basics",{draft:true}); },
+  next:()=>openDraft(),
   nextLabel:"Yes — add someone",
   extraNav: el("button",{class:"btn-quiet", type:"button",
-    onclick:()=>{ state.phase="main"; goTo("rosterSelect",{firstTime:true}); }},
+    onclick:()=>{ state.draft = null; state.phase="main"; goTo("rosterSelect",{firstTime:true}); }},
     "No — that's everyone")
 });
 
@@ -2579,7 +2795,7 @@ function rosterList(withActions, suggestId){
     const sub = [];
     const a = ageOf(m); if(a!==null) sub.push(trn("Age {n}", a));
     if(m.services && m.done) sub.push(tr("Intake complete"));
-    else if(m.services && m.step>0) sub.push(tr("Intake in progress"));
+    else if(m.services) sub.push(tr("Intake in progress"));
     const suggested = withActions && suggestId===m.id && !m.done;
     const right = el("div",{style:"display:flex; gap:8px; align-items:center; flex-wrap:wrap;"});
     if(withActions){
@@ -2589,7 +2805,7 @@ function rosterList(withActions, suggestId){
           onclick:()=>goTo("review",{mid:m.id})},"Review & edit"));
       } else {
         right.appendChild(el("button",{class:"btn-quiet", type:"button",
-          onclick:()=>startIntake(m)}, m.step>0 ? "Continue intake" : "Start intake"));
+          onclick:()=>startIntake(m)}, m.services ? "Continue intake" : "Start intake"));
         right.appendChild(el("button",{class:"btn-ghost", type:"button", style:"font-size:14px;",
           onclick:()=>goTo("basics",{mid:m.id, returnTo:"rosterSelect"})},"Edit info"));
       }
@@ -2598,7 +2814,7 @@ function rosterList(withActions, suggestId){
     if(suggested) left.appendChild(el("span",{class:"suggest-badge"},"★ Is this you? Start here"));
     left.appendChild(el("div",{class:"roster-name"}, fullName(m)||"(no name yet)"));
     left.appendChild(el("div",{class:"roster-sub"}, sub.join(" · ")));
-    if(withActions && m.done && !isChild(m) && m.id===state.lastDoneAdultId){
+    if(withActions && !state.cra && m.done && !isChild(m) && m.id===state.lastDoneAdultId){
       left.appendChild(el("div",{class:"roster-sub", style:"margin-top:4px; color:var(--accent);"},
         "Food, clothing, basic needs, and child care requests are covered by your intake — you don't need one for your child for those."));
     }
@@ -2614,14 +2830,15 @@ function rosterList(withActions, suggestId){
    entry point that jumps straight into the middle of an intake (Continue
    intake, Edit info resuming, Review's per-section Edit) instead of
    relying on whatever happens to already be on the history stack. */
-function enterIntakeAt(m, targetIdx, editEnd){
+function enterIntakeAt(m, targetIdx, editEnd, extraCtx){
+  if(!m.qset) m.qset = qSetOf(m);
   const steps = isChild(m) ? childSteps(m) : adultSteps(m);
   const mkCtx = (idx)=> editEnd!==undefined ? {mid:m.id, step:idx, editEnd:editEnd} : {mid:m.id, step:idx};
   for(let idx=0; idx<targetIdx; idx++){
     if(steps[idx](m).autoSkip) continue;
     history.push({id:"intake", ctx:mkCtx(idx)});
   }
-  goTo("intake", mkCtx(targetIdx));
+  goTo("intake", Object.assign(mkCtx(targetIdx), extraCtx||{}));
 }
 function startIntake(m){
   const anyDone = state.members.some(x=>x.done);
@@ -2666,10 +2883,21 @@ SCREENS.intakeDone = (ctx) => {
   });
 };
 
+/* ---- Finish rule: ONE place, checked by the household list AND by Submit ----
+   Needs a completed adult intake; in CRA mode also a completed child
+   intake (one child is enough). */
+function finishRule(){
+  const adultDone = state.members.some(m=>m.done && !isChild(m));
+  const childDone = state.members.some(m=>m.done && isChild(m));
+  return { ok: adultDone && (!state.cra || childDone),
+    why: state.cra ? "This button turns on once an adult's intake and a child's intake are both complete."
+      : "This button turns on once at least one adult's intake is complete." };
+}
+
 /* ---- Roster select (main phase hub) ---- */
 SCREENS.rosterSelect = (ctx) => {
   const anyDone = state.members.some(m=>m.done);
-  const anyInProgress = state.members.some(m=>m.services && !m.done);
+  const rule = finishRule();
   const suggestId = !anyDone ? ((state.members.find(x=>!isChild(x))||{}).id||null) : null;
   const body = [];
   if(!anyDone){
@@ -2678,7 +2906,16 @@ SCREENS.rosterSelect = (ctx) => {
   }
   if(anyDone){
     body.push(qLabel("Do you need to complete an intake for anyone else in your family today?"));
-    body.push(el("p",{class:"hint"},"Complete an intake for a child when they need direct referrals of their own, such as mental health services or extracurricular activities."));
+    if(!state.cra) body.push(el("p",{class:"hint"},"Complete an intake for a child when they need direct referrals of their own, such as mental health services or extracurricular activities."));
+  }
+  if(state.cra && !rule.ok){
+    body.push(el("div",{class:"notice", style:"font-weight:600;"},
+      "We need to have a full intake for you and for your child who was referred to us. Please complete both before finishing. For other members of the family, we only need their name, date of birth, and whether they have health insurance.",
+      (!state.members.some(isChild) ? el("div",{style:"margin-top:6px;"},"If your child isn't listed yet, tap \u201C+ Add a household member\u201D.") : null)));
+  }
+  /* nobody 18+ on the list (e.g. only the child was entered): say how to add yourself */
+  if(!state.members.some(m=>!isChild(m))){
+    body.push(el("div",{class:"notice", style:"font-weight:600;"},"If you're not on this list yet, tap \u201C+ Add a household member\u201D to add yourself."));
   }
   body.push(el("p",{class:"hint"},"A green check means that person's intake is complete."));
   body.push(rosterList(true, suggestId));
@@ -2686,15 +2923,24 @@ SCREENS.rosterSelect = (ctx) => {
     body.push(el("div",{class:"notice", style:"font-size:16.5px; font-weight:600;"},"If you're unsure, just ask a staff member — that's what we're here for."));
   }
   body.push(el("button",{class:"btn-quiet", type:"button", style:"margin-top:6px;",
-    onclick:()=>{ state.draft = newMember(); goTo("basics",{draft:true, returnTo:"rosterSelect"}); }},
+    onclick:()=>openDraft({returnTo:"rosterSelect"})},
     "+ Add a household member"));
 
   return shell({
     title:"Your household",
     noBack:true,
     body:body,
-    canNext: anyDone && !anyInProgress,
-    next:()=>goTo("finish"),
+    /* see finishRule(); unfinished extra intakes get a confirm */
+    canNext: rule.ok,
+    why: rule.why,
+    next:()=>{
+      const open = state.members.filter(m=>m.services && !m.done);
+      if(!open.length) return goTo("finish");
+      const msg = open.length===1
+        ? trn("{n}'s intake isn't complete. Finish without completing theirs?", displayName(open[0]))
+        : trn("These intakes aren't complete: {n}. Finish without completing them?", open.map(displayName).join(", "));
+      confirmBox(msg, "Finish anyway", "Go back", ()=>goTo("finish"));
+    },
     nextLabel:"No one else — finish up"
   });
 };
@@ -2709,11 +2955,14 @@ SCREENS.intake = (ctx) => {
   const editing = ctx.editEnd!==undefined;
   if(!editing) m.step = Math.max(m.step, i);
   const last = editing ? i>=ctx.editEnd : i===steps.length-1;
+  const notice = ctx.qsetNotice ? el("div",{class:"notice"},
+    trn("{n}'s date of birth changed, so some questions are different now. Please go through these questions again — earlier answers are kept where they still apply.", displayName(m))) : null;
   return shell({
     title: s.title,
     comfort: s.comfort,
-    body: s.body,
+    body: [notice, ...s.body],
     canNext: s.canNext!==false,
+    why:"To continue, please answer the question above.",
     next: ()=>{
       let j = i+1;
       while(j<steps.length){
@@ -2752,7 +3001,7 @@ function roleTypeahead(m){
       const aliasHits = new Set();
       for(const key in ROLE_ALIASES){ const nk=normTxt(key);
         if(nk.startsWith(q)||q.startsWith(nk)) ROLE_ALIASES[key].forEach(r=>aliasHits.add(r)); }
-      const aliasList = ROLE_ALIASES[q] || [...aliasHits];
+      const aliasList = hasOwn(ROLE_ALIASES, q) ? ROLE_ALIASES[q] : [...aliasHits];
       /* keep alias order first (most likely picks), then plain text matches */
       const textMatches = ROLES.filter(r=>normTxt(r).includes(q));
       matches = [...new Set([...aliasList.filter(r=>r!=="__DECLINE__"), ...textMatches])];
@@ -2875,16 +3124,18 @@ function ethRaceBlock(m){
     (a.race.includes("Other")? qText(a,"raceOther",{ph:"Race — in your own words"}):null)
   ];
 }
+function reasonPickOptions(m){
+  if(!isChild(m)) return [...REASON_PICKS_ADULT, "CRA Support"];
+  const age = ageOf(m);
+  return (age!==null && age>=11) ? [...REASON_PICKS_CHILD, "CRA Support"] : REASON_PICKS_CHILD;
+}
 function reasonBlock(m){
   const a=m.a; if(!a.reasonPicks) a.reasonPicks=[];
   const child = isChild(m);
-  const age = ageOf(m);
-  const adultPicks = [...REASON_PICKS_ADULT, "CRA Support"];
-  const childPicks = (age!==null && age>=11) ? [...REASON_PICKS_CHILD, "CRA Support"] : REASON_PICKS_CHILD;
   return [
     qLabel(child ? trn("What brings you in for {n} today?", displayName(m)) : "What brings you in today?"),
     el("p",{class:"hint"},"Tap anything that fits — then add anything else in your own words. A few words is plenty, no story needed."),
-    qMulti(child ? childPicks : adultPicks, ()=>a.reasonPicks),
+    qMulti(reasonPickOptions(m), ()=>a.reasonPicks),
     qLabel("Anything else, in your own words"),
     qArea(a,"reasonText",{ph:"e.g., housing, help with my son's school, feeling overwhelmed…", max:300})
   ];
@@ -3059,6 +3310,7 @@ function childSteps(m){
   (m)=>{
     const ag = age();
     if(ag!==null && ag<12){ a.craActive="No"; a.craUnder12=true; return {autoSkip:true, title:"", body:[]}; }
+    if(a.craUnder12) a.craActive=null;   /* was auto-set while under 12 — ask it now */
     a.craUnder12=false;
     return { title:trn("Court status for {n}", kid()),
     comfort:"If you're not sure, a staff member can help.",
@@ -3114,7 +3366,8 @@ function childSteps(m){
     const nsa = notSchoolAged(a);
     const ag = age();
     const showJob = !nsa && ag!==null && ag>=12;
-    if(!showJob) a.hasJob = a.hasJob || "No";
+    if(!showJob){ if(!a.hasJob){ a.hasJob="No"; a.hasJobAuto=true; } }
+    else if(a.hasJobAuto){ a.hasJob=null; a.hasJobAuto=false; }   /* auto "No" no longer applies — ask it */
     /* IEP -> 504 dependency */
     const iepYes = a.iep==="Yes";
     if(iepYes && !a.plan504Auto){ a.plan504="No"; a.plan504Auto=true; }
@@ -3188,11 +3441,15 @@ function childSteps(m){
   /* 9: safety gate */
   (m)=>{
     const ag = age();
+    const SAFETY_KEYS = ["safeHome","safeSchool","safeStreets","witnessed","exploited","gang"];
     if(ag!==null && ag<11){
       a.childPresent="No"; a.childPresentAuto=true;
-      a.safeHome="Did not answer"; a.safeSchool="Did not answer"; a.safeStreets="Did not answer";
-      a.witnessed="Did not answer"; a.exploited="Did not answer"; a.gang="Did not answer";
+      for(const k of SAFETY_KEYS) a[k]="Did not answer";
       return {autoSkip:true, title:"", body:[]};
+    }
+    if(a.childPresentAuto){   /* auto-filled while under 11 — ask these now */
+      a.childPresent=null;
+      for(const k of SAFETY_KEYS) if(a[k]==="Did not answer") a[k]=null;
     }
     a.childPresentAuto=false;
     return { title:trn("A few questions for {n}", kid()),
@@ -3298,6 +3555,8 @@ function pChecks(label, arr){
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function genderOut(m){ return m.gender==="Tell Us in Your Own Words" ? (m.genderOther||"Own words (blank)") : (m.gender||"Did Not Answer"); }
 function pronounOut(m){ return m.pronouns==="Tell Us in Your Own Words" ? (m.pronounsOther||"Own words (blank)") : (m.pronouns||"Did Not Answer"); }
+/* flags people whose intake was started but the family finished without it */
+function servicesOut(m){ return !m.services ? "No" : (m.done ? "Yes" : "Yes (intake not completed)"); }
 function dobOut(m){ if(!m.dob) return "Did Not Answer";
   const p=m.dob.split("-"); return p.length===3 ? (+p[1])+"/"+(+p[2])+"/"+p[0] : m.dob; }
 function listOut(arr, otherText){
@@ -3325,8 +3584,8 @@ function personSections(m, printOrder){
     pLine("Health insurance", m.insurance) +
     pLine("First Name", m.first) +
     pLine("Birthdate", dobOut(m)) +
-    pLine("Services Needed", m.services ? "Yes" : "No");
-  if(m.services) fmi += pLine("Initial Contact Date", TODAY_STR);
+    pLine("Services Needed", servicesOut(m));
+  if(m.services) fmi += pLine("Initial Contact Date", todayStr());
   S.push({title:"Family Member Info", inner:fmi, range:"basics"});
   if(!m.services) return S;
 
@@ -3349,7 +3608,7 @@ function personSections(m, printOrder){
 
   if(child){
     S.push({title:"S2 — CRA Related Questions", range:[0,0], inner:
-      pLine("CRA Indicator Last Set On", TODAY_STR) +
+      pLine("CRA Indicator Last Set On", todayStr()) +
       pLine("CRA Related Question", a.craActive==="Yes" ? "A CRA Application has been filed for this child" : "No active CRA") +
       pLine("Application was filed by", a.craActive==="Yes" ?
         (a.craFiledBy==="Other" ? "Other ("+(a.craFiledByOther||"?")+")" : (a.craFiledBy||"Did Not Answer")) : "Not Applicable") +
@@ -3472,6 +3731,11 @@ function personSections(m, printOrder){
 /* ---- Review & edit screen ---- */
 SCREENS.review = (ctx) => {
   const m = state.members.find(x=>x.id===ctx.mid);
+  /* a section whose steps were all skipped automatically (e.g. CRA for under-12s)
+     has nothing to edit — Edit would otherwise open the next unrelated question.
+     (Checked before building the sections: the step logic syncs auto-set answers.) */
+  const auto = (isChild(m) ? childSteps(m) : adultSteps(m)).map(fn=>!!fn(m).autoSkip);
+  const editable = (s)=> s.range==="basics" || auto.slice(s.range[0], s.range[1]+1).includes(false);
   PS_TR = true;                    /* review renders in the current language */
   const secs = personSections(m);
   PS_TR = false;
@@ -3479,11 +3743,11 @@ SCREENS.review = (ctx) => {
   for(const s of secs){
     const head = el("div",{class:"rev-head"},
       el("h3",null,tr(s.title)),
-      el("button",{class:"btn-quiet", type:"button", style:"padding:8px 14px; font-size:14px;",
+      editable(s) ? el("button",{class:"btn-quiet", type:"button", style:"padding:8px 14px; font-size:14px;",
         onclick:()=>{
           if(s.range==="basics") goTo("basics",{mid:m.id, returnTo:"review", returnMid:m.id});
           else enterIntakeAt(m, s.range[0], s.range[1]);
-        }},"Edit"));
+        }},"Edit") : null);
     const sec = el("div",{class:"rev-section"});
     sec.appendChild(head);
     const content = el("div",{html:s.inner});
@@ -3521,28 +3785,42 @@ SCREENS.finish = () => {
     ],
     noBack:true,
     next: async ()=>{
+      if(!finishRule().ok){ goTo("rosterSelect"); return; }   /* never send an intake that doesn't meet the rule */
       state.submitting = true;
       state.submitStatus = "Submitting…";
       rerender();
-      const printHtml = buildPrint();
-      const payload = {
-        family: state.family,
-        referral: state.referral,
-        members: state.members,
-        submittedAt: new Date().toISOString(),
-        printHtml: printHtml
-      };
-      const outcome = await submitIntake(payload);
-      state.submitting = false;
-      state.submitStatus = outcome.success
-        ? "Submitted."
+      let outcome;
+      /* try/finally: any error still releases the button (it used to stay on "Submitting…" for good) */
+      try{
+        const printHtml = buildPrint();
+        const payload = {
+          family: state.family,
+          referral: state.referral,
+          /* m.stash (answers parked by a DOB change) is never sent */
+          members: state.members.map(({stash, ...m})=>m),
+          submittedAt: new Date().toISOString(),
+          printHtml: printHtml
+        };
+        outcome = await submitIntake(payload);
+      }catch(err){
+        console.error("Submit failed before sending:", err);
+        outcome = {success:false};
+      }finally{
+        state.submitting = false;
+      }
+      state.submitted = outcome.success;
+      state.submitStatus = outcome.success ? "Submitted."
+        : outcome.timedOut ? "Submission timed out — please submit again, or print a copy to send to the FRC."
         : "Submission failed — please try again or download/print a copy to send to the FRC.";
       rerender();
     },
-    nextLabel: state.submitting ? "Submitting…" : "Submit",
-    canNext: !state.submitting,
+    nextLabel: state.submitting ? "Submitting…" : (state.submitted ? "Submitted ✓" : "Submit"),
+    canNext: !state.submitting && !state.submitted && finishRule().ok,
+    why: finishRule().ok ? undefined : finishRule().why,
     extraNav: el("div",{style:"display:flex; gap:10px; flex-wrap:wrap; align-items:center;"},
-      el("button",{class:"btn-ghost", type:"button", onclick:()=>goTo("rosterSelect")},"Edit"),
+      /* editing after a submit re-opens Submit so the updated answers can be sent */
+      el("button",{class:"btn-ghost", type:"button", disabled:state.submitting,
+        onclick:()=>{ state.submitted = false; state.submitStatus = null; goTo("rosterSelect"); }},"Edit"),
       el("button",{class:"btn-ghost", type:"button",
         onclick:()=>{ buildPrint(); window.print(); }},
         "Print"),
@@ -3571,7 +3849,7 @@ function miniCard(m){
     pLine("Health insurance", m.insurance)+
     pLine("First Name", m.first)+
     pLine("Birthday", dobOut(m))+
-    pLine("Services needed", m.services?"Yes":"No")+
+    pLine("Services needed", servicesOut(m))+
     '</div>';
 }
 
@@ -3601,7 +3879,8 @@ function buildPrint(){
   const f = state.family, ad = f.address;
   const kids = state.members.filter(m=>isChild(m)).length;
   let h = '<div class="p-title">Family Intake — '+esc(f.lastName||"(no family name)")+'</div>';
-  h += '<div class="p-meta">Completed '+TODAY_STR+' · Printed from the intake tablet · Enter into CRM, then shred.</div>';
+  h += '<div class="p-meta">Completed '+todayStr()+' · Printed from the intake tablet · Enter into CRM, then shred.</div>';
+  if(state.cra) h += '<div class="p-cra">CRA mode — this visit required an adult intake and a child intake.</div>';
 
   h += '<div class="p-section"><h3>FAMILY — Family Information</h3>'+
     pLine("Family Last Name", f.lastName) +
@@ -3634,14 +3913,15 @@ function buildPrint(){
     if(!m.services) continue;
     const child = isChild(m);
     h += '<div class="p-person">';
-    h += '<div class="p-title">'+esc(fullName(m)||"(no name)")+(m.isSelf?" (completed own intake)":"")+(child?" — CHILD":" — ADULT")+'</div>';
+    h += '<div class="p-title">'+esc(fullName(m)||"(no name)")+(m.isSelf&&m.done?" (completed own intake)":"")+(child?" — CHILD":" — ADULT")+(m.done?"":" — INTAKE NOT COMPLETED")+'</div>';
+    if(!m.done) h += '<div class="p-staff">Intake was started but not finished — the family chose to finish without it. Unanswered questions show as Did Not Answer.</div>';
     const secs = personSections(m, true);
     let screeningHeaderDone = false;
     for(const s of secs){
       /* insert screening header before S1 */
       if(!screeningHeaderDone && s.title.startsWith("S1")){
         h += '<div class="p-section"><h3>'+(child?"CHILD":"ADULT")+' SCREENING — Family Member Information</h3>'+
-          pLine("Date", TODAY_STR) +
+          pLine("Date", todayStr()) +
           '<div class="p-staff">Staff Completed: ______________________</div></div>';
         screeningHeaderDone = true;
       }
