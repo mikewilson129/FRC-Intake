@@ -92,9 +92,6 @@
   .roster-item.suggest{border-color:var(--accent); background:var(--accent-soft); box-shadow:0 0 0 2px rgba(34,104,92,.18);}
   .suggest-badge{display:block; font-size:13.5px; font-weight:700; color:var(--accent); margin-bottom:3px;}
   .divider{border:none; border-top:1px solid var(--line); margin:22px 0;}
-  .picked-tag{display:inline-block; background:var(--accent-soft); border-radius:999px; padding:4px 12px;
-    font-size:14px; color:var(--ink); margin:2px 0 4px;}
-  .picked-tag .skiplink{font-size:13px; padding:2px 2px;}
   .notice{background:var(--accent-soft); border-radius:10px; padding:13px 15px; font-size:15px; margin:14px 0;}
   .subtle{font-size:14px; color:var(--soft);}
   .scale{display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 2px;}
@@ -209,8 +206,6 @@ const I18N = { es: {
 /* --- V12 --- */
 "Step {n} of 4":"Paso {n} de 4","Family information":"Información familiar","Your information":"Su información",
 "Other family members":"Otros miembros de la familia","Review & submit":"Revisar y enviar",
-"Housed/sheltered":"Con vivienda/albergada","Unhoused/unsheltered":"Sin vivienda/sin albergue",
-"Which fits best?":"¿Cuál describe mejor su situación?",
 "Living in your own apartment or home (owned or rented)":"Viviendo en su propio apartamento o casa (propia o rentada)",
 "Household & income":"Hogar e ingresos",
 "Which best describes the caregivers living in your household?":"¿Qué describe mejor a los cuidadores que viven en su hogar?",
@@ -751,8 +746,6 @@ pt: {
 /* --- V12 --- */
 "Step {n} of 4":"Etapa {n} de 4","Family information":"Informações da família","Your information":"Suas informações",
 "Other family members":"Outros membros da família","Review & submit":"Revisar e enviar",
-"Housed/sheltered":"Com moradia/abrigada","Unhoused/unsheltered":"Sem moradia/sem abrigo",
-"Which fits best?":"Qual descreve melhor a sua situação?",
 "Living in your own apartment or home (owned or rented)":"Morando no seu próprio apartamento ou casa (próprio ou alugado)",
 "Household & income":"Domicílio e renda",
 "Which best describes the caregivers living in your household?":"O que melhor descreve os cuidadores que moram no seu domicílio?",
@@ -1294,8 +1287,6 @@ ht: {
 /* --- V12 --- */
 "Step {n} of 4":"Etap {n} nan 4","Family information":"Enfòmasyon sou fanmi an","Your information":"Enfòmasyon ou",
 "Other family members":"Lòt manm fanmi an","Review & submit":"Revize epi soumèt",
-"Housed/sheltered":"Gen kay/abrite","Unhoused/unsheltered":"San kay/pa abrite",
-"Which fits best?":"Kiyès ki dekri sitiyasyon ou pi byen?",
 "Living in your own apartment or home (owned or rented)":"Ap viv nan pwòp apatman oswa kay ou (ou posede l oswa w lwe l)",
 "Household & income":"Kay ak revni",
 "Which best describes the caregivers living in your household?":"Kisa ki pi byen dekri moun k ap okipe timoun yo ki rete lakay ou?",
@@ -1919,16 +1910,13 @@ const HOUSEHOLD_TYPES = [
   {v:"Two-Parent", info:"Two parents or caregivers share the home and caregiving."},
   {v:"Multi-Parent", info:"More than two parents or caregivers share the home (for example, a parent and step-parent both living with the family)."},
   {v:"Multi-Generational", info:"More than one generation of adults lives in the home together (for example, a parent and grandparent both caring for the children)."}];
-/* Two-level housing question. Stored values (v) are the exact CRM values;
-   label is only what the client sees. "Homeless but Sheltered" is offered
-   under both groups on purpose — it's the gray-area answer. */
-const LIV_OWN = {v:"Living in their own apartment or home (owned or rented)", label:"Living in your own apartment or home (owned or rented)"};
-const LIV_SHELTERED = {v:"Homeless but Sheltered", info:"Staying in a shelter, motel placement, or doubled-up with others."};
-const LIV_UNSHELTERED = {v:"Homeless and Not Sheltered", info:"No steady place to stay (like staying outside or in a car)."};
-const LIVING_GROUPS = [
-  {v:"Housed/sheltered", items:[LIV_OWN, LIV_SHELTERED]},
-  {v:"Unhoused/unsheltered", items:[LIV_UNSHELTERED, LIV_SHELTERED]},
-  {v:"Decline to answer", items:null}];
+/* Housing ("Your family is:"). Stored values (v) are the exact CRM values;
+   label is only what the client sees. */
+const LIVING_OPTS = [
+  {v:"Living in their own apartment or home (owned or rented)", label:"Living in your own apartment or home (owned or rented)"},
+  {v:"Homeless but Sheltered", info:"Staying in a shelter, motel placement, or doubled-up with others."},
+  {v:"Homeless and Not Sheltered", info:"No steady place to stay (like staying outside or in a car)."},
+  {v:"Not Answered", label:"Decline to answer"}];
 const INCOME_OPTS = ["Less than $10,000","$10,000 to $19,999","$20,000 to $29,999","$30,000 to $39,999",
   "$40,000 to $49,999","$50,000 to $59,999","$60,000 to $69,999","$70,000 to $79,999","$80,000 to $89,999",
   "$90,000 to $99,999","$100,000 to $149,999","$150,000 or more"];
@@ -2174,7 +2162,7 @@ const state = {
   submitted:false, /* true after a successful Submit; cleared when staff tap Edit */
   submitStatus:null,
   notesText:"",    /* single running note, shown via the persistent floating Notes panel */
-  family:{lastName:"", phone:"", email:"", householdType:null, livingGroup:null, living:null, income:null,
+  family:{lastName:"", phone:"", email:"", householdType:null, living:null, income:null,
     address:{street:"", street2:"", apt:"", city:"", cityAuto:false, state:"Massachusetts", zip:""}},
   referral:{category:null, value:null},
   members:[],
@@ -2611,30 +2599,16 @@ SCREENS.famBasics = () => {
   });
 };
 
-/* Housing (two-level, like the referral question) + address */
+/* Housing (one list, required) + address */
 SCREENS.famHome = () => {
   const f = state.family;
   const a = f.address;
-  const grp = LIVING_GROUPS.find(g=>g.v===f.livingGroup);
-  const housing = [qLabel("Your family is:")];
-  if(!grp){
-    housing.push(qSingle(LIVING_GROUPS, ()=>f.livingGroup, v=>{
-      f.livingGroup=v; f.living = (v==="Decline to answer") ? "Not Answered" : null;
-    }, {stack:true, toggle:false}));
-  } else {
-    housing.push(el("div",{class:"picked-tag"}, "✓ ", el("b",null,grp.v), " ",
-      el("button",{class:"skiplink", type:"button",
-        onclick:()=>{ f.livingGroup=null; f.living=null; rerender(); }},"change")));
-    if(grp.items){
-      housing.push(qLabel("Which fits best?"));
-      housing.push(qSingle(grp.items, ()=>f.living, v=>f.living=v, {stack:true, toggle:false}));
-    }
-  }
   return shell({
     title:"Your home",
     comfort:comfort("These are just for information."),
     body:[
-      ...housing,
+      qLabel("Your family is:"),
+      qSingle(LIVING_OPTS, ()=>f.living, v=>f.living=v, {stack:true, toggle:false}),
       qLabel("Street address"),
       qText(a,"street",{ph:"Street address"}),
       el("div",{class:"row2"},
