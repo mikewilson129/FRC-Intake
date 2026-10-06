@@ -49,6 +49,10 @@ required for the core flow — everything lives in one file.
   (Print is now the secondary, plain-text action next to it). This is a
   UI change only — Print is still required for CRM data entry, and the
   underlying submission is still non-BAA/proof-of-concept as noted above.
+- Submit gives up after 30 seconds (`SUBMIT_TIMEOUT_MS`) and shows "Submission
+  timed out — please submit again…", so a bad connection can't leave the
+  button stuck on "Submitting…". A timed-out request may still have reached
+  the server, so submitting again can occasionally store a duplicate copy.
 - `SUBMIT_TOKEN` is a plain static token embedded in client-side code. It
   should be rotated whenever it may have leaked (e.g. after sharing the file,
   a public commit, or a compromised tablet), and should not be treated as a
@@ -88,6 +92,15 @@ Since everything is one file, a few conventions keep it maintainable:
 5. Since there's no build step, test changes by opening `index.html` directly
    in a browser and clicking through the flow (including Print preview) in
    at least English and one other language before committing.
+6. **A greyed-out button should say why.** Screens with required answers
+   pass `why` to `shell()` (shown under the button only while it's greyed
+   out). Text boxes that affect the button call `setNext(ok, why)` as the
+   person types instead of re-rendering — don't look the button up with
+   `document.querySelector(".btn-primary")`.
+7. **Age-dependent questions:** if a question only applies at certain ages
+   and is auto-answered otherwise, also clear the auto-answer when it stops
+   applying (see the `craUnder12`, `childPresentAuto` and `hasJobAuto` flags),
+   so a corrected date of birth asks the question for real.
 
 ## Future ideas (not built yet)
 
@@ -98,6 +111,17 @@ Since everything is one file, a few conventions keep it maintainable:
   privacy choice on the shared Android tablets at the FRC. A likely shape:
   an "external" (client's own phone) mode that saves progress, and an
   "internal" (shared tablet) mode that keeps today's no-saving behavior.
+- **Child questions that can't be skipped (to review).** Three child-intake
+  questions must be answered before Continue turns on, and have no Skip
+  link: "Is there an active CRA for {name}?" (ages 12+), "Is {name} present
+  and able to answer a few questions directly?" (ages 11+), and "Is {name}
+  currently living with their family?" (all ages). Decide whether each
+  should stay required, get a Skip / "Not sure" option, or change with the
+  planned CRA mode.
+- **CRA mode / finishing with a child's intake.** "No one else — finish up"
+  turns on once at least one *adult's* intake is complete. The planned CRA
+  mode should also allow finishing with a child's intake. Today a household
+  with no adults entered (e.g. a youth on their own) can't finish.
 - **More personalized wording on the printout.** The printed/CRM copy
   intentionally keeps the CRM's own wording (e.g. "This child/youth feels
   safe in his/her home") so staff can match it to CRM fields. Making it more
@@ -105,6 +129,61 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 14
+
+Fixes for the "intake freezes / Continue won't work" reports, plus other
+bugs found while investigating.
+
+- **Fixed: Continue stuck greyed out on "Your family."** The button only
+  re-checked itself when the phone number was typed, so entering the phone
+  before the last name left it greyed out (and erasing the last name
+  afterward left it on). All three fields now update it as you type.
+- **A greyed-out button now says why.** A short line under the button lists
+  what's still needed (e.g. "Still needed: family last name, 10-digit phone
+  number" or "To continue, please answer the question above."). The phone
+  message ("needs 10 digits") and email message now appear while typing;
+  a number entered with a leading 1 gets "Leave off the 1 at the start…".
+- **Finishing with an unfinished intake.** "No one else — finish up" now
+  turns on as soon as one adult's intake is complete (before, any started
+  intake — even one opened by accident — kept it greyed out until finished,
+  with no way to cancel). If anyone's intake is unfinished, a pop-up asks
+  "John's intake isn't complete. Finish without completing theirs?" (Finish
+  anyway / Go back). The family list now shows "Intake in progress" for
+  anyone started. Unfinished intakes still print, marked "INTAKE NOT
+  COMPLETED" with "Services needed: Yes (intake not completed)".
+- **Submit can't get stuck.** It gives up after 30 seconds with "Submission
+  timed out — please submit again, or print a copy to send to the FRC," and
+  any error now releases the button. After a successful submit the button
+  shows "Submitted ✓" (prevents accidental duplicates); tapping Edit
+  re-opens Submit so changed answers can be sent.
+- **Date-of-birth corrections ask the right questions.** If a DOB change
+  moves someone between adult and child questions, or across the child age
+  cut-offs (11 and 12), their intake re-opens with a note explaining why,
+  answers that still apply are kept, and newly relevant questions (e.g.
+  CRA at 12+) are asked instead of keeping an automatic "No." The other
+  set's answers are parked in the background and restored if the DOB is
+  changed back; they're never printed or submitted.
+- **Printed dates use the current date** (the day it's printed/submitted),
+  not the day the page was loaded.
+- **Fixed: Back from "First, about you" erased what was typed** for the
+  first person (same for adding someone else).
+- **Fixed: Review → Edit opened the wrong question** for sections answered
+  automatically (CRA for under-12s; an adult's Basic Needs when food and
+  clothing were picked as reasons). Those sections no longer show Edit.
+- **Wording:** "If a question doesn't feel comfortable to answer, you're
+  welcome to skip it" is now "Most questions can be skipped if you'd rather
+  not answer" (Welcome screen and screen intros), since a few are required.
+- **Translations:** added Spanish/Portuguese/Haitian Creole for all new
+  text, plus strings that were showing in English ("There are no wrong
+  answers." on the child safety screen, the Spanish Welcome-screen language
+  tip, and some Review values like "Own words (blank)"). Removed duplicate
+  Spanish entries ("Preferred name" had two different translations). New
+  translations are drafts — review with bilingual staff.
+- **Minor:** typing certain words (e.g. "constructor") in the role search
+  no longer crashes the screen; the "papa" role shortcut keeps Grandfather.
+- **Unchanged on purpose:** the Notes box — closing it with ✕ uncovers
+  Continue.
 
 ### Version 13
 
