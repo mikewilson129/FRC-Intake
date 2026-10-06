@@ -168,9 +168,10 @@ Since everything is one file, a few conventions keep it maintainable:
     enough even if the household has several. Unfinished extra intakes
     still get the Version 14 "finish without completing theirs?" pop-up.
   - Until that's met, the household screen shows "We need to have a full
-    intake for you and for your child that was referred to us. Please
-    complete both before finishing. We only need name, DOB, and health
-    insurance indicator for other members of the family.", plus "If your
+    intake for you and for your child who was referred to us. Please
+    complete both before finishing. For other members of the family, we
+    only need their name, date of birth, and whether they have health
+    insurance.", plus "If your
     child isn't listed yet, tap '+ Add a household member'." when no child
     is listed. The line under the
     greyed-out button reads "This button turns on once an adult's intake

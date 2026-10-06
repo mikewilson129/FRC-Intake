@@ -725,7 +725,7 @@ const I18N = { es: {
 "Other (Not school aged)":"Otra (aún no tiene edad escolar)",
 "N/A (not school aged)":"N/C (aún no tiene edad escolar)",
 /* --- V15: CRA mode (hub notice) --- */
-"We need to have a full intake for you and for your child that was referred to us. Please complete both before finishing. We only need name, DOB, and health insurance indicator for other members of the family.":"Necesitamos una admisión completa para usted y para su hijo/a que nos fue referido/a. Por favor, complete ambas antes de terminar. Para los demás miembros de la familia solo necesitamos el nombre, la fecha de nacimiento y si tienen seguro médico.",
+"We need to have a full intake for you and for your child who was referred to us. Please complete both before finishing. For other members of the family, we only need their name, date of birth, and whether they have health insurance.":"Necesitamos una admisión completa para usted y para su hijo/a que nos fue referido/a. Por favor, complete ambas antes de terminar. Para los demás miembros de la familia solo necesitamos el nombre, la fecha de nacimiento y si tienen seguro médico.",
 "If you're not on this list yet, tap “+ Add a household member” to add yourself.":"Si usted todavía no aparece en la lista, toque “+ Agregar un miembro del hogar” para agregarse.",
 "If your child isn't listed yet, tap “+ Add a household member”.":"Si su hijo/a todavía no aparece en la lista, toque “+ Agregar un miembro del hogar”.",
 "This button turns on once an adult's intake and a child's intake are both complete.":"Este botón se activa cuando la admisión de un adulto y la de un niño/a estén completas."
@@ -1267,7 +1267,7 @@ pt: {
 "Other (Not school aged)":"Outra (ainda não está em idade escolar)",
 "N/A (not school aged)":"N/A (ainda não está em idade escolar)",
 /* --- V15: CRA mode (hub notice) --- */
-"We need to have a full intake for you and for your child that was referred to us. Please complete both before finishing. We only need name, DOB, and health insurance indicator for other members of the family.":"Precisamos de uma admissão completa para você e para o seu filho que foi encaminhado para nós. Por favor, complete as duas antes de finalizar. Para os outros membros da família, só precisamos do nome, da data de nascimento e se têm seguro de saúde.",
+"We need to have a full intake for you and for your child who was referred to us. Please complete both before finishing. For other members of the family, we only need their name, date of birth, and whether they have health insurance.":"Precisamos de uma admissão completa para você e para o seu filho que foi encaminhado para nós. Por favor, complete as duas antes de finalizar. Para os outros membros da família, só precisamos do nome, da data de nascimento e se têm seguro de saúde.",
 "If you're not on this list yet, tap “+ Add a household member” to add yourself.":"Se você ainda não estiver na lista, toque em “+ Adicionar um membro do domicílio” para se adicionar.",
 "If your child isn't listed yet, tap “+ Add a household member”.":"Se seu filho ainda não estiver na lista, toque em “+ Adicionar um membro do domicílio”.",
 "This button turns on once an adult's intake and a child's intake are both complete.":"Este botão fica disponível quando a admissão de um adulto e a de uma criança estiverem completas."
@@ -1809,7 +1809,7 @@ ht: {
 "Other (Not school aged)":"Lòt (poko gen laj lekòl)",
 "N/A (not school aged)":"N/A (poko gen laj lekòl)",
 /* --- V15: CRA mode (hub notice) --- */
-"We need to have a full intake for you and for your child that was referred to us. Please complete both before finishing. We only need name, DOB, and health insurance indicator for other members of the family.":"Nou bezwen yon admisyon konplè pou ou ak pou pitit ou yo te refere ban nou an. Tanpri konplete toude anvan ou fini. Pou lòt manm fanmi an, nou bezwen sèlman non, dat nesans, ak si yo gen asirans sante.",
+"We need to have a full intake for you and for your child who was referred to us. Please complete both before finishing. For other members of the family, we only need their name, date of birth, and whether they have health insurance.":"Nou bezwen yon admisyon konplè pou ou ak pou pitit ou yo te refere ban nou an. Tanpri konplete toude anvan ou fini. Pou lòt manm fanmi an, nou bezwen sèlman non, dat nesans, ak si yo gen asirans sante.",
 "If you're not on this list yet, tap “+ Add a household member” to add yourself.":"Si ou poko sou lis la, touche “+ Ajoute yon manm nan kay la” pou ajoute tèt ou.",
 "If your child isn't listed yet, tap “+ Add a household member”.":"Si pitit ou a poko sou lis la, touche “+ Ajoute yon manm nan kay la”.",
 "This button turns on once an adult's intake and a child's intake are both complete.":"Bouton sa a ap mache lè admisyon yon granmoun ak admisyon yon timoun fini."
@@ -2910,7 +2910,7 @@ SCREENS.rosterSelect = (ctx) => {
   }
   if(state.cra && !rule.ok){
     body.push(el("div",{class:"notice", style:"font-weight:600;"},
-      "We need to have a full intake for you and for your child that was referred to us. Please complete both before finishing. We only need name, DOB, and health insurance indicator for other members of the family.",
+      "We need to have a full intake for you and for your child who was referred to us. Please complete both before finishing. For other members of the family, we only need their name, date of birth, and whether they have health insurance.",
       (!state.members.some(isChild) ? el("div",{style:"margin-top:6px;"},"If your child isn't listed yet, tap \u201C+ Add a household member\u201D.") : null)));
   }
   /* nobody 18+ on the list (e.g. only the child was entered): say how to add yourself */
