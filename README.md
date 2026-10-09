@@ -148,8 +148,9 @@ changes:
   completed intake (when the release buttons are on — see "Release of
   information"), then a **Submit** button the family presses. Releases are
   encouraged but not required. "‹ Back" works until they submit.
-  - **Unsigned releases:** if anyone listed hasn't signed their CFFS/JRI
-    release, Submit first shows "Please complete the releases for each
+  - **Unsigned releases:** while anyone listed hasn't signed their CFFS/JRI
+    release, Submit looks greyed out (it turns green once everyone has
+    signed) but still works: tapping it first shows "Please complete the releases for each
     household member listed here. We need these releases completed for us
     to appropriately serve your family." with **Go back** (the prominent
     button) and **Submit anyway** (so staff doing an intake over the phone
@@ -424,6 +425,13 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 16.5
+
+- **Remote "Almost done": Submit looks greyed out until every CFFS/JRI
+  release is signed**, then turns green. It still works while grey —
+  tapping it shows the "Please complete the releases…" warning, as before.
+  The tablet is unchanged.
 
 ### Version 16.4
 

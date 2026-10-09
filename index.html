@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 16.4 — see README.md changelog for what changed in this version -->
+<!-- Version 16.5 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -62,6 +62,7 @@
   .btn-primary{background:var(--accent); color:var(--accent-ink); border:none; border-radius:12px;
     padding:14px 26px; font-size:17px; font-weight:600; min-height:52px;}
   .btn-primary:disabled{opacity:.45; cursor:not-allowed;}
+  .btn-primary.btn-muted{opacity:.45;}   /* looks greyed out but still works (see shell's nextMuted) */
   .why{font-size:14px; color:#8A4A22; text-align:right; margin-top:8px;}
   @media(max-width:520px){.why{text-align:left;}}  /* keep clear of the Notes button on phones */
   .modal-overlay{position:fixed; inset:0; z-index:100; background:rgba(34,48,45,.45);
@@ -2655,7 +2656,8 @@ function shell(o){
   if(o.extraNav) right.appendChild(o.extraNav);
   const blocked = o.canNext!==undefined && !o.canNext;
   if(o.next){
-    right.appendChild(el("button",{class:"btn-primary", id:"navNext", type:"button",
+    /* o.nextMuted: greyed-out look, but still clickable */
+    right.appendChild(el("button",{class:"btn-primary"+(o.nextMuted ? " btn-muted" : ""), id:"navNext", type:"button",
       disabled:blocked, onclick:o.next}, o.nextLabel||"Continue"));
   }
   nav.appendChild(right);
@@ -4061,6 +4063,8 @@ function remoteFinishScreen(){
       remoteSubmit();
     },
     nextLabel: state.submitting ? "Submitting…" : "Submit",
+    /* grey until every CFFS/JRI release is signed; tapping it anyway shows the warning */
+    nextMuted: unsignedReleasePeople().length > 0,
     canNext: !state.submitting && rule.ok,
     why: rule.ok ? undefined : rule.why
   });
