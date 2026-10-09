@@ -122,7 +122,8 @@ When the intake form moves to a new address, check each of these:
 Added in Version 16, for the links staff send to families to fill out on
 their own phone or computer. It's locked on for the session (there's no
 on-screen switch) and combines with `?cra` and `?lang=`. The questions are
-the same (two are worded differently — see the table below); what changes:
+the same (a few are worded differently — see the table below); what
+changes:
 
 - **The ending.** "No one else — finish up" goes to **"Almost done"**:
   a "Sign release for {first name}" button for each person with a
@@ -159,6 +160,8 @@ the same (two are worded differently — see the table below); what changes:
   | How did you hear about us (2) | …This question can't be skipped — ask a staff member if none of these look right. | …This question can't be skipped — if none of these look right, try your best and tell us in the Notes section in your own words. |
   | "One suggestion first" | If you're staff or have a reason to go in a different order, you can continue anyway. | If you have a reason to go in a different order, you can continue anyway. |
   | Your household | If you're unsure, just ask a staff member — that's what we're here for. | If you're unsure, call us at 978-296-8080 — that's what we're here for. |
+  | What brings you in — screen title (adult) | What brings you in | How we can help |
+  | What brings you in — screen title (child) | What brings {name} in | How we can help |
   | What brings you in — question (adult) | What brings you in today? | What can we help you with? |
   | What brings you in — question (child) | What brings you in for {name} today? | What can we help you with for {name}? |
   | What brings you in — hint (adult and child) | A few words is plenty — a staff member can help you sort it out. | A few words is plenty — we can help you sort it out later. |
@@ -177,8 +180,8 @@ the same (two are worded differently — see the table below); what changes:
   signed release shows "signed remotely ✓" instead of "signed on tablet ✓".
 - **Phone number:** `FRC_PHONE` in `index.html` (one place). It's kept on
   one line on screen.
-- The screen title "What brings you in" and the review/printout labels
-  (CRM wording, e.g. "Child present to answer directly?") are unchanged.
+- The review/printout labels (CRM wording, e.g. "Child present to answer
+  directly?") are unchanged.
 
 ## Remote submission (proof of concept)
 
@@ -385,7 +388,8 @@ Since everything is one file, a few conventions keep it maintainable:
   work, call the FRC at 978-296-8080." Lines written for the tablet get
   remote versions (the phone number only on Welcome, the household list and
   the submit-failed message; the state line and referral hints point to the
-  Notes box; "What can we help you with?"; "Is {name} with you…?"), the CRA
+  Notes box; "How we can help" / "What can we help you with?"; "Is {name}
+  with you…?"), the CRA
   switch and crash-screen staff print button are hidden, and the printout
   gets a "Completed remotely" line (plus "Submitted from the family's own
   device", "Category chosen by the family", "signed remotely ✓"). Remote
@@ -415,9 +419,9 @@ Since everything is one file, a few conventions keep it maintainable:
   panel title, Close and Thank you, plus every new or changed remote-mode
   and household line, in Spanish, Portuguese and Haitian Creole.
   - Spanish: reviewed by staff, except the lines changed just before merge
-    (state line, both referral hints, court hint, "What can we help you
-    with…", "…with you…", the two household lines and the two printing
-    notices), which are drafts.
+    (state line, both referral hints, court hint, "How we can help", "What
+    can we help you with…", "…with you…", the two household lines and the
+    two printing notices), which are drafts.
   - Portuguese and Haitian Creole: drafts — review with bilingual staff.
     (The Portuguese pre-merge lines use the wording from the Portuguese
     review doc.)

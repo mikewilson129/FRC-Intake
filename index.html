@@ -778,7 +778,8 @@ const I18N = { es: {
 "We'll add everyone that lives in your home — starting with you. We do need a name, date of birth, and the insurance answer.":"Vamos a agregar a todas las personas que viven en su casa — comenzando con usted. Necesitamos el nombre, la fecha de nacimiento y la respuesta sobre el seguro médico.",
 "Please add everyone that lives in your home — adults and children.":"Por favor, agregue a todas las personas que viven en su casa — adultos y niños.",
 "Printing isn't available. Your intake was sent to the FRC.":"No es posible imprimir. Su admisión fue enviada al FRC.",
-"Printing isn't available.":"No es posible imprimir."
+"Printing isn't available.":"No es posible imprimir.",
+"How we can help":"Cómo podemos ayudarle"
 },
 pt: {
 /* --- chrome / navigation --- */
@@ -1349,7 +1350,8 @@ pt: {
 "We'll add everyone that lives in your home — starting with you. We do need a name, date of birth, and the insurance answer.":"Vamos incluir todas as pessoas que moram na sua casa — começando por você. Precisamos do nome, da data de nascimento e da resposta sobre o seguro de saúde.",
 "Please add everyone that lives in your home — adults and children.":"Por favor, inclua todas as pessoas que moram na sua casa — adultos e crianças.",
 "Printing isn't available. Your intake was sent to the FRC.":"Não é possível imprimir. Sua admissão foi enviada ao FRC.",
-"Printing isn't available.":"Não é possível imprimir."
+"Printing isn't available.":"Não é possível imprimir.",
+"How we can help":"Como podemos ajudar"
 },
 ht: {
 /* --- chrome / navigation --- */
@@ -1920,7 +1922,8 @@ ht: {
 "We'll add everyone that lives in your home — starting with you. We do need a name, date of birth, and the insurance answer.":"Nou pral ajoute tout moun ki abite lakay ou — kòmanse ak ou menm. Nou bezwen non an, dat nesans lan, ak repons lan sou asirans sante.",
 "Please add everyone that lives in your home — adults and children.":"Tanpri ajoute tout moun ki abite lakay ou — granmoun ak timoun.",
 "Printing isn't available. Your intake was sent to the FRC.":"Ou pa ka enprime. Admisyon ou an te voye bay FRC a.",
-"Printing isn't available.":"Ou pa ka enprime."
+"Printing isn't available.":"Ou pa ka enprime.",
+"How we can help":"Kijan nou ka ede"
 }
 };
 /* ============ DATA ============ */
@@ -3324,7 +3327,7 @@ function adultSteps(m){
       skipRow(()=>a.marital, v=>a.marital=v)
     ], canNext:true }),
   /* 4 */
-  (m)=>({ title:"What brings you in",
+  (m)=>({ title:byMode("What brings you in", "How we can help"),
     comfort:comfort(byMode("A few words is plenty — a staff member can help you sort it out.",
       "A few words is plenty — we can help you sort it out later.")),
     body: reasonBlock(m),
@@ -3485,7 +3488,7 @@ function childSteps(m){
       famStatusBlock(m)
     ], canNext:true }),
   /* 4: reason for visit */
-  (m)=>({ title:trn("What brings {n} in", kid()),
+  (m)=>({ title:trn(byMode("What brings {n} in", "How we can help"), kid()),
     comfort:comfort(byMode("A few words is plenty — a staff member can help you sort it out.",
       "A few words is plenty — we can help you sort it out later.")),
     body: reasonBlock(m),
