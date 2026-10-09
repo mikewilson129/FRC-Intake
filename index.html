@@ -783,7 +783,10 @@ const I18N = { es: {
 "Please add everyone that lives in your home — adults and children.":"Por favor, agregue a todas las personas que viven en su casa — adultos y niños.",
 "Printing isn't available. Your intake was sent to the FRC.":"No es posible imprimir. Su admisión fue enviada al FRC.",
 "Printing isn't available.":"No es posible imprimir.",
-"How we can help":"Cómo podemos ayudarle"
+"How we can help":"Cómo podemos ayudarle",
+/* --- V16.3: unsigned-release warning (remote Submit) — DRAFT --- */
+"Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.":"Por favor, complete las autorizaciones de cada miembro del hogar que aparece aquí. Necesitamos estas autorizaciones para poder atender adecuadamente a su familia.",
+"Submit anyway":"Enviar de todos modos"
 },
 pt: {
 /* --- chrome / navigation --- */
@@ -1355,7 +1358,10 @@ pt: {
 "Please add everyone that lives in your home — adults and children.":"Por favor, inclua todas as pessoas que moram na sua casa — adultos e crianças.",
 "Printing isn't available. Your intake was sent to the FRC.":"Não é possível imprimir. Sua admissão foi enviada ao FRC.",
 "Printing isn't available.":"Não é possível imprimir.",
-"How we can help":"Como podemos ajudar"
+"How we can help":"Como podemos ajudar",
+/* --- V16.3: unsigned-release warning (remote Submit) — DRAFT --- */
+"Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.":"Por favor, complete as autorizações de cada membro do domicílio listado aqui. Precisamos dessas autorizações para atender sua família adequadamente.",
+"Submit anyway":"Enviar mesmo assim"
 },
 ht: {
 /* --- chrome / navigation --- */
@@ -1927,7 +1933,10 @@ ht: {
 "Please add everyone that lives in your home — adults and children.":"Tanpri ajoute tout moun ki abite lakay ou — granmoun ak timoun.",
 "Printing isn't available. Your intake was sent to the FRC.":"Ou pa ka enprime. Admisyon ou an te voye bay FRC a.",
 "Printing isn't available.":"Ou pa ka enprime.",
-"How we can help":"Kijan nou ka ede"
+"How we can help":"Kijan nou ka ede",
+/* --- V16.3: unsigned-release warning (remote Submit) — DRAFT --- */
+"Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.":"Tanpri ranpli otorizasyon yo pou chak manm nan kay la ki sou lis la. Nou bezwen otorizasyon sa yo pou nou ka sèvi fanmi ou kòmsadwa.",
+"Submit anyway":"Soumèt kanmenm"
 }
 };
 /* ============ DATA ============ */
@@ -2285,7 +2294,8 @@ const state = {
   referral:{category:null, value:null},
   members:[],
   cra:false,       /* CRA mode: finishing needs a completed adult AND child intake */
-  otherReleases:0  /* releases signed through the staff panel's "Complete another release" */
+  otherReleases:0, /* releases signed through the staff panel's "Complete another release" */
+  releaseWarned:false /* remote Submit: the unsigned-release warning was clicked past */
 };
 
 /* ============ URL TAGS ============
@@ -2661,14 +2671,15 @@ function setNext(ok, why){
 /* "Still needed: first name, date of birth" (translated) */
 function stillNeeded(items){ return items.length ? tr("Still needed:")+" "+items.map(tr).join(", ") : ""; }
 /* In-page yes/no box (translatable buttons, unlike window.confirm) */
-function confirmBox(message, yesLabel, noLabel, onYes){
+/* stayPrimary: make the "no" (stay) button the prominent one, to discourage the "yes" */
+function confirmBox(message, yesLabel, noLabel, onYes, stayPrimary){
   const overlay = el("div",{class:"modal-overlay"});
   const close = ()=>overlay.remove();
   overlay.appendChild(el("div",{class:"modal", role:"dialog", "aria-modal":"true"},
     el("p",null,message),
     el("div",{class:"modal-actions"},
-      el("button",{class:"btn-quiet", type:"button", onclick:close}, noLabel),
-      el("button",{class:"btn-primary", type:"button", onclick:()=>{ close(); onYes(); }}, yesLabel))));
+      el("button",{class:stayPrimary ? "btn-primary" : "btn-quiet", type:"button", onclick:close}, noLabel),
+      el("button",{class:stayPrimary ? "btn-quiet" : "btn-primary", type:"button", onclick:()=>{ close(); onYes(); }}, yesLabel))));
   document.body.appendChild(overlay);
 }
 
@@ -4021,22 +4032,32 @@ function remoteFinishScreen(){
       state.submitStatus ? el("div",{class:"notice"}, state.submitStatus) : null
     ],
     noBack: state.submitting,
-    next: async ()=>{
+    next: ()=>{
       if(!finishRule().ok){ goTo("rosterSelect"); return; }   /* never send an intake that doesn't meet the rule */
-      state.submitStatus = null;
-      const outcome = await sendIntake();
-      if(outcome.success){
-        allowLeave = true;   /* it's been sent: closing the page needs no warning */
-        notesPanel.classList.remove("open"); notesFab.style.display = "none";   /* a note typed now wouldn't be sent */
-      } else {
-        state.submitStatus = trn("Please try again. If it still doesn't work, call the FRC at {n}.", FRC_PHONE);
+      /* Unsigned releases: discourage skipping them, but allow it (e.g. staff doing
+         the intake over the phone). Asked once; a retry after a failed send isn't asked again. */
+      if(RELEASE_ENABLED && !state.releaseWarned && releasePeople().some(m=>!m.releaseSigned)){
+        confirmBox("Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.",
+          "Submit anyway", "Go back", ()=>{ state.releaseWarned = true; remoteSubmit(); }, true);
+        return;
       }
-      rerender();
+      remoteSubmit();
     },
     nextLabel: state.submitting ? "Submitting…" : "Submit",
     canNext: !state.submitting && rule.ok,
     why: rule.ok ? undefined : rule.why
   });
+}
+async function remoteSubmit(){
+  state.submitStatus = null;
+  const outcome = await sendIntake();
+  if(outcome.success){
+    allowLeave = true;   /* it's been sent: closing the page needs no warning */
+    notesPanel.classList.remove("open"); notesFab.style.display = "none";   /* a note typed now wouldn't be sent */
+  } else {
+    state.submitStatus = trn("Please try again. If it still doesn't work, call the FRC at {n}.", FRC_PHONE);
+  }
+  rerender();
 }
 function remoteSentScreen(){
   return shell({

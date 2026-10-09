@@ -148,6 +148,13 @@ changes:
   completed intake (when the release buttons are on — see "Release of
   information"), then a **Submit** button the family presses. Releases are
   encouraged but not required. "‹ Back" works until they submit.
+  - **Unsigned releases:** if anyone listed hasn't signed their CFFS/JRI
+    release, Submit first shows "Please complete the releases for each
+    household member listed here. We need these releases completed for us
+    to appropriately serve your family." with **Go back** (the prominent
+    button) and **Submit anyway** (so staff doing an intake over the phone
+    can click past). It's asked once: a retry after a failed send isn't
+    asked again. Not shown when the release buttons are switched off.
   - Success → **"Intake sent"**: "Thank you! Your intake was sent to the
     FRC. Someone from the FRC will follow up with you." / "You can close
     this page now." No Back, Print, staff panel or Start over; the Notes
@@ -423,6 +430,11 @@ Since everything is one file, a few conventions keep it maintainable:
   a ✓ on screen and ☑ on later printouts. Before Submit the panel says
   "Releases appear here after you press Submit." Tablet only. See "Other
   releases" under "Release of information".
+- **Remote Submit warns about unsigned releases** (skippable): "Please
+  complete the releases for each household member listed here. We need
+  these releases completed for us to appropriately serve your family." —
+  **Go back** / **Submit anyway**. Asked once per intake. The tablet's staff
+  Submit isn't warned. Spanish, Portuguese and Haitian Creole are drafts.
 - **`release-done.html`:** opened directly (not inside the intake) with
   `?form=` set to one of the two release forms, it shows a "Fill out another
   release" button back to that form (English, Spanish, Portuguese, Haitian
