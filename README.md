@@ -1,8 +1,10 @@
 # FRC Family Intake
 
 A single-page, tablet-friendly intake form for a Family Resource Center (FRC).
-Clients complete their own intake on a shared tablet in the language of their
-choice; staff then print a CRM-ready data-entry copy. There is no backend
+Families complete their own intake in the language of their choice, either
+on their own phone or computer (the plain link — "remote mode") or on the
+FRC's shared tablet (the `?office` link), where staff then print a CRM-ready
+data-entry copy. There is no backend
 required for the core flow — everything lives in one file.
 
 ## How it's built
@@ -47,29 +49,33 @@ loads and are never saved; they can be combined.
 
 | Tag | What it does | Example |
 |---|---|---|
+| `?office` | **In-office (FRC tablet) version** for the whole session: "All set!" with the hand-off to staff, the staff panel (Submit, Print, Edit, Start over) and the staff "CRA mode" switch. Without it the form is in **remote mode** (since Version 16.2): for families on their own phone or computer — see "Remote mode" below. | `index.html?office` |
 | `?cra` | **CRA mode, locked on** for the whole session. This is the link staff send to CRA families. Welcome shows a "CRA mode" label that can't be tapped off. | `index.html?cra` |
 | `?lang=es` / `?lang=pt` / `?lang=ht` | Starts in Spanish / Portuguese / Haitian Creole (the dropdown shows it selected and still works). Anything else starts in English. | `index.html?lang=es` |
-| `?remote` | **Remote mode, locked on** for the whole session. This is the link staff send to families to fill out on their own phone or computer: no staff hand-off, the family submits it themselves. See "Remote mode" below. | `index.html?remote` |
 | `?releasetest` | **Staff only — never send to families.** Shows the release buttons when they're switched off for everyone (`RELEASE_FOR_EVERYONE = false`), so staff can test them on the live site. While they're on for everyone it changes nothing. See "Release of information" below. | `index.html?releasetest` |
-| combined | e.g. remote CRA mode in Spanish | `index.html?remote&cra&lang=es` |
+| combined | e.g. the tablet in CRA mode in Spanish | `index.html?office&cra&lang=es` |
 
-- Without `?cra`, staff can turn CRA mode on or off with the small, quiet
-  "CRA mode" button on the Welcome screen (off by default; English only,
-  since it's staff-facing).
+- On the tablet (`?office`) without `?cra`, staff can turn CRA mode on or
+  off with the small, quiet "CRA mode" button on the Welcome screen (off by
+  default; English only, since it's staff-facing). Family (remote) links
+  have no such button; use a `?cra` link.
 - **CRA mode** is for families coming in for a CRA (open, or at risk of
   one). Staff decide which families are CRA; families aren't asked. In CRA
   mode, "No one else — finish up" needs a completed adult intake **and** a
   completed child intake (one child is enough). Until then the household
   screen explains that both are needed, and the printout shows a "CRA mode"
   line near the top. Nothing else about the form changes.
-- "Start over" reloads the same address, so a `?cra` / `?lang=` link keeps
-  its mode and language for the next family. (Remote mode has no Start
-  over.)
+- "Start over" (tablet only) reloads the same address, so an `?office`
+  link keeps the tablet version, and `?cra` / `?lang=` keep their mode and
+  language, for the next family.
 
 ### Staff links
 
-The live form is at `https://mikewilson129.github.io/FRC-Intake/`. Copy the
-link that fits the family:
+The live form is at `https://mikewilson129.github.io/FRC-Intake/`. Since Version 16.2 the plain link is the
+**family (remote) version**, for families filling it out on their own phone
+or computer. The **FRC tablet** uses the `?office` links.
+
+**Family links** (send these to families):
 
 | Use | Link |
 |---|---|
@@ -81,17 +87,22 @@ link that fits the family:
 | CRA — Spanish | `https://mikewilson129.github.io/FRC-Intake/?cra&lang=es` |
 | CRA — Portuguese | `https://mikewilson129.github.io/FRC-Intake/?cra&lang=pt` |
 | CRA — Haitian Creole | `https://mikewilson129.github.io/FRC-Intake/?cra&lang=ht` |
-| Remote (English) | `https://mikewilson129.github.io/FRC-Intake/?remote` |
-| Remote — Spanish | `https://mikewilson129.github.io/FRC-Intake/?remote&lang=es` |
-| Remote — Portuguese | `https://mikewilson129.github.io/FRC-Intake/?remote&lang=pt` |
-| Remote — Haitian Creole | `https://mikewilson129.github.io/FRC-Intake/?remote&lang=ht` |
-| Remote CRA (English) | `https://mikewilson129.github.io/FRC-Intake/?remote&cra` |
-| Remote CRA — Spanish | `https://mikewilson129.github.io/FRC-Intake/?remote&cra&lang=es` |
-| Remote CRA — Portuguese | `https://mikewilson129.github.io/FRC-Intake/?remote&cra&lang=pt` |
-| Remote CRA — Haitian Creole | `https://mikewilson129.github.io/FRC-Intake/?remote&cra&lang=ht` |
 
-The **Remote** links are for families filling it out on their own phone
-or computer; the others are for the FRC tablet.
+**FRC tablet links** (in the office):
+
+| Use | Link |
+|---|---|
+| Tablet (English) | `https://mikewilson129.github.io/FRC-Intake/?office` |
+| Tablet — Spanish | `https://mikewilson129.github.io/FRC-Intake/?office&lang=es` |
+| Tablet — Portuguese | `https://mikewilson129.github.io/FRC-Intake/?office&lang=pt` |
+| Tablet — Haitian Creole | `https://mikewilson129.github.io/FRC-Intake/?office&lang=ht` |
+| Tablet CRA (English) | `https://mikewilson129.github.io/FRC-Intake/?office&cra` |
+| Tablet CRA — Spanish | `https://mikewilson129.github.io/FRC-Intake/?office&cra&lang=es` |
+| Tablet CRA — Portuguese | `https://mikewilson129.github.io/FRC-Intake/?office&cra&lang=pt` |
+| Tablet CRA — Haitian Creole | `https://mikewilson129.github.io/FRC-Intake/?office&cra&lang=ht` |
+
+The tablet's bookmark / home-screen shortcut should be the `?office` link
+(usually Tablet, English); "Start over" keeps it.
 
 On the language links the family can still switch languages from the
 dropdown. On the CRA links, CRA mode stays on and can't be turned off on
@@ -104,10 +115,10 @@ staff can test on the live site:
 
 | Use | Link |
 |---|---|
-| Tablet, with release buttons | `https://mikewilson129.github.io/FRC-Intake/?releasetest` |
-| Remote, with release buttons | `https://mikewilson129.github.io/FRC-Intake/?remote&releasetest` |
+| Tablet, with release buttons | `https://mikewilson129.github.io/FRC-Intake/?office&releasetest` |
+| Family (remote), with release buttons | `https://mikewilson129.github.io/FRC-Intake/?releasetest` |
 
-`releasetest` combines with the other tags too (e.g. `?remote&lang=es&releasetest`).
+`releasetest` combines with the other tags too (e.g. `?lang=es&releasetest`).
 
 ### Hosting-move checklist
 
@@ -117,12 +128,16 @@ When the intake form moves to a new address, check each of these:
   release-done.html at the form's current address. Update it whenever the
   intake form moves (e.g. to intake.pw4c.org), or the panel won't
   auto-close.
+- [ ] Update the FRC tablet's bookmark / home-screen shortcut to the new
+  address **with `?office`** (a plain link opens the family version).
+- [ ] Update the family and tablet links in "Staff links" above.
 
-## Remote mode (`?remote`)
+## Remote mode (the default link)
 
-Added in Version 16, for the links staff send to families to fill out on
-their own phone or computer. It's locked on for the session (there's no
-on-screen switch) and combines with `?cra` and `?lang=`. The questions are
+Added in Version 16, for families filling out the form on their own phone
+or computer. Since Version 16.2 it's what the plain link opens; the FRC
+tablet uses `?office` instead. There's no on-screen switch, and it
+combines with `?cra` and `?lang=`. The questions are
 the same (a few are worded differently — see the table below); what
 changes:
 
@@ -354,6 +369,15 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 16.2
+
+- **The plain link is now the family (remote) version.** The FRC tablet
+  (in-office) version needs `?office` (it combines with `?cra`, `?lang=`
+  and `?releasetest`). **Update the tablet's bookmark / home-screen
+  shortcut to the `?office` link**, or it will open the family version (no
+  staff panel or Print). The `?remote` tag is gone (remote is the
+  default). Staff links, URL tags and the hosting-move checklist updated.
 
 ### Version 16.1
 
