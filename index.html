@@ -4166,7 +4166,8 @@ function buildPrint(){
     if(!(m.services && m.done)) continue;
     const name = esc(fullName(m)||"(no name)");
     const a = m.a||{};
-    roiHtml += '<div class="p-roi-line">\u2610 '+name+' - CFFS/JRI'+(m.releaseSigned?' \u2014 signed '+(REMOTE?'remotely':'on tablet')+' \u2713':'')+'</div>';
+    /* signed: checked box (\uFE0E keeps ☑ a plain symbol, not a color emoji) */
+    roiHtml += '<div class="p-roi-line">'+(m.releaseSigned?'\u2611\uFE0E':'\u2610')+' '+name+' - CFFS/JRI'+(m.releaseSigned?' \u2014 signed '+(REMOTE?'remotely':'on tablet'):'')+'</div>';
     for(const ag of RELEASE_AGENCIES){
       if((a.agencies||[]).includes(ag)){
         roiHtml += '<div class="p-roi-line">\u2610 '+name+' - '+esc(ag.split(" ")[0])+'</div>';

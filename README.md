@@ -193,7 +193,7 @@ changes:
   line near the top (above the CRA mode line); the header says "Submitted
   from the family's own device" instead of "Printed from the intake
   tablet"; "Category chosen by the family:" instead of "…on tablet:"; and a
-  signed release shows "signed remotely ✓" instead of "signed on tablet ✓".
+  signed release shows "signed remotely" instead of "signed on tablet".
 - **Phone number:** `FRC_PHONE` in `index.html` (one place). It's kept on
   one line on screen.
 - The review/printout labels (CRM wording, e.g. "Child present to answer
@@ -262,10 +262,10 @@ Everything prefilled can still be changed in Jotform.
   that person's button changes to **"Release signed ✓"** and no longer
   opens the release, so a tap can't create a duplicate signed release in
   Jotform; the printout's Releases box
-  shows `☐ Name - CFFS/JRI — signed on tablet ✓` (remote mode: "signed
-  remotely ✓"); and the submitted JSON
-  has `releaseSigned: true` on that person (the field is left out for
-  anyone who didn't sign).
+  shows a checked box: `☑ Name - CFFS/JRI — signed on tablet` (remote
+  mode: "signed remotely"); unsigned releases keep the empty box `☐`; and
+  the submitted JSON has `releaseSigned: true` on that person (the field
+  is left out for anyone who didn't sign).
 - **Closed early, or the release doesn't load:** nothing else changes.
   Submit and Print work as before, and the button still says "Sign
   release for…", so it can be tried again.
@@ -378,6 +378,10 @@ Since everything is one file, a few conventions keep it maintainable:
   shortcut to the `?office` link**, or it will open the family version (no
   staff panel or Print). The `?remote` tag is gone (remote is the
   default). Staff links, URL tags and the hosting-move checklist updated.
+- **Printout: signed releases get a checked box.** In the Releases box, a
+  release signed in the intake now shows `☑ Name - CFFS/JRI — signed on
+  tablet` (remote: "signed remotely") instead of `☐ … — signed on tablet ✓`.
+  Unsigned releases keep the empty box.
 
 ### Version 16.1
 
