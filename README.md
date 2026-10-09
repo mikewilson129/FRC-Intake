@@ -47,7 +47,9 @@ loads and are never saved; they can be combined.
 |---|---|---|
 | `?cra` | **CRA mode, locked on** for the whole session. This is the link staff send to CRA families. Welcome shows a "CRA mode" label that can't be tapped off. | `index.html?cra` |
 | `?lang=es` / `?lang=pt` / `?lang=ht` | Starts in Spanish / Portuguese / Haitian Creole (the dropdown shows it selected and still works). Anything else starts in English. | `index.html?lang=es` |
-| both | CRA mode in Spanish | `index.html?cra&lang=es` |
+| `?remote` | **Remote mode, locked on** for the whole session. This is the link staff send to families to fill out on their own phone or computer: no staff hand-off, the family submits it themselves. See "Remote mode" below. | `index.html?remote` |
+| `?releasetest` | **Staff only — never send to families.** Shows the release buttons before they're switched on for everyone, so staff can test them on the live site. See "Release of information" below. | `index.html?releasetest` |
+| combined | e.g. remote CRA mode in Spanish | `index.html?remote&cra&lang=es` |
 
 - Without `?cra`, staff can turn CRA mode on or off with the small, quiet
   "CRA mode" button on the Welcome screen (off by default; English only,
@@ -59,7 +61,8 @@ loads and are never saved; they can be combined.
   screen explains that both are needed, and the printout shows a "CRA mode"
   line near the top. Nothing else about the form changes.
 - "Start over" reloads the same address, so a `?cra` / `?lang=` link keeps
-  its mode and language for the next family.
+  its mode and language for the next family. (Remote mode has no Start
+  over.)
 
 ### Staff links
 
@@ -76,10 +79,32 @@ link that fits the family:
 | CRA — Spanish | `https://mikewilson129.github.io/FRC-Intake/?cra&lang=es` |
 | CRA — Portuguese | `https://mikewilson129.github.io/FRC-Intake/?cra&lang=pt` |
 | CRA — Haitian Creole | `https://mikewilson129.github.io/FRC-Intake/?cra&lang=ht` |
+| Remote (English) | `https://mikewilson129.github.io/FRC-Intake/?remote` |
+| Remote — Spanish | `https://mikewilson129.github.io/FRC-Intake/?remote&lang=es` |
+| Remote — Portuguese | `https://mikewilson129.github.io/FRC-Intake/?remote&lang=pt` |
+| Remote — Haitian Creole | `https://mikewilson129.github.io/FRC-Intake/?remote&lang=ht` |
+| Remote CRA (English) | `https://mikewilson129.github.io/FRC-Intake/?remote&cra` |
+| Remote CRA — Spanish | `https://mikewilson129.github.io/FRC-Intake/?remote&cra&lang=es` |
+| Remote CRA — Portuguese | `https://mikewilson129.github.io/FRC-Intake/?remote&cra&lang=pt` |
+| Remote CRA — Haitian Creole | `https://mikewilson129.github.io/FRC-Intake/?remote&cra&lang=ht` |
+
+The **Remote** links are for families filling it out on their own phone
+or computer; the others are for the FRC tablet.
 
 On the language links the family can still switch languages from the
 dropdown. On the CRA links, CRA mode stays on and can't be turned off on
 screen.
+
+**Staff-only test links** (never send these to families). While the
+release buttons are switched off for everyone, these show them so staff
+can test on the live site:
+
+| Use | Link |
+|---|---|
+| Tablet, with release buttons | `https://mikewilson129.github.io/FRC-Intake/?releasetest` |
+| Remote, with release buttons | `https://mikewilson129.github.io/FRC-Intake/?remote&releasetest` |
+
+`releasetest` combines with the other tags too (e.g. `?remote&lang=es&releasetest`).
 
 ### Hosting-move checklist
 
@@ -89,6 +114,57 @@ When the intake form moves to a new address, check each of these:
   release-done.html at the form's current address. Update it whenever the
   intake form moves (e.g. to intake.pw4c.org), or the panel won't
   auto-close.
+
+## Remote mode (`?remote`)
+
+Added in Version 16, for the links staff send to families to fill out on
+their own phone or computer. It's locked on for the session (there's no
+on-screen switch) and combines with `?cra` and `?lang=`. The questions are
+the same; what changes:
+
+- **The ending.** "No one else — finish up" goes to **"Almost done"**:
+  a "Sign release for {first name}" button for each person with a
+  completed intake (when the release buttons are on — see "Release of
+  information"), then a **Submit** button the family presses. Releases are
+  encouraged but not required. "‹ Back" works until they submit.
+  - Success → **"Intake sent"**: "Thank you! Your intake was sent to the
+    FRC. Someone from the FRC will follow up with you." / "You can close
+    this page now." No Back, Print, staff panel or Start over; the Notes
+    button is hidden (a note typed now wouldn't be sent); closing the page
+    no longer asks "Leave site?".
+  - Failure (or a 30-second timeout) → "Please try again. If it still
+    doesn't work, call the FRC at 978-296-8080." Submit stays available.
+- **No print fallback.** On the family's own device there's no Print, so
+  the remote submission (proof of concept — see below) is the only way the
+  intake reaches the FRC. If it keeps failing, the family is asked to call.
+- **Lines that assume the FRC tablet or staff nearby** show a remote
+  version instead (translated in Spanish, Portuguese and Haitian Creole as
+  drafts):
+
+  | Where | Tablet (unchanged) | Remote |
+  |---|---|---|
+  | Welcome | A staff member is nearby if anything is confusing — just ask. Most questions can be skipped… | If anything is confusing, call us at 978-296-8080. Most questions can be skipped… |
+  | Welcome | Nothing is saved on this tablet. When this page is closed, everything on it is erased. | Nothing is saved on this device. If this page is closed before you submit, everything on it is erased. |
+  | Your home | State: Massachusetts (tell a staff member if that's not right) | State: Massachusetts (if that's not right, call us at 978-296-8080) |
+  | How did you hear about us (1) | …Pick the closest fit — a staff member can help if you're not sure. | …Pick the closest fit — call us at 978-296-8080 if you're not sure. |
+  | How did you hear about us (2) | …This question can't be skipped — ask a staff member if none of these look right. | …This question can't be skipped — call us at 978-296-8080 if none of these look right. |
+  | "One suggestion first" | If you're staff or have a reason to go in a different order, you can continue anyway. | If you have a reason to go in a different order, you can continue anyway. |
+  | Your household | If you're unsure, just ask a staff member — that's what we're here for. | If you're unsure, call us at 978-296-8080 — that's what we're here for. |
+  | What brings you in (adult and child) | A few words is plenty — a staff member can help you sort it out. | A few words is plenty — we can help you sort it out later. |
+  | Court status (child 12+) | If you're not sure, a staff member can help. | If you're not sure, call us at 978-296-8080. |
+
+  Also hidden in remote mode: the staff "CRA mode" switch on Welcome (a
+  `?cra` link still shows its "CRA mode" label) and the "Staff: print
+  what's been entered" button on the "Something went wrong" screen. The
+  tablet-only "All set!" screen and staff panel never appear.
+- **Printout / submission** (staff-facing, English): a "Completed remotely —
+  the family filled out and submitted this intake on their own device."
+  line near the top (above the CRA mode line); the header says "Submitted
+  from the family's own device" instead of "Printed from the intake
+  tablet"; "Category chosen by the family:" instead of "…on tablet:"; and a
+  signed release shows "signed remotely ✓" instead of "signed on tablet ✓".
+- **Phone number:** `FRC_PHONE` in `index.html` (one place). It's kept on
+  one line on screen.
 
 ## Remote submission (proof of concept)
 
@@ -112,13 +188,13 @@ When the intake form moves to a new address, check each of these:
   a public commit, or a compromised tablet), and should not be treated as a
   real secret — it's a light deterrent, not access control.
 
-## Release of information (signed on the tablet)
+## Release of information (signed in the intake)
 
 Added in Version 16. On the client "All set!" screen (before staff tap
-"Next steps"), each person with a completed intake gets a **"Sign release
-for {first name}"** button. It opens the CFFS/JRI release
-(`https://form.jotform.com/262673921694064`) in a full-screen panel inside
-the intake page, already filled in:
+"Next steps"), or remote mode's "Almost done" screen, each person with a
+completed intake gets a **"Sign release for {first name}"** button. It
+opens the CFFS/JRI release (`https://form.jotform.com/262673921694064`) in
+a full-screen panel inside the intake page, already filled in:
 
 | Jotform field | Filled with |
 |---|---|
@@ -128,6 +204,13 @@ the intake page, already filled in:
 | `language` | the intake's language: `en`, `es`, `pt`, or `bzj` for Haitian Creole |
 
 Everything prefilled can still be changed in Jotform.
+
+- **Hidden until switched on.** For now the release buttons only appear
+  on links with the staff-only `?releasetest` tag (see "Staff-only test
+  links"); without it nobody sees them, and the tablet links work exactly
+  as in Version 15. After testing, `RELEASE_FOR_EVERYONE = true` in
+  `index.html` shows them to everyone (tablet and remote); setting it back
+  to `false` hides them again.
 
 - **The intake page never leaves.** The release loads in a sandboxed iframe
   (scripts, forms, same-origin and popups allowed; no top navigation of any
@@ -146,19 +229,19 @@ Everything prefilled can still be changed in Jotform.
   that person's button changes to **"Release signed ✓"** and no longer
   opens the release, so a tap can't create a duplicate signed release in
   Jotform; the printout's Releases box
-  shows `☐ Name - CFFS/JRI — signed on tablet ✓`; and the submitted JSON
+  shows `☐ Name - CFFS/JRI — signed on tablet ✓` (remote mode: "signed
+  remotely ✓"); and the submitted JSON
   has `releaseSigned: true` on that person (the field is left out for
   anyone who didn't sign).
 - **Closed early, or the release doesn't load:** nothing else changes.
   Submit and Print work as before, and the button still says "Sign
   release for…", so it can be tried again.
-- **Staff redo:** if a signed release really needs redoing, the staff panel
-  ("Next steps") shows "Redo release for {first name}" for each signed
-  person. It warns that signing again creates a second signed release in
-  Jotform, then opens the release as before. (Staff-facing, English only.)
-- **Off switch:** set `RELEASE_ENABLED = false` in `index.html`. The buttons
-  disappear and the intake works exactly as in Version 15 (same screens,
-  printout and submitted JSON).
+- **Staff panel (tablet):** "Next steps" shows, for each person with a
+  completed intake, **"Open release for {first name}"** if they haven't
+  signed (opens it straight away), or **"Redo release for {first name}"**
+  if they have (warns first that signing again creates a second signed
+  release in Jotform). Staff-facing, English only. Remote mode has no staff
+  panel.
 
 ## Privacy / data handling
 
@@ -172,6 +255,11 @@ Everything prefilled can still be changed in Jotform.
   their own generic wording for the warning, and **iPhone/iPad Safari often
   skips it**, so this reduces accidental data loss but can't fully prevent
   it on Apple devices. The "Start over" button deliberately skips the warning.
+- Remote mode runs on the family's own phone or computer and saves
+  nothing there either. The leave-page warning works the same until they
+  submit (iPhone Safari often skips it, as above), so a refresh before
+  Submit erases everything; after a successful Submit closing the page
+  doesn't warn.
 - The release panel sends the person's name and date of birth to Jotform
   in the release address (that's how prefilling works), so Jotform receives
   them as soon as the panel opens, even if it's closed without signing. The
@@ -207,7 +295,11 @@ Since everything is one file, a few conventions keep it maintainable:
    `document.querySelector(".btn-primary")`.
 7. **Finish requirements live in `finishRule()`** — change the rule there,
    not in the household screen or Submit button separately.
-8. **Age-dependent questions:** if a question only applies at certain ages
+8. **Lines that assume the FRC tablet or staff nearby** use
+   `byMode(tabletLine, remoteLine)` so remote mode shows its own version
+   (`{n}` in the remote line becomes `FRC_PHONE`). Add both lines to each
+   dictionary.
+9. **Age-dependent questions:** if a question only applies at certain ages
    and is auto-answered otherwise, also clear the auto-answer when it stops
    applying (see the `craUnder12`, `childPresentAuto` and `hasJobAuto` flags),
    so a corrected date of birth asks the question for real.
@@ -215,8 +307,8 @@ Since everything is one file, a few conventions keep it maintainable:
 ## Future ideas (not built yet)
 
 - **Save progress (internal vs. external).** Clients may fill this out on
-  their own iPhones at home, where Safari often skips the leave-page
-  warning, so an accidental refresh can still erase everything. Saving
+  their own iPhones at home (remote mode, Version 16), where Safari often
+  skips the leave-page warning, so an accidental refresh can still erase everything. Saving
   progress on the device would fix that, but conflicts with the no-saving
   privacy choice on the shared Android tablets at the FRC. A likely shape:
   an "external" (client's own phone) mode that saves progress, and an
@@ -258,15 +350,33 @@ Since everything is one file, a few conventions keep it maintainable:
   from the staff panel ("Redo release for {first name}", after a warning).
   See "Release of information" above, including the one-time Jotform Thank
   You redirect and the new hosting-move checklist.
+- **Release buttons hidden until tested.** They only appear with the
+  staff-only `?releasetest` tag until `RELEASE_FOR_EVERYONE` is set to
+  `true`; without the tag, the tablet links' screens, printout and
+  submitted JSON are the same as Version 15. (This replaces the earlier
+  `RELEASE_ENABLED` switch.)
+- **Staff panel "Open release for {first name}"** for anyone with a
+  completed intake who hasn't signed (no warning), next to the existing
+  "Redo release for {first name}" for people who have.
+- **Remote mode (`?remote`)** for links families complete on their own
+  phone or computer. Locked on for the session; combines with `?cra` and
+  `?lang=`. New ending: "Almost done" (release buttons + Submit; releases
+  encouraged, not required) → "Intake sent" (no Print, staff panel or
+  Start over). A failed submit says "Please try again. If it still doesn't
+  work, call the FRC at 978-296-8080." Nine lines that assume the tablet or
+  staff nearby get remote versions, the CRA switch and crash-screen staff
+  print button are hidden, and the printout gets a "Completed remotely"
+  line (plus "Submitted from the family's own device", "Category chosen by
+  the family", "signed remotely ✓"). See "Remote mode" above for the full
+  list. New staff links for remote, remote + language and remote + CRA.
 - **New page: `release-done.html`.** Shows "Thank you" (English, Spanish,
   Portuguese or Haitian Creole via `?lang=`) and tells the intake the release
   was signed. The intake only accepts that message from its own site, from
   the open panel.
-- **Off switch:** `RELEASE_ENABLED = false` hides the buttons and the intake
-  works exactly as in Version 15.
 - **Translations:** button labels ("Sign release for…", "Release signed ✓"),
-  panel title, Close and Thank you in Spanish, Portuguese and Haitian
-  Creole (drafts — review with bilingual staff).
+  panel title, Close and Thank you, plus every new or changed remote-mode
+  line, in Spanish, Portuguese and Haitian Creole (drafts — review with
+  bilingual staff).
 
 ### Version 15
 

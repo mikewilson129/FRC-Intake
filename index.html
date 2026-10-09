@@ -154,11 +154,12 @@
   .notes-panel textarea{flex:1; min-height:260px; width:100%; resize:vertical; font:inherit;
     padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink);}
   /* ---------- release panel (full screen, above everything incl. Notes) ---------- */
+  .phone{white-space:nowrap;}
   .rel-list{display:flex; flex-direction:column; gap:10px; margin-top:18px;}
   .rel-row{display:flex; align-items:center; gap:10px;}
   .rel-signed:disabled{opacity:1; cursor:default; color:var(--good); border-color:var(--good); background:#fff; font-weight:600;}
-  .rel-redo{display:flex; flex-wrap:wrap; gap:0 16px; margin-top:4px;}
-  .rel-redo .btn-ghost{font-size:14.5px; padding:8px 2px;}
+  .rel-staff{display:flex; flex-wrap:wrap; gap:0 16px; margin-top:4px;}
+  .rel-staff .btn-ghost{font-size:14.5px; padding:8px 2px;}
   .rel-overlay{position:fixed; inset:0; z-index:200; display:flex; flex-direction:column; background:var(--bg);}
   .rel-head{flex:none; display:flex; justify-content:space-between; align-items:center; gap:12px;
     padding:10px 16px; background:var(--card); border-bottom:1px solid var(--line);}
@@ -753,7 +754,24 @@ const I18N = { es: {
 "Release form for {n}":"Formulario de autorización de {n}",
 "Close":"Cerrar",
 "Thank you":"Gracias",
-"Release signed ✓":"Autorización firmada ✓"
+"Release signed ✓":"Autorización firmada ✓",
+/* --- V16: remote mode (?remote) --- */
+"If anything is confusing, call us at {n}. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":"Si algo no está claro, llámenos al {n}. La mayoría de las preguntas se pueden omitir si prefiere no contestarlas — igual podrá recibir nuestra ayuda.",
+"Nothing is saved on this device. If this page is closed before you submit, everything on it is erased.":"Nada se guarda en este dispositivo. Si cierra esta página antes de enviar, toda la información se borra.",
+"State: Massachusetts (if that's not right, call us at {n})":"Estado: Massachusetts (si no es correcto, llámenos al {n})",
+"First, what kind of person or place told you about us? Pick the closest fit — call us at {n} if you're not sure.":"Primero, ¿qué tipo de persona o lugar le habló de nosotros? Elija la opción más cercana — llámenos al {n} si no está seguro/a.",
+"Now the specific one. This question can't be skipped — call us at {n} if none of these look right.":"Ahora la opción específica. Esta pregunta no se puede omitir — llámenos al {n} si ninguna corresponde.",
+"If you have a reason to go in a different order, you can continue anyway.":"Si tiene una razón para seguir otro orden, puede continuar de todos modos.",
+"If you're unsure, call us at {n} — that's what we're here for.":"Si tiene dudas, llámenos al {n} — para eso estamos.",
+"A few words is plenty — we can help you sort it out later.":"Con pocas palabras basta — más adelante podemos ayudarle a aclararlo.",
+"If you're not sure, call us at {n}.":"Si no está seguro/a, llámenos al {n}.",
+"Almost done":"Ya casi termina",
+"If you can, please sign a release for each person below. Then tap Submit to send your intake to the FRC.":"Si puede, por favor firme una autorización para cada persona de abajo. Luego toque Enviar para mandar su admisión al FRC.",
+"Tap Submit to send your intake to the FRC.":"Toque Enviar para mandar su admisión al FRC.",
+"Please try again. If it still doesn't work, call the FRC at {n}.":"Por favor, intente de nuevo. Si todavía no funciona, llame al FRC al {n}.",
+"Intake sent":"Admisión enviada",
+"Thank you! Your intake was sent to the FRC. Someone from the FRC will follow up with you.":"¡Gracias! Su admisión fue enviada al FRC. Alguien del FRC se comunicará con usted.",
+"You can close this page now.":"Ya puede cerrar esta página."
 },
 pt: {
 /* --- chrome / navigation --- */
@@ -1301,7 +1319,24 @@ pt: {
 "Release form for {n}":"Formulário de autorização de {n}",
 "Close":"Fechar",
 "Thank you":"Obrigado",
-"Release signed ✓":"Autorização assinada ✓"
+"Release signed ✓":"Autorização assinada ✓",
+/* --- V16: remote mode (?remote) --- */
+"If anything is confusing, call us at {n}. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":"Se algo não estiver claro, ligue para nós no {n}. A maioria das perguntas pode ser pulada se você preferir não responder — você ainda poderá receber nossa ajuda.",
+"Nothing is saved on this device. If this page is closed before you submit, everything on it is erased.":"Nada é salvo neste dispositivo. Se esta página for fechada antes de você enviar, tudo será apagado.",
+"State: Massachusetts (if that's not right, call us at {n})":"Estado: Massachusetts (se não estiver correto, ligue para nós no {n})",
+"First, what kind of person or place told you about us? Pick the closest fit — call us at {n} if you're not sure.":"Primeiro, que tipo de pessoa ou lugar falou de nós para você? Escolha a opção mais próxima — ligue para nós no {n} se você não tiver certeza.",
+"Now the specific one. This question can't be skipped — call us at {n} if none of these look right.":"Agora a opção específica. Esta pergunta não pode ser pulada — ligue para nós no {n} se nenhuma delas estiver certa.",
+"If you have a reason to go in a different order, you can continue anyway.":"Se você tiver um motivo para seguir outra ordem, pode continuar mesmo assim.",
+"If you're unsure, call us at {n} — that's what we're here for.":"Se tiver dúvida, ligue para nós no {n} — estamos aqui para isso.",
+"A few words is plenty — we can help you sort it out later.":"Poucas palavras já bastam — podemos ajudar você a esclarecer depois.",
+"If you're not sure, call us at {n}.":"Se você não tiver certeza, ligue para nós no {n}.",
+"Almost done":"Quase pronto",
+"If you can, please sign a release for each person below. Then tap Submit to send your intake to the FRC.":"Se puder, assine uma autorização para cada pessoa abaixo. Depois toque em Enviar para mandar sua admissão ao FRC.",
+"Tap Submit to send your intake to the FRC.":"Toque em Enviar para mandar sua admissão ao FRC.",
+"Please try again. If it still doesn't work, call the FRC at {n}.":"Por favor, tente novamente. Se ainda não funcionar, ligue para o FRC no {n}.",
+"Intake sent":"Admissão enviada",
+"Thank you! Your intake was sent to the FRC. Someone from the FRC will follow up with you.":"Obrigado! Sua admissão foi enviada ao FRC. Alguém do FRC vai entrar em contato com você.",
+"You can close this page now.":"Você já pode fechar esta página."
 },
 ht: {
 /* --- chrome / navigation --- */
@@ -1849,7 +1884,24 @@ ht: {
 "Release form for {n}":"Fòm otorizasyon pou {n}",
 "Close":"Fèmen",
 "Thank you":"Mèsi",
-"Release signed ✓":"Otorizasyon siyen ✓"
+"Release signed ✓":"Otorizasyon siyen ✓",
+/* --- V16: remote mode (?remote) --- */
+"If anything is confusing, call us at {n}. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":"Si yon bagay pa klè, rele nou nan {n}. Ou ka sote pifò kesyon yo si ou pa vle reponn — ou ap toujou ka jwenn èd nan men nou.",
+"Nothing is saved on this device. If this page is closed before you submit, everything on it is erased.":"Anyen pa anrejistre sou aparèy sa a. Si paj sa a fèmen anvan ou soumèt, tout bagay efase.",
+"State: Massachusetts (if that's not right, call us at {n})":"Eta: Massachusetts (si sa pa kòrèk, rele nou nan {n})",
+"First, what kind of person or place told you about us? Pick the closest fit — call us at {n} if you're not sure.":"Premyèman, ki kalite moun oswa kote ki te pale ou de nou? Chwazi sa ki pi pre a — rele nou nan {n} si ou pa sèten.",
+"Now the specific one. This question can't be skipped — call us at {n} if none of these look right.":"Kounye a chwa espesifik la. Kesyon sa a pa ka sote — rele nou nan {n} si okenn nan yo pa kòrèk.",
+"If you have a reason to go in a different order, you can continue anyway.":"Si ou gen yon rezon pou swiv yon lòt lòd, ou ka kontinye kanmenm.",
+"If you're unsure, call us at {n} — that's what we're here for.":"Si ou pa sèten, rele nou nan {n} — se pou sa nou la.",
+"A few words is plenty — we can help you sort it out later.":"Kèk mo sifi — nou ka ede ou klarifye sa pita.",
+"If you're not sure, call us at {n}.":"Si ou pa sèten, rele nou nan {n}.",
+"Almost done":"Prèske fini",
+"If you can, please sign a release for each person below. Then tap Submit to send your intake to the FRC.":"Si ou kapab, tanpri siyen yon otorizasyon pou chak moun ki anba a. Apre sa, touche Soumèt pou voye admisyon ou bay FRC a.",
+"Tap Submit to send your intake to the FRC.":"Touche Soumèt pou voye admisyon ou bay FRC a.",
+"Please try again. If it still doesn't work, call the FRC at {n}.":"Tanpri eseye ankò. Si li toujou pa mache, rele FRC a nan {n}.",
+"Intake sent":"Admisyon an voye",
+"Thank you! Your intake was sent to the FRC. Someone from the FRC will follow up with you.":"Mèsi! Admisyon ou an te voye bay FRC a. Yon moun nan FRC a ap kontakte ou.",
+"You can close this page now.":"Ou ka fèmen paj sa a kounye a."
 }
 };
 /* ============ DATA ============ */
@@ -2211,15 +2263,38 @@ const state = {
 
 /* ============ URL TAGS ============
    Read once at load (never stored):
-   ?cra       CRA mode on and locked for the session (the link staff send to CRA families)
-   ?lang=xx   start in es, pt or ht; anything else starts in English
-   They combine: ?cra&lang=es */
+   ?cra          CRA mode on and locked for the session (the link staff send to CRA families)
+   ?lang=xx      start in es, pt or ht; anything else starts in English
+   ?remote       remote mode, locked on: the family finishes on their own device
+                 (Almost done → Submit → Intake sent), no staff hand-off
+   ?releasetest  staff only: shows the release buttons before they're on for everyone
+   They combine: ?remote&cra&lang=es */
 const URL_TAGS = new URLSearchParams(location.search);
 function urlTag(name){ for(const [k,v] of URL_TAGS) if(k.toLowerCase()===name) return v; return null; }
 const CRA_LOCKED = urlTag("cra")!==null;
 state.cra = CRA_LOCKED;
 const URL_LANG = (urlTag("lang")||"").trim().toLowerCase();
 if(hasOwn(I18N, URL_LANG)) LANG = URL_LANG;   /* set before the first render */
+const REMOTE = urlTag("remote")!==null;
+const RELEASE_TEST = urlTag("releasetest")!==null;
+/* the number remote mode's "call us" lines give */
+const FRC_PHONE = "978-296-8080";
+/* A client line that assumes the FRC tablet or staff nearby, and its remote
+   version ({n} = FRC_PHONE). Add both versions to the dictionaries. */
+function byMode(kiosk, remote){ return REMOTE ? trn(remote, FRC_PHONE) : kiosk; }
+/* keep the phone number on one line wherever a screen shows it */
+function keepPhoneTogether(root){
+  const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), hits = [];
+  while(walk.nextNode()) if(walk.currentNode.nodeValue.includes(FRC_PHONE)) hits.push(walk.currentNode);
+  for(const t of hits){
+    const frag = document.createDocumentFragment();
+    t.nodeValue.split(FRC_PHONE).forEach((part, i)=>{
+      if(i) frag.appendChild(el("span",{class:"phone"}, FRC_PHONE));
+      if(part) frag.appendChild(document.createTextNode(part));
+    });
+    t.replaceWith(frag);
+  }
+}
 
 let nextId = 1;
 function newMember(){
@@ -2463,6 +2538,7 @@ function render(preserveScroll){
   try{ scr = SCREENS[current.id](current.ctx); }
   catch(err){ console.error("Screen failed:", current.id, err); PS_TR = false; scr = crashScreen(); }
   app.appendChild(scr);
+  if(REMOTE) keepPhoneTogether(app);
   if(preserveScroll) window.scrollTo(x, y);
   else window.scrollTo(0,0);
 }
@@ -2476,7 +2552,7 @@ function crashScreen(){
       el("button",{class:"btn-primary", type:"button", onclick:()=>{
         if(history.length>1){ history.pop(); current = history[history.length-1]; render(false); }
       }}, tr("Go back")),
-      el("button",{class:"btn-ghost", type:"button", onclick:()=>{
+      REMOTE ? null : el("button",{class:"btn-ghost", type:"button", onclick:()=>{
         try{ buildPrint(); }
         catch(e){ const r=document.getElementById("printRoot"); r.style.whiteSpace="pre-wrap"; r.textContent=JSON.stringify(state,null,2); }
         window.print();
@@ -2493,7 +2569,7 @@ function progressInfo(id, ctx){
   if(id==="welcome") return null;
   const anyDone = state.members.some(x=>x.done);
   const listStep = anyDone ? 3 : 2;
-  if(id==="finish") return {step:4, pct:null};
+  if(id==="finish") return (REMOTE && state.submitted) ? null : {step:4, pct:null};
   if(state.phase==="build" && STEP1_SCREENS.includes(id)){
     /* adding extra household members loops basics <-> anyoneElse; hold the bar steady */
     const pos = (id==="basics" && !ctx.first) ? "anyoneElse" : id;
@@ -2574,19 +2650,22 @@ SCREENS.welcome = () => shell({
   noBack:true,
   body:[
     el("p",null,"This will walk you through our intake, one small step at a time."),
-    el("div",{class:"notice"},"A staff member is nearby if anything is confusing — just ask. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us."),
+    el("div",{class:"notice"},byMode("A staff member is nearby if anything is confusing — just ask. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.",
+      "If anything is confusing, call us at {n}. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.")),
     el("p",{class:"subtle"},"You can change the language at any time using the dropdown in the top corner."),
-    el("p",{class:"subtle"},"Nothing is saved on this tablet. When this page is closed, everything on it is erased."),
+    el("p",{class:"subtle"},byMode("Nothing is saved on this tablet. When this page is closed, everything on it is erased.",
+      "Nothing is saved on this device. If this page is closed before you submit, everything on it is erased.")),
     craControl()
   ],
   next:()=>goTo("famBasics"), nextLabel:"Start"
 });
 /* Staff-facing CRA mode switch on Welcome. English only: the text node
    skips tr(), so it never picks up a translation. On the ?cra link it's
-   locked on and shown as a plain label. */
+   locked on and shown as a plain label. Hidden in remote mode. */
 function craControl(){
   const txt = ()=>document.createTextNode("CRA mode");
   if(CRA_LOCKED) return el("div",{class:"cra-row"}, el("span",{class:"cra-tag"}, txt()));
+  if(REMOTE) return null;   /* families' own devices: no staff switch */
   return el("div",{class:"cra-row"}, el("button",{type:"button", class:state.cra ? "cra-tag" : "cra-off",
     "aria-pressed":String(state.cra), onclick:()=>{ state.cra = !state.cra; rerender(); }}, txt()));
 }
@@ -2670,7 +2749,8 @@ SCREENS.famHome = () => {
         el("div",null, qLabel("City/Town"), (function(){
           const i=qText(a,"city",{ph:"City or town", oninput:()=>{a.cityAuto=false;}});
           i.id="cityInp"; return i; })())),
-      el("p",{class:"subtle"},"State: Massachusetts (tell a staff member if that's not right)")
+      el("p",{class:"subtle"},byMode("State: Massachusetts (tell a staff member if that's not right)",
+        "State: Massachusetts (if that's not right, call us at {n})"))
     ],
     canNext: !!f.living,
     why:"To continue, please answer the question above.",
@@ -2701,14 +2781,16 @@ SCREENS.refSource = () => {
   const cat = REFERRAL_CATS.find(c=>c.cat===r.category);
   const body = [];
   if(!cat){
-    body.push(el("p",{class:"hint"},"First, what kind of person or place told you about us? Pick the closest fit — a staff member can help if you're not sure."));
+    body.push(el("p",{class:"hint"},byMode("First, what kind of person or place told you about us? Pick the closest fit — a staff member can help if you're not sure.",
+      "First, what kind of person or place told you about us? Pick the closest fit — call us at {n} if you're not sure.")));
     body.push(qSingle(REFERRAL_CATS.map(c=>({v:c.cat, ex:c.ex})), ()=>r.category,
       v=>{ r.category=v; r.value=null; }, {stack:true, toggle:false, bold:true}));
   } else {
     body.push(el("div",{class:"notice"},"Category: ", el("b",null,cat.cat), " ",
       el("button",{class:"skiplink", type:"button",
         onclick:()=>{ r.category=null; r.value=null; rerender(); }},"change")));
-    body.push(el("p",{class:"hint"},"Now the specific one. This question can't be skipped — ask a staff member if none of these look right."));
+    body.push(el("p",{class:"hint"},byMode("Now the specific one. This question can't be skipped — ask a staff member if none of these look right.",
+      "Now the specific one. This question can't be skipped — call us at {n} if none of these look right.")));
     body.push(qSingle(cat.items, ()=>r.value, v=>r.value=v, {stack:true, toggle:false}));
   }
   return shell({
@@ -2894,7 +2976,8 @@ SCREENS.redirect = (ctx) => {
     title:"One suggestion first",
     body:[
       el("p",null,"Usually the adult filling this out completes their own intake first — it helps us understand the whole family."),
-      el("p",{class:"subtle"},"If you're staff or have a reason to go in a different order, you can continue anyway.")
+      el("p",{class:"subtle"},byMode("If you're staff or have a reason to go in a different order, you can continue anyway.",
+        "If you have a reason to go in a different order, you can continue anyway."))
     ],
     next:()=>{ back(); },
     nextLabel:"Okay — I'll do mine first",
@@ -2957,7 +3040,8 @@ SCREENS.rosterSelect = (ctx) => {
   body.push(el("p",{class:"hint"},"A green check means that person's intake is complete."));
   body.push(rosterList(true, suggestId));
   if(anyDone){
-    body.push(el("div",{class:"notice", style:"font-size:16.5px; font-weight:600;"},"If you're unsure, just ask a staff member — that's what we're here for."));
+    body.push(el("div",{class:"notice", style:"font-size:16.5px; font-weight:600;"},byMode("If you're unsure, just ask a staff member — that's what we're here for.",
+      "If you're unsure, call us at {n} — that's what we're here for.")));
   }
   body.push(el("button",{class:"btn-quiet", type:"button", style:"margin-top:6px;",
     onclick:()=>openDraft({returnTo:"rosterSelect"})},
@@ -3220,7 +3304,8 @@ function adultSteps(m){
     ], canNext:true }),
   /* 4 */
   (m)=>({ title:"What brings you in",
-    comfort:comfort("A few words is plenty — a staff member can help you sort it out."),
+    comfort:comfort(byMode("A few words is plenty — a staff member can help you sort it out.",
+      "A few words is plenty — we can help you sort it out later.")),
     body: reasonBlock(m),
     canNext:true }),
   /* 5 */
@@ -3350,7 +3435,7 @@ function childSteps(m){
     if(a.craUnder12) a.craActive=null;   /* was auto-set while under 12 — ask it now */
     a.craUnder12=false;
     return { title:trn("Court status for {n}", kid()),
-    comfort:"If you're not sure, a staff member can help.",
+    comfort:byMode("If you're not sure, a staff member can help.", "If you're not sure, call us at {n}."),
     body:[
       qLabel(trn("Is there an active CRA for {n}?", kid()),"CRA stands for Child Requiring Assistance — a type of juvenile court case, sometimes filed by a parent or a school."),
       qSingle(["Yes","No"], ()=>a.craActive, v=>a.craActive=v, {toggle:false}),
@@ -3380,7 +3465,8 @@ function childSteps(m){
     ], canNext:true }),
   /* 4: reason for visit */
   (m)=>({ title:trn("What brings {n} in", kid()),
-    comfort:comfort("A few words is plenty — a staff member can help you sort it out."),
+    comfort:comfort(byMode("A few words is plenty — a staff member can help you sort it out.",
+      "A few words is plenty — we can help you sort it out later.")),
     body: reasonBlock(m),
     canNext:true }),
   /* 5: school part 1 */
@@ -3802,6 +3888,7 @@ SCREENS.review = (ctx) => {
 
 /* ============ FINISH & PRINT ============ */
 SCREENS.finish = () => {
+  if(REMOTE) return state.submitted ? remoteSentScreen() : remoteFinishScreen();
   if(!state.showStaffPanel){
     /* Client-facing — no exit option at all. Only the plain staff-reveal button moves forward. */
     return shell({
@@ -3820,34 +3907,13 @@ SCREENS.finish = () => {
     body:[
       el("div",{class:"notice"},"Staff: use Print to make the data-entry copy. Nothing is saved on this device — closing or refreshing this page erases everything, so print first."),
       state.submitStatus ? el("div",{class:"notice"}, state.submitStatus) : null,
-      releaseRedoButtons(),
+      releaseStaffButtons(),
     ],
     noBack:true,
     next: async ()=>{
       if(!finishRule().ok){ goTo("rosterSelect"); return; }   /* never send an intake that doesn't meet the rule */
-      state.submitting = true;
       state.submitStatus = "Submitting…";
-      rerender();
-      let outcome;
-      /* try/finally: any error still releases the button (it used to stay on "Submitting…" for good) */
-      try{
-        const printHtml = buildPrint();
-        const payload = {
-          family: state.family,
-          referral: state.referral,
-          /* m.stash (answers parked by a DOB change) is never sent */
-          members: state.members.map(({stash, ...m})=>m),
-          submittedAt: new Date().toISOString(),
-          printHtml: printHtml
-        };
-        outcome = await submitIntake(payload);
-      }catch(err){
-        console.error("Submit failed before sending:", err);
-        outcome = {success:false};
-      }finally{
-        state.submitting = false;
-      }
-      state.submitted = outcome.success;
+      const outcome = await sendIntake();
       state.submitStatus = outcome.success ? "Submitted."
         : outcome.timedOut ? "Submission timed out — please submit again, or print a copy to send to the FRC."
         : "Submission failed — please try again or download/print a copy to send to the FRC.";
@@ -3877,6 +3943,79 @@ SCREENS.finish = () => {
     )
   });
 };
+
+/* Sends the intake (staff panel Submit and remote mode's Submit). Shows the
+   button as "Submitting…" meanwhile; try/finally: any error still releases
+   the button (it used to stay on "Submitting…" for good). */
+async function sendIntake(){
+  state.submitting = true;
+  rerender();
+  let outcome;
+  try{
+    const printHtml = buildPrint();
+    const payload = {
+      family: state.family,
+      referral: state.referral,
+      /* m.stash (answers parked by a DOB change) is never sent */
+      members: state.members.map(({stash, ...m})=>m),
+      submittedAt: new Date().toISOString(),
+      printHtml: printHtml
+    };
+    outcome = await submitIntake(payload);
+  }catch(err){
+    console.error("Submit failed before sending:", err);
+    outcome = {success:false};
+  }finally{
+    state.submitting = false;
+  }
+  state.submitted = outcome.success;
+  return outcome;
+}
+
+/* ---- Remote mode (?remote): the family finishes on their own device ----
+   "Almost done" (release buttons, encouraged but not required) → Submit →
+   "Intake sent". No staff panel, Print or Start over. */
+function remoteFinishScreen(){
+  const releases = releaseButtons();
+  const rule = finishRule();
+  return shell({
+    title:"Almost done",
+    body:[
+      el("p",null, releases
+        ? "If you can, please sign a release for each person below. Then tap Submit to send your intake to the FRC."
+        : "Tap Submit to send your intake to the FRC."),
+      releases,
+      state.submitStatus ? el("div",{class:"notice"}, state.submitStatus) : null
+    ],
+    noBack: state.submitting,
+    next: async ()=>{
+      if(!finishRule().ok){ goTo("rosterSelect"); return; }   /* never send an intake that doesn't meet the rule */
+      state.submitStatus = null;
+      const outcome = await sendIntake();
+      if(outcome.success){
+        allowLeave = true;   /* it's been sent: closing the page needs no warning */
+        notesPanel.classList.remove("open"); notesFab.style.display = "none";   /* a note typed now wouldn't be sent */
+      } else {
+        state.submitStatus = trn("Please try again. If it still doesn't work, call the FRC at {n}.", FRC_PHONE);
+      }
+      rerender();
+    },
+    nextLabel: state.submitting ? "Submitting…" : "Submit",
+    canNext: !state.submitting && rule.ok,
+    why: rule.ok ? undefined : rule.why
+  });
+}
+function remoteSentScreen(){
+  return shell({
+    title:"Intake sent",
+    noBack:true,
+    body:[
+      el("p",null, el("span",{class:"check"},"✓ "),
+        "Thank you! Your intake was sent to the FRC. Someone from the FRC will follow up with you."),
+      el("p",{class:"subtle"},"You can close this page now.")
+    ]
+  });
+}
 
 function miniCard(m){
   return '<div class="p-card">'+
@@ -3918,7 +4057,8 @@ function buildPrint(){
   const f = state.family, ad = f.address;
   const kids = state.members.filter(m=>isChild(m)).length;
   let h = '<div class="p-title">Family Intake — '+esc(f.lastName||"(no family name)")+'</div>';
-  h += '<div class="p-meta">Completed '+todayStr()+' · Printed from the intake tablet · Enter into CRM, then shred.</div>';
+  h += '<div class="p-meta">Completed '+todayStr()+(REMOTE ? ' · Submitted from the family\'s own device' : ' · Printed from the intake tablet')+' · Enter into CRM, then shred.</div>';
+  if(REMOTE) h += '<div class="p-cra">Completed remotely — the family filled out and submitted this intake on their own device.</div>';
   if(state.cra) h += '<div class="p-cra">CRA mode — this visit required an adult intake and a child intake.</div>';
 
   h += '<div class="p-section"><h3>FAMILY — Family Information</h3>'+
@@ -3940,7 +4080,7 @@ function buildPrint(){
 
   h += '<div class="p-section"><h3>FAMILY — Referral Source (exactly one)</h3>'+
     pLine("How did you hear about us?", state.referral.value) +
-    '<div class="p-line">Category chosen on tablet: '+esc(state.referral.category||"—")+'</div></div>';
+    '<div class="p-line">Category chosen '+(REMOTE ? 'by the family' : 'on tablet')+': '+esc(state.referral.category||"—")+'</div></div>';
 
   /* Family member mini-cards — quick reference for CRM entry */
   h += '<div class="p-section"><h3>FAMILY MEMBERS — quick reference (add each to CRM)</h3><div class="p-cards">';
@@ -3999,7 +4139,7 @@ function buildPrint(){
     if(!(m.services && m.done)) continue;
     const name = esc(fullName(m)||"(no name)");
     const a = m.a||{};
-    roiHtml += '<div class="p-roi-line">\u2610 '+name+' - CFFS/JRI'+(m.releaseSigned?' \u2014 signed on tablet \u2713':'')+'</div>';
+    roiHtml += '<div class="p-roi-line">\u2610 '+name+' - CFFS/JRI'+(m.releaseSigned?' \u2014 signed '+(REMOTE?'remotely':'on tablet')+' \u2713':'')+'</div>';
     for(const ag of RELEASE_AGENCIES){
       if((a.agencies||[]).includes(ag)){
         roiHtml += '<div class="p-roi-line">\u2610 '+name+' - '+esc(ag.split(" ")[0])+'</div>';
@@ -4022,22 +4162,27 @@ function buildPrint(){
   return h;
 }
 
-/* ============ RELEASE OF INFORMATION (Jotform, signed on the tablet) ============
-   "All set!" shows one "Sign release for {name}" button per completed intake.
+/* ============ RELEASE OF INFORMATION (Jotform, signed in the intake) ============
+   "All set!" (remote mode: "Almost done") shows one "Sign release for {name}"
+   button per completed intake.
    It opens the prefilled CFFS/JRI release in a full-screen panel. The intake
    page itself never navigates (leaving it erases the intake): the release
    loads in a sandboxed iframe that can't navigate the top page. Jotform's
    Thank You setting redirects the panel to release-done.html, which posts
    {type:"release-signed"}; the intake then shows "Thank you", closes the
    panel and marks the person (their button turns into "Release signed ✓"
-   and stops opening the release, "signed on tablet ✓" in the printout's
-   Releases box, releaseSigned:true in the submitted JSON). Staff can redo
-   a signed release from the staff panel. Closing early or a failed load
-   changes nothing.
+   and stops opening the release, "signed on tablet ✓" (remote: "signed
+   remotely ✓") in the printout's Releases box, releaseSigned:true in the
+   submitted JSON). On the kiosk, the staff panel can open the release for
+   anyone who hasn't signed and redo a signed one. Closing early or a failed
+   load changes nothing.
    The release URL holds the person's name and DOB: never log it, store it,
    or send it anywhere but the iframe.
-   RELEASE_ENABLED = false hides the buttons; the intake works as before. */
-const RELEASE_ENABLED = true;
+   Release buttons stay hidden (the intake works exactly as before) until
+   RELEASE_FOR_EVERYONE is true. Until then, staff can test them on the live
+   site with the staff-only ?releasetest link. */
+const RELEASE_FOR_EVERYONE = false;
+const RELEASE_ENABLED = RELEASE_FOR_EVERYONE || RELEASE_TEST;
 const RELEASE_FORM_URL = "https://form.jotform.com/262673921694064";
 const RELEASE_JOTFORM_LANG = {en:"en", es:"es", pt:"pt", ht:"bzj"};
 const RELEASE_THANKS_MS = 5000;
@@ -4065,27 +4210,34 @@ function releaseButtons(){
   const people = releasePeople();
   if(!people.length) return null;
   /* once signed, the button can't reopen the release (no duplicate signed
-     releases in Jotform); staff can redo it from the staff panel */
+     releases in Jotform); on the kiosk, staff can redo it from the staff panel */
   return el("div",{class:"rel-list"}, ...people.map(m=>el("div",{class:"rel-row"},
     m.releaseSigned
       ? el("button",{class:"btn-quiet rel-signed", type:"button", disabled:true}, "Release signed ✓")
       : el("button",{class:"btn-primary", type:"button", onclick:()=>openRelease(m)},
           trn("Sign release for {n}", m.first.trim())))));
 }
-/* Staff panel: reopen a signed release, after a warning. Staff-facing, so
-   English only (deliberately not in the dictionaries). */
-function releaseRedoButtons(){
+/* Staff panel (kiosk): open the release for anyone who hasn't signed, or redo
+   a signed one after a warning. Staff-facing, so English only (deliberately
+   not in the dictionaries). */
+function releaseStaffButtons(){
   if(!RELEASE_ENABLED) return null;
-  const signed = releasePeople().filter(m=>m.releaseSigned);
-  if(!signed.length) return null;
-  return el("div",{class:"rel-redo"}, ...signed.map(m=>el("button",{class:"btn-ghost", type:"button",
-    onclick:()=>confirmBox(m.first.trim()+"'s release is already signed. Open it again? Signing again creates a second signed release in Jotform.",
-      "Open release", "Cancel", ()=>openRelease(m, true))},
-    "Redo release for "+m.first.trim())));
+  const people = releasePeople();
+  if(!people.length) return null;
+  return el("div",{class:"rel-staff"}, ...people.map(m=>{
+    const name = m.first.trim();
+    return m.releaseSigned
+      ? el("button",{class:"btn-ghost", type:"button",
+          onclick:()=>confirmBox(name+"'s release is already signed. Open it again? Signing again creates a second signed release in Jotform.",
+            "Open release", "Cancel", ()=>openRelease(m, true))},
+          "Redo release for "+name)
+      : el("button",{class:"btn-ghost", type:"button", onclick:()=>openRelease(m)}, "Open release for "+name);
+  }));
 }
 let releasePanel = null;   /* {mid, overlay, frame, body, signed, timer, prevOverflow} while open */
 function openRelease(m, redo){
   if(releasePanel || (m.releaseSigned && !redo)) return;   /* signed: only the staff panel's redo reopens it */
+  if(state.submitting) return;   /* a release signed mid-submit would miss the submission */
   const title = trn("Release form for {n}", m.first.trim());
   const spinner = el("div",{class:"rel-spin", "aria-hidden":"true"});
   /* no allow-top-navigation of any kind: the release can never take the intake page away */
