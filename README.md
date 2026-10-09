@@ -50,7 +50,7 @@ loads and are never saved; they can be combined.
 | `?cra` | **CRA mode, locked on** for the whole session. This is the link staff send to CRA families. Welcome shows a "CRA mode" label that can't be tapped off. | `index.html?cra` |
 | `?lang=es` / `?lang=pt` / `?lang=ht` | Starts in Spanish / Portuguese / Haitian Creole (the dropdown shows it selected and still works). Anything else starts in English. | `index.html?lang=es` |
 | `?remote` | **Remote mode, locked on** for the whole session. This is the link staff send to families to fill out on their own phone or computer: no staff hand-off, the family submits it themselves. See "Remote mode" below. | `index.html?remote` |
-| `?releasetest` | **Staff only — never send to families.** Shows the release buttons before they're switched on for everyone, so staff can test them on the live site. See "Release of information" below. | `index.html?releasetest` |
+| `?releasetest` | **Staff only — never send to families.** Shows the release buttons when they're switched off for everyone (`RELEASE_FOR_EVERYONE = false`), so staff can test them on the live site. While they're on for everyone it changes nothing. See "Release of information" below. | `index.html?releasetest` |
 | combined | e.g. remote CRA mode in Spanish | `index.html?remote&cra&lang=es` |
 
 - Without `?cra`, staff can turn CRA mode on or off with the small, quiet
@@ -97,9 +97,10 @@ On the language links the family can still switch languages from the
 dropdown. On the CRA links, CRA mode stays on and can't be turned off on
 screen.
 
-**Staff-only test links** (never send these to families). While the
-release buttons are switched off for everyone, these show them so staff
-can test on the live site:
+**Staff-only test links** (never send these to families). The release
+buttons are on for everyone (since Version 16.1), so these aren't needed
+now. If the buttons are ever switched off again, these still show them so
+staff can test on the live site:
 
 | Use | Link |
 |---|---|
@@ -222,13 +223,11 @@ a full-screen panel inside the intake page, already filled in:
 
 Everything prefilled can still be changed in Jotform.
 
-- **Hidden until switched on.** For now the release buttons only appear
-  on links with the staff-only `?releasetest` tag (see "Staff-only test
-  links"); without it nobody sees them, and the tablet links work as in
+- **On for everyone** (tablet and remote) since Version 16.1. To hide the
+  buttons again, set `RELEASE_FOR_EVERYONE = false` in `index.html`; staff
+  can still test them with the staff-only `?releasetest` links (see
+  "Staff-only test links"). With them hidden, the tablet links work as in
   Version 15 apart from the wording changes in the Version 16 changelog.
-  After testing, `RELEASE_FOR_EVERYONE = true` in
-  `index.html` shows them to everyone (tablet and remote); setting it back
-  to `false` hides them again.
 
 - **The intake page never leaves.** The release loads in a sandboxed iframe
   (scripts, forms, same-origin and popups allowed; no top navigation of any
@@ -243,7 +242,8 @@ Everything prefilled can still be changed in Jotform.
   Jotform's own thank-you page, doesn't close by itself, and nobody is
   marked as signed; tap Close. If the form moves, see the hosting-move
   checklist above.
-- **After signing:** the panel shows "Thank you" for 5 seconds and closes;
+- **After signing:** the panel shows "Thank you" for 2.5 seconds
+  (`RELEASE_THANKS_MS`) and closes;
   that person's button changes to **"Release signed ✓"** and no longer
   opens the release, so a tap can't create a duplicate signed release in
   Jotform; the printout's Releases box
@@ -354,6 +354,15 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 16.1
+
+- **Release buttons switched on for everyone** (tablet and remote):
+  `RELEASE_FOR_EVERYONE = true`. The Jotform Thank You redirect to
+  `release-done.html` is set. `?releasetest` now only matters if the
+  buttons are switched off again.
+- **Shorter "Thank you" after signing:** the panel now closes after 2.5
+  seconds instead of 5.
 
 ### Version 16
 

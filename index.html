@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 16 — see README.md changelog for what changed in this version -->
+<!-- Version 16.1 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -4210,14 +4210,14 @@ function remotePrintNotice(){
    load changes nothing.
    The release URL holds the person's name and DOB: never log it, store it,
    or send it anywhere but the iframe.
-   Release buttons stay hidden (the intake works exactly as before) until
-   RELEASE_FOR_EVERYONE is true. Until then, staff can test them on the live
+   RELEASE_FOR_EVERYONE = false hides the release buttons (the intake then
+   works as it did without them); staff can still test them on the live
    site with the staff-only ?releasetest link. */
-const RELEASE_FOR_EVERYONE = false;
+const RELEASE_FOR_EVERYONE = true;
 const RELEASE_ENABLED = RELEASE_FOR_EVERYONE || RELEASE_TEST;
 const RELEASE_FORM_URL = "https://form.jotform.com/262673921694064";
 const RELEASE_JOTFORM_LANG = {en:"en", es:"es", pt:"pt", ht:"bzj"};
-const RELEASE_THANKS_MS = 5000;
+const RELEASE_THANKS_MS = 2500;   /* how long "Thank you" shows before the panel closes */
 /* same people as the printout's Releases box */
 function releasePeople(){ return state.members.filter(m=>m.services && m.done); }
 function legalName(m){ return [m.first.trim(), m.last.trim()].filter(Boolean).join(" "); }
