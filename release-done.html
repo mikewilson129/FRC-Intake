@@ -2,7 +2,10 @@
 <!-- Release "Thank you" page (Version 16). Jotform's Thank You setting redirects the
      release here after it's signed in the intake's panel; this page tells the intake
      (its parent window) so the panel can close. ?lang=es|pt|ht picks the language
-     (Jotform's bzj also means Haitian Creole); anything else shows English. -->
+     (Jotform's bzj also means Haitian Creole); anything else shows English.
+     ?form=<Jotform form ID> (Version 16.3): opened directly (not in the intake), the
+     page also shows "Fill out another release", back to that form. Only the two
+     release forms below are linked; any other value shows no button. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -16,20 +19,35 @@
     padding:24px; box-sizing:border-box; text-align:center;}
   .check{color:#2E7D4F; font-size:56px; font-weight:700; line-height:1;}
   h1{font-size:30px; font-weight:650; margin:0;}
+  .again{display:inline-block; margin-top:18px; background:#22685C; color:#FFFFFF; text-decoration:none;
+    border-radius:12px; padding:14px 26px; font-size:17px; font-weight:600;}
+  .again[hidden]{display:none;}   /* .again's display would otherwise override hidden */
 </style>
 </head>
 <body>
 <div class="check" aria-hidden="true">✓</div>
 <h1 id="msg">Thank you</h1>
+<a id="again" class="again" hidden></a>
 <script>
 "use strict";
 /* Drafts for staff review — keep in step with "Thank you" in index.html's dictionaries */
 const THANKS = {en:"Thank you", es:"Gracias", pt:"Obrigado", ht:"Mèsi"};
+const AGAIN = {en:"Fill out another release", es:"Llenar otra autorización", pt:"Preencher outra autorização", ht:"Ranpli yon lòt otorizasyon"};
+/* the release forms this page may link back to: CFFS/JRI, and other agencies/people */
+const FORMS = ["262673921694064", "262774481459066"];
+const JOTFORM_LANG = {en:"en", es:"es", pt:"pt", ht:"bzj"};
 let lang = (new URLSearchParams(location.search).get("lang")||"").trim().toLowerCase();
 if(lang==="bzj") lang = "ht";   /* Jotform's code for Haitian Creole */
 if(!Object.prototype.hasOwnProperty.call(THANKS, lang)) lang = "en";
 document.documentElement.lang = lang;
 document.title = document.getElementById("msg").textContent = THANKS[lang];
+const form = (new URLSearchParams(location.search).get("form")||"").trim();
+if(window.parent===window && FORMS.includes(form)){
+  const again = document.getElementById("again");
+  again.href = "https://form.jotform.com/"+form+(lang==="en" ? "" : "?language="+JOTFORM_LANG[lang]);
+  again.textContent = AGAIN[lang];
+  again.hidden = false;
+}
 /* Tell the intake the release was signed. Targeting our own origin means the
    message only reaches the intake page, never another site framing this one. */
 if(window.parent!==window && location.origin && location.origin!=="null"){
