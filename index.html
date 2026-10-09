@@ -137,6 +137,7 @@
     .p-roi{border:2px solid #000; border-radius:6px; padding:10px 12px; margin-top:10px; font-weight:700; page-break-inside:avoid;}
     .p-roi h3{font-size:14px; margin-bottom:6px;}
     .p-roi-line{margin:3px 0; font-size:12.5px;}
+    .p-remote-note{font-size:16px; padding:24px 0;}
     .p-cra{display:inline-block; border:2px solid #000; border-radius:6px; padding:4px 10px; margin:0 0 10px; font-weight:700; font-size:12.5px;}
   }
   /* ---------- persistent Notes widget ---------- */
@@ -265,7 +266,6 @@ const I18N = { es: {
 "Answer however you're comfortable.":"Conteste como se sienta cómodo/a.",
 "Answer however you're comfortable — none of this changes what help is available.":"Conteste como se sienta cómodo/a — nada de esto cambia la ayuda disponible.",
 "This helps us avoid duplicating supports already in place.":"Esto nos ayuda a no duplicar los apoyos que ya existen.",
-"We'll add everyone in your household — starting with you. We do need a name, date of birth, and the insurance answer.":"Vamos a agregar a todas las personas de su hogar — comenzando con usted. Necesitamos el nombre, la fecha de nacimiento y la respuesta sobre el seguro médico.",
 "We do need a name, date of birth, and the insurance answer.":"Necesitamos el nombre, la fecha de nacimiento y la respuesta sobre el seguro médico.",
 /* --- family screens --- */
 "Your family":"Su familia","Family last name":"Apellido de la familia","Last name":"Apellido",
@@ -365,7 +365,6 @@ const I18N = { es: {
 /* --- roster / household flow --- */
 "Your household":"Su hogar",
 "Are there any other people in your house you haven't told us about yet?":"¿Hay otras personas en su casa de las que aún no nos ha hablado?",
-"We'd like to include everyone who lives with you — adults and children.":"Queremos incluir a todas las personas que viven con usted — adultos y niños.",
 "Yes — add someone":"Sí — agregar a alguien","No — that's everyone":"No — ya están todos",
 "+ Add a household member":"+ Agregar un miembro del hogar",
 "(no name yet)":"(sin nombre todavía)",
@@ -749,29 +748,37 @@ const I18N = { es: {
 "If you're not on this list yet, tap “+ Add a household member” to add yourself.":"Si usted todavía no aparece en la lista, toque “+ Agregar un miembro del hogar” para agregarse.",
 "If your child isn't listed yet, tap “+ Add a household member”.":"Si su hijo/a todavía no aparece en la lista, toque “+ Agregar un miembro del hogar”.",
 "This button turns on once an adult's intake and a child's intake are both complete.":"Este botón se activa cuando la admisión de un adulto y la de un niño/a estén completas.",
-/* --- V16: release of information (signed on the tablet) --- */
+/* --- V16: release of information (signed on the tablet) — Spanish reviewed by staff --- */
 "Sign release for {n}":"Firmar la autorización de {n}",
 "Release form for {n}":"Formulario de autorización de {n}",
 "Close":"Cerrar",
 "Thank you":"Gracias",
 "Release signed ✓":"Autorización firmada ✓",
-/* --- V16: remote mode (?remote) --- */
+/* --- V16: remote mode (?remote) — Spanish reviewed by staff --- */
 "If anything is confusing, call us at {n}. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":"Si algo no está claro, llámenos al {n}. La mayoría de las preguntas se pueden omitir si prefiere no contestarlas — igual podrá recibir nuestra ayuda.",
 "Nothing is saved on this device. If this page is closed before you submit, everything on it is erased.":"Nada se guarda en este dispositivo. Si cierra esta página antes de enviar, toda la información se borra.",
-"State: Massachusetts (if that's not right, call us at {n})":"Estado: Massachusetts (si no es correcto, llámenos al {n})",
-"First, what kind of person or place told you about us? Pick the closest fit — call us at {n} if you're not sure.":"Primero, ¿qué tipo de persona o lugar le habló de nosotros? Elija la opción más cercana — llámenos al {n} si no está seguro/a.",
-"Now the specific one. This question can't be skipped — call us at {n} if none of these look right.":"Ahora la opción específica. Esta pregunta no se puede omitir — llámenos al {n} si ninguna corresponde.",
 "If you have a reason to go in a different order, you can continue anyway.":"Si tiene una razón para seguir otro orden, puede continuar de todos modos.",
 "If you're unsure, call us at {n} — that's what we're here for.":"Si tiene dudas, llámenos al {n} — para eso estamos.",
 "A few words is plenty — we can help you sort it out later.":"Con pocas palabras basta — más adelante podemos ayudarle a aclararlo.",
-"If you're not sure, call us at {n}.":"Si no está seguro/a, llámenos al {n}.",
 "Almost done":"Ya casi termina",
 "If you can, please sign a release for each person below. Then tap Submit to send your intake to the FRC.":"Si puede, por favor firme una autorización para cada persona de abajo. Luego toque Enviar para mandar su admisión al FRC.",
 "Tap Submit to send your intake to the FRC.":"Toque Enviar para mandar su admisión al FRC.",
 "Please try again. If it still doesn't work, call the FRC at {n}.":"Por favor, intente de nuevo. Si todavía no funciona, llame al FRC al {n}.",
 "Intake sent":"Admisión enviada",
 "Thank you! Your intake was sent to the FRC. Someone from the FRC will follow up with you.":"¡Gracias! Su admisión fue enviada al FRC. Alguien del FRC se comunicará con usted.",
-"You can close this page now.":"Ya puede cerrar esta página."
+"You can close this page now.":"Ya puede cerrar esta página.",
+/* --- V16 pre-merge changes: DRAFT — review with bilingual staff --- */
+"State: Massachusetts — if you live in a different state, please let us know in the Notes section.":"Estado: Massachusetts — si vive en otro estado, por favor avísenos en la sección de Notas.",
+"First, what kind of person or place told you about us? Pick the closest fit — if you're not sure, try your best and tell us in the Notes section in your own words.":"Primero, ¿qué tipo de persona o lugar le habló de nosotros? Elija la opción más cercana — si no está seguro/a, haga lo mejor que pueda y cuéntenos en la sección de Notas con sus propias palabras.",
+"Now the specific one. This question can't be skipped — if none of these look right, try your best and tell us in the Notes section in your own words.":"Ahora la opción específica. Esta pregunta no se puede omitir — si ninguna corresponde, haga lo mejor que pueda y cuéntenos en la sección de Notas con sus propias palabras.",
+"If you're not sure, just try your best.":"Si no está seguro/a, responda lo mejor que pueda.",
+"What can we help you with?":"¿En qué le podemos ayudar?",
+"What can we help you with for {n}?":"¿En qué le podemos ayudar con {n}?",
+"Is {n} with you and able to answer a few questions directly?":"¿Está {n} con usted y puede contestar unas preguntas directamente?",
+"We'll add everyone that lives in your home — starting with you. We do need a name, date of birth, and the insurance answer.":"Vamos a agregar a todas las personas que viven en su casa — comenzando con usted. Necesitamos el nombre, la fecha de nacimiento y la respuesta sobre el seguro médico.",
+"Please add everyone that lives in your home — adults and children.":"Por favor, agregue a todas las personas que viven en su casa — adultos y niños.",
+"Printing isn't available. Your intake was sent to the FRC.":"No es posible imprimir. Su admisión fue enviada al FRC.",
+"Printing isn't available.":"No es posible imprimir."
 },
 pt: {
 /* --- chrome / navigation --- */
@@ -831,7 +838,6 @@ pt: {
 "Answer however you're comfortable.":"Responda como se sentir à vontade.",
 "Answer however you're comfortable — none of this changes what help is available.":"Responda como se sentir à vontade — nada disso muda a ajuda disponível.",
 "This helps us avoid duplicating supports already in place.":"Isto nos ajuda a não duplicar os apoios que já existem.",
-"We'll add everyone in your household — starting with you. We do need a name, date of birth, and the insurance answer.":"Vamos incluir todas as pessoas do seu domicílio — começando por você. Precisamos do nome, da data de nascimento e da resposta sobre o seguro de saúde.",
 "We do need a name, date of birth, and the insurance answer.":"Precisamos do nome, da data de nascimento e da resposta sobre o seguro de saúde.",
 /* --- family screens --- */
 "Your family":"Sua família","Family last name":"Sobrenome da família","Last name":"Sobrenome",
@@ -932,7 +938,6 @@ pt: {
 /* --- roster / household flow --- */
 "Your household":"Seu domicílio",
 "Are there any other people in your house you haven't told us about yet?":"Há outras pessoas na sua casa que você ainda não nos contou?",
-"We'd like to include everyone who lives with you — adults and children.":"Queremos incluir todas as pessoas que moram com você — adultos e crianças.",
 "Yes — add someone":"Sim — adicionar alguém","No — that's everyone":"Não — já são todos",
 "+ Add a household member":"+ Adicionar um membro do domicílio",
 "(no name yet)":"(ainda sem nome)",
@@ -1192,7 +1197,7 @@ pt: {
 /* --- roles (typeahead) --- */
 "Adopted Child/Youth":"Criança/Jovem adotado(a)","Adopted Daughter":"Filha adotiva","Adopted Son":"Filho adotivo",
 "Aunt":"Tia","Biological Daughter":"Filha biológica","Biological Son":"Filho biológico",
-"Boyfriend/Girlfriend":"Namorado(a)","Brother":"Irmão","Child/Youth":"Criança/Jovem","Co-partner":"Coparceiro(a)",
+"Boyfriend/Girlfriend":"Namorado(a)","Brother":"Irmão","Child/Youth":"Criança/Jovem","Co-partner":"Co-responsável Legal (Guarda Compartilhada / Coparentalidade)",
 "Cousin":"Primo(a)","Daughter":"Filha","Ex-Husband":"Ex-marido","Ex-Wife":"Ex-esposa","Family Friend":"Amigo(a) da família",
 "Father":"Pai","Fiance":"Noivo(a)","Foster Child/Youth":"Criança/Jovem de criação (foster)",
 "Friend":"Amigo(a)","Grandchild":"Neto(a)","Grandfather":"Avô","Grandmother":"Avó",
@@ -1323,20 +1328,28 @@ pt: {
 /* --- V16: remote mode (?remote) --- */
 "If anything is confusing, call us at {n}. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":"Se algo não estiver claro, ligue para nós no {n}. A maioria das perguntas pode ser pulada se você preferir não responder — você ainda poderá receber nossa ajuda.",
 "Nothing is saved on this device. If this page is closed before you submit, everything on it is erased.":"Nada é salvo neste dispositivo. Se esta página for fechada antes de você enviar, tudo será apagado.",
-"State: Massachusetts (if that's not right, call us at {n})":"Estado: Massachusetts (se não estiver correto, ligue para nós no {n})",
-"First, what kind of person or place told you about us? Pick the closest fit — call us at {n} if you're not sure.":"Primeiro, que tipo de pessoa ou lugar falou de nós para você? Escolha a opção mais próxima — ligue para nós no {n} se você não tiver certeza.",
-"Now the specific one. This question can't be skipped — call us at {n} if none of these look right.":"Agora a opção específica. Esta pergunta não pode ser pulada — ligue para nós no {n} se nenhuma delas estiver certa.",
 "If you have a reason to go in a different order, you can continue anyway.":"Se você tiver um motivo para seguir outra ordem, pode continuar mesmo assim.",
 "If you're unsure, call us at {n} — that's what we're here for.":"Se tiver dúvida, ligue para nós no {n} — estamos aqui para isso.",
 "A few words is plenty — we can help you sort it out later.":"Poucas palavras já bastam — podemos ajudar você a esclarecer depois.",
-"If you're not sure, call us at {n}.":"Se você não tiver certeza, ligue para nós no {n}.",
 "Almost done":"Quase pronto",
 "If you can, please sign a release for each person below. Then tap Submit to send your intake to the FRC.":"Se puder, assine uma autorização para cada pessoa abaixo. Depois toque em Enviar para mandar sua admissão ao FRC.",
 "Tap Submit to send your intake to the FRC.":"Toque em Enviar para mandar sua admissão ao FRC.",
 "Please try again. If it still doesn't work, call the FRC at {n}.":"Por favor, tente novamente. Se ainda não funcionar, ligue para o FRC no {n}.",
 "Intake sent":"Admissão enviada",
 "Thank you! Your intake was sent to the FRC. Someone from the FRC will follow up with you.":"Obrigado! Sua admissão foi enviada ao FRC. Alguém do FRC vai entrar em contato com você.",
-"You can close this page now.":"Você já pode fechar esta página."
+"You can close this page now.":"Você já pode fechar esta página.",
+/* --- V16 pre-merge changes: DRAFT — wording from the Portuguese review doc --- */
+"State: Massachusetts — if you live in a different state, please let us know in the Notes section.":"Estado: Massachusetts — se você mora em outro estado, por favor, avise-nos na seção de Notas.",
+"First, what kind of person or place told you about us? Pick the closest fit — if you're not sure, try your best and tell us in the Notes section in your own words.":"Primeiro, que tipo de pessoa ou lugar falou de nós para você? Escolha a opção mais próxima — se não tiver certeza, escolha da melhor forma que puder e conte para nós na seção de Notas, com suas próprias palavras.",
+"Now the specific one. This question can't be skipped — if none of these look right, try your best and tell us in the Notes section in your own words.":"Agora a opção específica. Esta pergunta não pode ser pulada — se nenhuma delas estiver certa, escolha da melhor forma que puder e conte para nós na seção de Notas, com suas próprias palavras.",
+"If you're not sure, just try your best.":"Se você não tiver certeza, responda da melhor forma que puder.",
+"What can we help you with?":"Como podemos ajudar você?",
+"What can we help you with for {n}?":"Como podemos ajudar você com {n}?",
+"Is {n} with you and able to answer a few questions directly?":"{n} está com você e pode responder algumas perguntas diretamente?",
+"We'll add everyone that lives in your home — starting with you. We do need a name, date of birth, and the insurance answer.":"Vamos incluir todas as pessoas que moram na sua casa — começando por você. Precisamos do nome, da data de nascimento e da resposta sobre o seguro de saúde.",
+"Please add everyone that lives in your home — adults and children.":"Por favor, inclua todas as pessoas que moram na sua casa — adultos e crianças.",
+"Printing isn't available. Your intake was sent to the FRC.":"Não é possível imprimir. Sua admissão foi enviada ao FRC.",
+"Printing isn't available.":"Não é possível imprimir."
 },
 ht: {
 /* --- chrome / navigation --- */
@@ -1396,7 +1409,6 @@ ht: {
 "Answer however you're comfortable.":"Reponn jan ou santi ou alèz.",
 "Answer however you're comfortable — none of this changes what help is available.":"Reponn jan ou santi ou alèz — anyen nan sa pa chanje èd ki disponib.",
 "This helps us avoid duplicating supports already in place.":"Sa ede nou pa double sipò ki deja egziste.",
-"We'll add everyone in your household — starting with you. We do need a name, date of birth, and the insurance answer.":"Nou pral ajoute tout moun nan kay ou a — kòmanse ak ou menm. Nou bezwen non an, dat nesans lan, ak repons lan sou asirans sante.",
 "We do need a name, date of birth, and the insurance answer.":"Nou bezwen non an, dat nesans lan, ak repons lan sou asirans sante.",
 /* --- family screens --- */
 "Your family":"Fanmi ou","Family last name":"Siyati fanmi an","Last name":"Siyati",
@@ -1497,7 +1509,6 @@ ht: {
 /* --- roster / household flow --- */
 "Your household":"Kay ou",
 "Are there any other people in your house you haven't told us about yet?":"Èske gen lòt moun nan kay ou a ou poko pale nou de yo?",
-"We'd like to include everyone who lives with you — adults and children.":"Nou vle enkli tout moun k ap viv ak ou — granmoun ak timoun.",
 "Yes — add someone":"Wi — ajoute yon moun","No — that's everyone":"Non — se tout",
 "+ Add a household member":"+ Ajoute yon manm nan kay la",
 "(no name yet)":"(poko gen non)",
@@ -1888,20 +1899,28 @@ ht: {
 /* --- V16: remote mode (?remote) --- */
 "If anything is confusing, call us at {n}. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":"Si yon bagay pa klè, rele nou nan {n}. Ou ka sote pifò kesyon yo si ou pa vle reponn — ou ap toujou ka jwenn èd nan men nou.",
 "Nothing is saved on this device. If this page is closed before you submit, everything on it is erased.":"Anyen pa anrejistre sou aparèy sa a. Si paj sa a fèmen anvan ou soumèt, tout bagay efase.",
-"State: Massachusetts (if that's not right, call us at {n})":"Eta: Massachusetts (si sa pa kòrèk, rele nou nan {n})",
-"First, what kind of person or place told you about us? Pick the closest fit — call us at {n} if you're not sure.":"Premyèman, ki kalite moun oswa kote ki te pale ou de nou? Chwazi sa ki pi pre a — rele nou nan {n} si ou pa sèten.",
-"Now the specific one. This question can't be skipped — call us at {n} if none of these look right.":"Kounye a chwa espesifik la. Kesyon sa a pa ka sote — rele nou nan {n} si okenn nan yo pa kòrèk.",
 "If you have a reason to go in a different order, you can continue anyway.":"Si ou gen yon rezon pou swiv yon lòt lòd, ou ka kontinye kanmenm.",
 "If you're unsure, call us at {n} — that's what we're here for.":"Si ou pa sèten, rele nou nan {n} — se pou sa nou la.",
 "A few words is plenty — we can help you sort it out later.":"Kèk mo sifi — nou ka ede ou klarifye sa pita.",
-"If you're not sure, call us at {n}.":"Si ou pa sèten, rele nou nan {n}.",
 "Almost done":"Prèske fini",
 "If you can, please sign a release for each person below. Then tap Submit to send your intake to the FRC.":"Si ou kapab, tanpri siyen yon otorizasyon pou chak moun ki anba a. Apre sa, touche Soumèt pou voye admisyon ou bay FRC a.",
 "Tap Submit to send your intake to the FRC.":"Touche Soumèt pou voye admisyon ou bay FRC a.",
 "Please try again. If it still doesn't work, call the FRC at {n}.":"Tanpri eseye ankò. Si li toujou pa mache, rele FRC a nan {n}.",
 "Intake sent":"Admisyon an voye",
 "Thank you! Your intake was sent to the FRC. Someone from the FRC will follow up with you.":"Mèsi! Admisyon ou an te voye bay FRC a. Yon moun nan FRC a ap kontakte ou.",
-"You can close this page now.":"Ou ka fèmen paj sa a kounye a."
+"You can close this page now.":"Ou ka fèmen paj sa a kounye a.",
+/* --- V16 pre-merge changes: DRAFT — review with bilingual staff --- */
+"State: Massachusetts — if you live in a different state, please let us know in the Notes section.":"Eta: Massachusetts — si ou abite nan yon lòt eta, tanpri fè nou konnen nan seksyon Nòt la.",
+"First, what kind of person or place told you about us? Pick the closest fit — if you're not sure, try your best and tell us in the Notes section in your own words.":"Premyèman, ki kalite moun oswa kote ki te pale ou de nou? Chwazi sa ki pi pre a — si ou pa sèten, fè sa ou kapab epi di nou nan seksyon Nòt la ak pwòp mo pa ou.",
+"Now the specific one. This question can't be skipped — if none of these look right, try your best and tell us in the Notes section in your own words.":"Kounye a chwa espesifik la. Kesyon sa a pa ka sote — si okenn nan yo pa kòrèk, fè sa ou kapab epi di nou nan seksyon Nòt la ak pwòp mo pa ou.",
+"If you're not sure, just try your best.":"Si ou pa sèten, jis reponn jan ou kapab.",
+"What can we help you with?":"Ki jan nou ka ede ou?",
+"What can we help you with for {n}?":"Ki jan nou ka ede ou pou {n}?",
+"Is {n} with you and able to answer a few questions directly?":"Èske {n} avè ou epi li ka reponn kèk kesyon dirèkteman?",
+"We'll add everyone that lives in your home — starting with you. We do need a name, date of birth, and the insurance answer.":"Nou pral ajoute tout moun ki abite lakay ou — kòmanse ak ou menm. Nou bezwen non an, dat nesans lan, ak repons lan sou asirans sante.",
+"Please add everyone that lives in your home — adults and children.":"Tanpri ajoute tout moun ki abite lakay ou — granmoun ak timoun.",
+"Printing isn't available. Your intake was sent to the FRC.":"Ou pa ka enprime. Admisyon ou an te voye bay FRC a.",
+"Printing isn't available.":"Ou pa ka enprime."
 }
 };
 /* ============ DATA ============ */
@@ -2082,7 +2101,7 @@ const ROLE_ALIASES = {
  "noivo":["Fiance"],"noiva":["Fiance"],
  "padrasto":["Step-Parent"],"madrasta":["Step-Parent"],"enteado":["Step-Child"],"enteada":["Step-Child"],
  "sogra":["Mother-In-Law"],"parceiro":["Partner","Co-partner"],"parceira":["Partner","Co-partner"],
- "responsavel":["Legal Guardian Parent","Temporary Guardian"],
+ "responsavel":["Legal Guardian Parent","Temporary Guardian","Co-partner"],"guarda":["Co-partner"],"coparentalidade":["Co-partner"],
  "cuidador":["Kinship","Foster Parent","Legal Guardian Parent"],"cuidadora":["Kinship","Foster Parent","Legal Guardian Parent"],
  "amigo":["Friend","Family Friend"],"amiga":["Friend","Family Friend"],
  "eu":["Self"],
@@ -2279,9 +2298,10 @@ const REMOTE = urlTag("remote")!==null;
 const RELEASE_TEST = urlTag("releasetest")!==null;
 /* the number remote mode's "call us" lines give */
 const FRC_PHONE = "978-296-8080";
-/* A client line that assumes the FRC tablet or staff nearby, and its remote
-   version ({n} = FRC_PHONE). Add both versions to the dictionaries. */
-function byMode(kiosk, remote){ return REMOTE ? trn(remote, FRC_PHONE) : kiosk; }
+/* A client line written for the FRC tablet, and its remote version. Returns
+   the untranslated line; where it has {n}, the caller fills it in with trn()
+   (FRC_PHONE or a name). Add both versions to the dictionaries. */
+function byMode(kiosk, remote){ return REMOTE ? remote : kiosk; }
 /* keep the phone number on one line wherever a screen shows it */
 function keepPhoneTogether(root){
   const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), hits = [];
@@ -2517,7 +2537,7 @@ function render(preserveScroll){
   const LANG_OPTIONS = [
     ["en","English",false],
     ["es","Espa\u00f1ol",false],
-    ["pt","Portugu\u00eas",true],
+    ["pt","Portugu\u00eas",false],
     ["ht","Krey\u00f2l",true],
   ];
   const langSel = el("select",{id:"langSelect", style:"padding:8px 10px; font-size:15px; border-radius:8px; border:1px solid var(--border,#ccc); background:#fff;",
@@ -2538,7 +2558,7 @@ function render(preserveScroll){
   try{ scr = SCREENS[current.id](current.ctx); }
   catch(err){ console.error("Screen failed:", current.id, err); PS_TR = false; scr = crashScreen(); }
   app.appendChild(scr);
-  if(REMOTE) keepPhoneTogether(app);
+  if(REMOTE){ keepPhoneTogether(app); remotePrintNotice(); }
   if(preserveScroll) window.scrollTo(x, y);
   else window.scrollTo(0,0);
 }
@@ -2650,8 +2670,8 @@ SCREENS.welcome = () => shell({
   noBack:true,
   body:[
     el("p",null,"This will walk you through our intake, one small step at a time."),
-    el("div",{class:"notice"},byMode("A staff member is nearby if anything is confusing — just ask. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.",
-      "If anything is confusing, call us at {n}. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.")),
+    el("div",{class:"notice"},trn(byMode("A staff member is nearby if anything is confusing — just ask. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.",
+      "If anything is confusing, call us at {n}. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us."), FRC_PHONE)),
     el("p",{class:"subtle"},"You can change the language at any time using the dropdown in the top corner."),
     el("p",{class:"subtle"},byMode("Nothing is saved on this tablet. When this page is closed, everything on it is erased.",
       "Nothing is saved on this device. If this page is closed before you submit, everything on it is erased.")),
@@ -2750,7 +2770,7 @@ SCREENS.famHome = () => {
           const i=qText(a,"city",{ph:"City or town", oninput:()=>{a.cityAuto=false;}});
           i.id="cityInp"; return i; })())),
       el("p",{class:"subtle"},byMode("State: Massachusetts (tell a staff member if that's not right)",
-        "State: Massachusetts (if that's not right, call us at {n})"))
+        "State: Massachusetts — if you live in a different state, please let us know in the Notes section."))
     ],
     canNext: !!f.living,
     why:"To continue, please answer the question above.",
@@ -2782,7 +2802,7 @@ SCREENS.refSource = () => {
   const body = [];
   if(!cat){
     body.push(el("p",{class:"hint"},byMode("First, what kind of person or place told you about us? Pick the closest fit — a staff member can help if you're not sure.",
-      "First, what kind of person or place told you about us? Pick the closest fit — call us at {n} if you're not sure.")));
+      "First, what kind of person or place told you about us? Pick the closest fit — if you're not sure, try your best and tell us in the Notes section in your own words.")));
     body.push(qSingle(REFERRAL_CATS.map(c=>({v:c.cat, ex:c.ex})), ()=>r.category,
       v=>{ r.category=v; r.value=null; }, {stack:true, toggle:false, bold:true}));
   } else {
@@ -2790,7 +2810,7 @@ SCREENS.refSource = () => {
       el("button",{class:"skiplink", type:"button",
         onclick:()=>{ r.category=null; r.value=null; rerender(); }},"change")));
     body.push(el("p",{class:"hint"},byMode("Now the specific one. This question can't be skipped — ask a staff member if none of these look right.",
-      "Now the specific one. This question can't be skipped — call us at {n} if none of these look right.")));
+      "Now the specific one. This question can't be skipped — if none of these look right, try your best and tell us in the Notes section in your own words.")));
     body.push(qSingle(cat.items, ()=>r.value, v=>r.value=v, {stack:true, toggle:false}));
   }
   return shell({
@@ -2842,7 +2862,7 @@ SCREENS.basics = (ctx) => {
     title:title,
     comfort:el("span",null,
       el("b",{style:"color:var(--ink);"}, firstEver ?
-        "We'll add everyone in your household — starting with you. We do need a name, date of birth, and the insurance answer." :
+        "We'll add everyone that lives in your home — starting with you. We do need a name, date of birth, and the insurance answer." :
         "We do need a name, date of birth, and the insurance answer."),
       COMFORT_TAIL),
     body:[
@@ -2899,7 +2919,7 @@ SCREENS.anyoneElse = () => shell({
   body:[
     rosterList(false),
     qLabel("Are there any other people in your house you haven't told us about yet?"),
-    el("p",{class:"hint"},"We'd like to include everyone who lives with you — adults and children.")
+    el("p",{class:"hint"}, el("b",{style:"color:var(--ink);"},"Please add everyone that lives in your home — adults and children."))
   ],
   next:()=>openDraft(),
   nextLabel:"Yes — add someone",
@@ -3040,8 +3060,8 @@ SCREENS.rosterSelect = (ctx) => {
   body.push(el("p",{class:"hint"},"A green check means that person's intake is complete."));
   body.push(rosterList(true, suggestId));
   if(anyDone){
-    body.push(el("div",{class:"notice", style:"font-size:16.5px; font-weight:600;"},byMode("If you're unsure, just ask a staff member — that's what we're here for.",
-      "If you're unsure, call us at {n} — that's what we're here for.")));
+    body.push(el("div",{class:"notice", style:"font-size:16.5px; font-weight:600;"},trn(byMode("If you're unsure, just ask a staff member — that's what we're here for.",
+      "If you're unsure, call us at {n} — that's what we're here for."), FRC_PHONE)));
   }
   body.push(el("button",{class:"btn-quiet", type:"button", style:"margin-top:6px;",
     onclick:()=>openDraft({returnTo:"rosterSelect"})},
@@ -3254,7 +3274,8 @@ function reasonBlock(m){
   const a=m.a; if(!a.reasonPicks) a.reasonPicks=[];
   const child = isChild(m);
   return [
-    qLabel(child ? trn("What brings you in for {n} today?", displayName(m)) : "What brings you in today?"),
+    qLabel(child ? trn(byMode("What brings you in for {n} today?", "What can we help you with for {n}?"), displayName(m))
+      : byMode("What brings you in today?", "What can we help you with?")),
     el("p",{class:"hint"},"Tap anything that fits — then add anything else in your own words. A few words is plenty, no story needed."),
     qMulti(reasonPickOptions(m), ()=>a.reasonPicks),
     qLabel("Anything else, in your own words"),
@@ -3435,7 +3456,7 @@ function childSteps(m){
     if(a.craUnder12) a.craActive=null;   /* was auto-set while under 12 — ask it now */
     a.craUnder12=false;
     return { title:trn("Court status for {n}", kid()),
-    comfort:byMode("If you're not sure, a staff member can help.", "If you're not sure, call us at {n}."),
+    comfort:byMode("If you're not sure, a staff member can help.", "If you're not sure, just try your best."),
     body:[
       qLabel(trn("Is there an active CRA for {n}?", kid()),"CRA stands for Child Requiring Assistance — a type of juvenile court case, sometimes filed by a parent or a school."),
       qSingle(["Yes","No"], ()=>a.craActive, v=>a.craActive=v, {toggle:false}),
@@ -3578,7 +3599,8 @@ function childSteps(m){
     return { title:trn("A few questions for {n}", kid()),
     comfort:"It's okay if they're not here or would rather not.",
     body:[
-      qLabel(trn("Is {n} present and able to answer a few questions directly?", kid())),
+      qLabel(trn(byMode("Is {n} present and able to answer a few questions directly?",
+        "Is {n} with you and able to answer a few questions directly?"), kid())),
       qSingle(["Yes","No"], ()=>a.childPresent, v=>{
         a.childPresent=v;
         if(v==="No"){ a.safeHome="Did not answer"; a.safeSchool="Did not answer"; a.safeStreets="Did not answer";
@@ -4158,8 +4180,15 @@ function buildPrint(){
       esc(state.notesText).replace(/\n/g,'<br>')+'</div></div>';
   }
 
-  document.getElementById("printRoot").innerHTML = h;
+  /* remote mode: only the submitted string; the staff copy never goes in #printRoot */
+  if(!REMOTE) document.getElementById("printRoot").innerHTML = h;
   return h;
+}
+/* Remote mode: if the page is printed anyway (browser Print, Share > Print),
+   this is all that prints — never the staff copy or the screen. */
+function remotePrintNotice(){
+  document.getElementById("printRoot").replaceChildren(el("div",{class:"p-remote-note"},
+    state.submitted ? "Printing isn't available. Your intake was sent to the FRC." : "Printing isn't available."));
 }
 
 /* ============ RELEASE OF INFORMATION (Jotform, signed in the intake) ============

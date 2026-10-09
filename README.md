@@ -32,6 +32,8 @@ required for the core flow — everything lives in one file.
 - Supported languages are listed in `LANGS`. Full dictionaries currently
   exist for a subset (e.g. Spanish, Portuguese, Haitian Creole); others fall
   back to English for untranslated strings.
+- The language menu marks Haitian Creole "(beta)". Portuguese came out of
+  beta in Version 16 after a native-speaker review (`LANG_OPTIONS`).
 - Translation dictionaries are drafts (see the comment above the Spanish
   dictionary) — new or changed client-facing strings should be reviewed with
   bilingual staff before going live, and any string missing from a
@@ -120,7 +122,7 @@ When the intake form moves to a new address, check each of these:
 Added in Version 16, for the links staff send to families to fill out on
 their own phone or computer. It's locked on for the session (there's no
 on-screen switch) and combines with `?cra` and `?lang=`. The questions are
-the same; what changes:
+the same (two are worded differently — see the table below); what changes:
 
 - **The ending.** "No one else — finish up" goes to **"Almost done"**:
   a "Sign release for {first name}" button for each person with a
@@ -134,24 +136,34 @@ the same; what changes:
     no longer asks "Leave site?".
   - Failure (or a 30-second timeout) → "Please try again. If it still
     doesn't work, call the FRC at 978-296-8080." Submit stays available.
-- **No print fallback.** On the family's own device there's no Print, so
-  the remote submission (proof of concept — see below) is the only way the
-  intake reaches the FRC. If it keeps failing, the family is asked to call.
-- **Lines that assume the FRC tablet or staff nearby** show a remote
-  version instead (translated in Spanish, Portuguese and Haitian Creole as
-  drafts):
+- **No printing.** The staff data-entry copy is only built as the text
+  that gets submitted; it never goes into the page's print area. If the
+  family uses the browser's own Print (or Share > Print), all that prints
+  is "Printing isn't available." — after Submit, "Printing isn't available.
+  Your intake was sent to the FRC." — never the staff copy (with its Needs &
+  Follow-ups box) or the screen. Tablet printing is unchanged.
+- **No print fallback.** So the remote submission (proof of concept — see
+  below) is the only way a remote intake reaches the FRC. If it keeps
+  failing, the family is asked to call.
+- **Lines written for the FRC tablet** show a remote version instead. The
+  phone number appears only on Welcome, the household list and the
+  submit-failed message; elsewhere families are pointed to the Notes box
+  or told to try their best:
 
   | Where | Tablet (unchanged) | Remote |
   |---|---|---|
   | Welcome | A staff member is nearby if anything is confusing — just ask. Most questions can be skipped… | If anything is confusing, call us at 978-296-8080. Most questions can be skipped… |
   | Welcome | Nothing is saved on this tablet. When this page is closed, everything on it is erased. | Nothing is saved on this device. If this page is closed before you submit, everything on it is erased. |
-  | Your home | State: Massachusetts (tell a staff member if that's not right) | State: Massachusetts (if that's not right, call us at 978-296-8080) |
-  | How did you hear about us (1) | …Pick the closest fit — a staff member can help if you're not sure. | …Pick the closest fit — call us at 978-296-8080 if you're not sure. |
-  | How did you hear about us (2) | …This question can't be skipped — ask a staff member if none of these look right. | …This question can't be skipped — call us at 978-296-8080 if none of these look right. |
+  | Your home | State: Massachusetts (tell a staff member if that's not right) | State: Massachusetts — if you live in a different state, please let us know in the Notes section. |
+  | How did you hear about us (1) | …Pick the closest fit — a staff member can help if you're not sure. | …Pick the closest fit — if you're not sure, try your best and tell us in the Notes section in your own words. |
+  | How did you hear about us (2) | …This question can't be skipped — ask a staff member if none of these look right. | …This question can't be skipped — if none of these look right, try your best and tell us in the Notes section in your own words. |
   | "One suggestion first" | If you're staff or have a reason to go in a different order, you can continue anyway. | If you have a reason to go in a different order, you can continue anyway. |
   | Your household | If you're unsure, just ask a staff member — that's what we're here for. | If you're unsure, call us at 978-296-8080 — that's what we're here for. |
-  | What brings you in (adult and child) | A few words is plenty — a staff member can help you sort it out. | A few words is plenty — we can help you sort it out later. |
-  | Court status (child 12+) | If you're not sure, a staff member can help. | If you're not sure, call us at 978-296-8080. |
+  | What brings you in — question (adult) | What brings you in today? | What can we help you with? |
+  | What brings you in — question (child) | What brings you in for {name} today? | What can we help you with for {name}? |
+  | What brings you in — hint (adult and child) | A few words is plenty — a staff member can help you sort it out. | A few words is plenty — we can help you sort it out later. |
+  | Child present (11+) | Is {name} present and able to answer a few questions directly? | Is {name} with you and able to answer a few questions directly? |
+  | Court status (child 12+) | If you're not sure, a staff member can help. | If you're not sure, just try your best. |
 
   Also hidden in remote mode: the staff "CRA mode" switch on Welcome (a
   `?cra` link still shows its "CRA mode" label) and the "Staff: print
@@ -165,6 +177,8 @@ the same; what changes:
   signed release shows "signed remotely ✓" instead of "signed on tablet ✓".
 - **Phone number:** `FRC_PHONE` in `index.html` (one place). It's kept on
   one line on screen.
+- The screen title "What brings you in" and the review/printout labels
+  (CRM wording, e.g. "Child present to answer directly?") are unchanged.
 
 ## Remote submission (proof of concept)
 
@@ -207,8 +221,9 @@ Everything prefilled can still be changed in Jotform.
 
 - **Hidden until switched on.** For now the release buttons only appear
   on links with the staff-only `?releasetest` tag (see "Staff-only test
-  links"); without it nobody sees them, and the tablet links work exactly
-  as in Version 15. After testing, `RELEASE_FOR_EVERYONE = true` in
+  links"); without it nobody sees them, and the tablet links work as in
+  Version 15 apart from the wording changes in the Version 16 changelog.
+  After testing, `RELEASE_FOR_EVERYONE = true` in
   `index.html` shows them to everyone (tablet and remote); setting it back
   to `false` hides them again.
 
@@ -295,10 +310,10 @@ Since everything is one file, a few conventions keep it maintainable:
    `document.querySelector(".btn-primary")`.
 7. **Finish requirements live in `finishRule()`** — change the rule there,
    not in the household screen or Submit button separately.
-8. **Lines that assume the FRC tablet or staff nearby** use
-   `byMode(tabletLine, remoteLine)` so remote mode shows its own version
-   (`{n}` in the remote line becomes `FRC_PHONE`). Add both lines to each
-   dictionary.
+8. **Lines written for the FRC tablet** use `byMode(tabletLine,
+   remoteLine)` so remote mode shows its own version. It returns the
+   untranslated line; if the line has `{n}`, wrap it in `trn(…, FRC_PHONE)`
+   or `trn(…, name)`. Add both lines to each dictionary.
 9. **Age-dependent questions:** if a question only applies at certain ages
    and is auto-answered otherwise, also clear the auto-answer when it stops
    applying (see the `craUnder12`, `childPresentAuto` and `hasJobAuto` flags),
@@ -320,6 +335,9 @@ Since everything is one file, a few conventions keep it maintainable:
   currently living with their family?" (all ages). Decide whether each
   should stay required or get a Skip / "Not sure" option. (CRA mode, added
   in Version 15, doesn't change them.)
+- **Separate address for a second adult** (e.g. divorced parents at
+  different addresses) — discuss for a future version; needs a place in
+  the CRM. For now, families use the Notes box.
 - **Households with no adult.** "No one else — finish up" needs a completed
   adult intake (plus a child's in CRA mode), so a household with no adults
   entered (e.g. a youth on their own) can't finish.
@@ -353,7 +371,8 @@ Since everything is one file, a few conventions keep it maintainable:
 - **Release buttons hidden until tested.** They only appear with the
   staff-only `?releasetest` tag until `RELEASE_FOR_EVERYONE` is set to
   `true`; without the tag, the tablet links' screens, printout and
-  submitted JSON are the same as Version 15. (This replaces the earlier
+  submitted JSON are the same as Version 15 except for the household
+  wording and Portuguese changes below. (This replaces the earlier
   `RELEASE_ENABLED` switch.)
 - **Staff panel "Open release for {first name}"** for anyone with a
   completed intake who hasn't signed (no warning), next to the existing
@@ -363,20 +382,45 @@ Since everything is one file, a few conventions keep it maintainable:
   `?lang=`. New ending: "Almost done" (release buttons + Submit; releases
   encouraged, not required) → "Intake sent" (no Print, staff panel or
   Start over). A failed submit says "Please try again. If it still doesn't
-  work, call the FRC at 978-296-8080." Nine lines that assume the tablet or
-  staff nearby get remote versions, the CRA switch and crash-screen staff
-  print button are hidden, and the printout gets a "Completed remotely"
-  line (plus "Submitted from the family's own device", "Category chosen by
-  the family", "signed remotely ✓"). See "Remote mode" above for the full
-  list. New staff links for remote, remote + language and remote + CRA.
+  work, call the FRC at 978-296-8080." Lines written for the tablet get
+  remote versions (the phone number only on Welcome, the household list and
+  the submit-failed message; the state line and referral hints point to the
+  Notes box; "What can we help you with?"; "Is {name} with you…?"), the CRA
+  switch and crash-screen staff print button are hidden, and the printout
+  gets a "Completed remotely" line (plus "Submitted from the family's own
+  device", "Category chosen by the family", "signed remotely ✓"). Remote
+  mode never prints the staff copy: the browser's Print shows only
+  "Printing isn't available." (after Submit: "…Your intake was sent to the
+  FRC."). See "Remote mode" above for the full list. New staff links for
+  remote, remote + language and remote + CRA.
+- **Household wording (tablet and remote).** "First, about you": "We'll add
+  everyone that lives in your home — starting with you. We do need a name,
+  date of birth, and the insurance answer." The add-someone screen now says,
+  in bold, "Please add everyone that lives in your home — adults and
+  children." (was "We'd like to include everyone who lives with you —
+  adults and children.").
+- **Portuguese, after a native-speaker review.** "Co-partner" now shows as
+  "Co-responsável Legal (Guarda Compartilhada / Coparentalidade)" (the
+  stored/CRM value is still "Co-partner"). Typing "responsável" (or
+  "responsavel"), "guarda" or "coparentalidade" in the role search finds
+  it; "responsável" still finds Legal Guardian Parent and Temporary
+  Guardian too. "Tribunal de Família" and "Ze/Zir/Zirs" stay as they are.
+  Português is no longer marked "(beta)" in the language menu; Haitian
+  Creole stays beta.
 - **New page: `release-done.html`.** Shows "Thank you" (English, Spanish,
   Portuguese or Haitian Creole via `?lang=`) and tells the intake the release
   was signed. The intake only accepts that message from its own site, from
   the open panel.
 - **Translations:** button labels ("Sign release for…", "Release signed ✓"),
   panel title, Close and Thank you, plus every new or changed remote-mode
-  line, in Spanish, Portuguese and Haitian Creole (drafts — review with
-  bilingual staff).
+  and household line, in Spanish, Portuguese and Haitian Creole.
+  - Spanish: reviewed by staff, except the lines changed just before merge
+    (state line, both referral hints, court hint, "What can we help you
+    with…", "…with you…", the two household lines and the two printing
+    notices), which are drafts.
+  - Portuguese and Haitian Creole: drafts — review with bilingual staff.
+    (The Portuguese pre-merge lines use the wording from the Portuguese
+    review doc.)
 
 ### Version 15
 
