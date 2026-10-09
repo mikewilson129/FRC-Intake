@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 16.2 — see README.md changelog for what changed in this version -->
+<!-- Version 16.3 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -160,6 +160,10 @@
   .rel-row{display:flex; align-items:center; gap:10px;}
   .rel-signed:disabled{opacity:1; cursor:default; color:var(--good); border-color:var(--good); background:#fff; font-weight:600;}
   .rel-staff{display:flex; flex-wrap:wrap; gap:0 16px; margin-top:4px;}
+  .rel-more{margin-top:18px; padding-top:14px; border-top:1px solid var(--line);}
+  .rel-more h3{font-size:17px; margin-bottom:6px;}
+  .rel-more-list{display:flex; flex-wrap:wrap; gap:8px; margin:6px 0 12px;}
+  .rel-another{font-weight:600;}
   .rel-staff .btn-ghost{font-size:14.5px; padding:8px 2px;}
   .rel-overlay{position:fixed; inset:0; z-index:200; display:flex; flex-direction:column; background:var(--bg);}
   .rel-head{flex:none; display:flex; justify-content:space-between; align-items:center; gap:12px;
@@ -779,7 +783,11 @@ const I18N = { es: {
 "Please add everyone that lives in your home — adults and children.":"Por favor, agregue a todas las personas que viven en su casa — adultos y niños.",
 "Printing isn't available. Your intake was sent to the FRC.":"No es posible imprimir. Su admisión fue enviada al FRC.",
 "Printing isn't available.":"No es posible imprimir.",
-"How we can help":"Cómo podemos ayudarle"
+"How we can help":"Cómo podemos ayudarle",
+/* --- V16.3: unsigned-release warning (remote Submit) — DRAFT --- */
+"Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.":"Por favor, complete las autorizaciones de cada miembro del hogar que aparece aquí. Necesitamos estas autorizaciones para poder atender adecuadamente a su familia.",
+"Submit anyway":"Enviar de todos modos",
+"Continue anyway":"Continuar de todos modos"
 },
 pt: {
 /* --- chrome / navigation --- */
@@ -1351,7 +1359,11 @@ pt: {
 "Please add everyone that lives in your home — adults and children.":"Por favor, inclua todas as pessoas que moram na sua casa — adultos e crianças.",
 "Printing isn't available. Your intake was sent to the FRC.":"Não é possível imprimir. Sua admissão foi enviada ao FRC.",
 "Printing isn't available.":"Não é possível imprimir.",
-"How we can help":"Como podemos ajudar"
+"How we can help":"Como podemos ajudar",
+/* --- V16.3: unsigned-release warning (remote Submit) — DRAFT --- */
+"Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.":"Por favor, complete as autorizações de cada membro do domicílio listado aqui. Precisamos dessas autorizações para atender sua família adequadamente.",
+"Submit anyway":"Enviar mesmo assim",
+"Continue anyway":"Continuar mesmo assim"
 },
 ht: {
 /* --- chrome / navigation --- */
@@ -1923,7 +1935,11 @@ ht: {
 "Please add everyone that lives in your home — adults and children.":"Tanpri ajoute tout moun ki abite lakay ou — granmoun ak timoun.",
 "Printing isn't available. Your intake was sent to the FRC.":"Ou pa ka enprime. Admisyon ou an te voye bay FRC a.",
 "Printing isn't available.":"Ou pa ka enprime.",
-"How we can help":"Kijan nou ka ede"
+"How we can help":"Kijan nou ka ede",
+/* --- V16.3: unsigned-release warning (remote Submit) — DRAFT --- */
+"Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.":"Tanpri ranpli otorizasyon yo pou chak manm nan kay la ki sou lis la. Nou bezwen otorizasyon sa yo pou nou ka sèvi fanmi ou kòmsadwa.",
+"Submit anyway":"Soumèt kanmenm",
+"Continue anyway":"Kontinye kanmenm"
 }
 };
 /* ============ DATA ============ */
@@ -2280,7 +2296,10 @@ const state = {
     address:{street:"", street2:"", apt:"", city:"", cityAuto:false, state:"Massachusetts", zip:""}},
   referral:{category:null, value:null},
   members:[],
-  cra:false        /* CRA mode: finishing needs a completed adult AND child intake */
+  cra:false,       /* CRA mode: finishing needs a completed adult AND child intake */
+  otherReleases:0, /* releases signed through the staff panel's "Complete another release" */
+  releaseWarned:false,  /* Submit (remote, or staff on the tablet): the unsigned-release warning was clicked past */
+  handoffWarned:false   /* tablet "Next steps": the unsigned-release warning was clicked past */
 };
 
 /* ============ URL TAGS ============
@@ -2656,14 +2675,15 @@ function setNext(ok, why){
 /* "Still needed: first name, date of birth" (translated) */
 function stillNeeded(items){ return items.length ? tr("Still needed:")+" "+items.map(tr).join(", ") : ""; }
 /* In-page yes/no box (translatable buttons, unlike window.confirm) */
-function confirmBox(message, yesLabel, noLabel, onYes){
+/* stayPrimary: make the "no" (stay) button the prominent one, to discourage the "yes" */
+function confirmBox(message, yesLabel, noLabel, onYes, stayPrimary){
   const overlay = el("div",{class:"modal-overlay"});
   const close = ()=>overlay.remove();
   overlay.appendChild(el("div",{class:"modal", role:"dialog", "aria-modal":"true"},
     el("p",null,message),
     el("div",{class:"modal-actions"},
-      el("button",{class:"btn-quiet", type:"button", onclick:close}, noLabel),
-      el("button",{class:"btn-primary", type:"button", onclick:()=>{ close(); onYes(); }}, yesLabel))));
+      el("button",{class:stayPrimary ? "btn-primary" : "btn-quiet", type:"button", onclick:close}, noLabel),
+      el("button",{class:stayPrimary ? "btn-quiet" : "btn-primary", type:"button", onclick:()=>{ close(); onYes(); }}, yesLabel))));
   document.body.appendChild(overlay);
 }
 
@@ -3925,8 +3945,14 @@ SCREENS.finish = () => {
         releaseButtons(),
       ],
       noBack:true,
-      extraNav: el("button",{class:"btn-quiet", type:"button",
-        onclick:()=>{ state.showStaffPanel=true; rerender(); }}, "Next steps")
+      extraNav: el("button",{class:"btn-quiet", type:"button", onclick:()=>{
+        const handOff = ()=>{ state.showStaffPanel=true; rerender(); };
+        /* last chance for the family to sign before handing over: discourage skipping (asked once) */
+        if(unsignedReleasePeople().length && !state.handoffWarned)
+          return confirmBox("Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.",
+            "Continue anyway", "Go back", ()=>{ state.handoffWarned = true; handOff(); }, true);
+        handOff();
+      }}, "Next steps")
     });
   }
   return shell({
@@ -3935,16 +3961,16 @@ SCREENS.finish = () => {
       el("div",{class:"notice"},"Staff: use Print to make the data-entry copy. Nothing is saved on this device — closing or refreshing this page erases everything, so print first."),
       state.submitStatus ? el("div",{class:"notice"}, state.submitStatus) : null,
       releaseStaffButtons(),
+      moreReleasesSection(),
     ],
     noBack:true,
-    next: async ()=>{
+    next: ()=>{
       if(!finishRule().ok){ goTo("rosterSelect"); return; }   /* never send an intake that doesn't meet the rule */
-      state.submitStatus = "Submitting…";
-      const outcome = await sendIntake();
-      state.submitStatus = outcome.success ? "Submitted."
-        : outcome.timedOut ? "Submission timed out — please submit again, or print a copy to send to the FRC."
-        : "Submission failed — please try again or download/print a copy to send to the FRC.";
-      rerender();
+      const unsigned = unsignedReleasePeople();
+      if(unsigned.length && !state.releaseWarned)   /* staff-facing, English only */
+        return confirmBox("CFFS/JRI release not signed yet for: "+unsigned.map(m=>m.first.trim()).join(", ")+". Use \u201COpen release for\u2026\u201D above, or submit anyway.",
+          "Submit anyway", "Go back", ()=>{ state.releaseWarned = true; staffSubmit(); }, true);
+      staffSubmit();
     },
     nextLabel: state.submitting ? "Submitting…" : (state.submitted ? "Submitted ✓" : "Submit"),
     canNext: !state.submitting && !state.submitted && finishRule().ok,
@@ -3971,6 +3997,14 @@ SCREENS.finish = () => {
   });
 };
 
+async function staffSubmit(){
+  state.submitStatus = "Submitting…";
+  const outcome = await sendIntake();
+  state.submitStatus = outcome.success ? "Submitted."
+    : outcome.timedOut ? "Submission timed out — please submit again, or print a copy to send to the FRC."
+    : "Submission failed — please try again or download/print a copy to send to the FRC.";
+  rerender();
+}
 /* Sends the intake (staff panel Submit and remote mode's Submit). Shows the
    button as "Submitting…" meanwhile; try/finally: any error still releases
    the button (it used to stay on "Submitting…" for good). */
@@ -4015,22 +4049,32 @@ function remoteFinishScreen(){
       state.submitStatus ? el("div",{class:"notice"}, state.submitStatus) : null
     ],
     noBack: state.submitting,
-    next: async ()=>{
+    next: ()=>{
       if(!finishRule().ok){ goTo("rosterSelect"); return; }   /* never send an intake that doesn't meet the rule */
-      state.submitStatus = null;
-      const outcome = await sendIntake();
-      if(outcome.success){
-        allowLeave = true;   /* it's been sent: closing the page needs no warning */
-        notesPanel.classList.remove("open"); notesFab.style.display = "none";   /* a note typed now wouldn't be sent */
-      } else {
-        state.submitStatus = trn("Please try again. If it still doesn't work, call the FRC at {n}.", FRC_PHONE);
+      /* Unsigned releases: discourage skipping them, but allow it (e.g. staff doing
+         the intake over the phone). Asked once; a retry after a failed send isn't asked again. */
+      if(unsignedReleasePeople().length && !state.releaseWarned){
+        confirmBox("Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.",
+          "Submit anyway", "Go back", ()=>{ state.releaseWarned = true; remoteSubmit(); }, true);
+        return;
       }
-      rerender();
+      remoteSubmit();
     },
     nextLabel: state.submitting ? "Submitting…" : "Submit",
     canNext: !state.submitting && rule.ok,
     why: rule.ok ? undefined : rule.why
   });
+}
+async function remoteSubmit(){
+  state.submitStatus = null;
+  const outcome = await sendIntake();
+  if(outcome.success){
+    allowLeave = true;   /* it's been sent: closing the page needs no warning */
+    notesPanel.classList.remove("open"); notesFab.style.display = "none";   /* a note typed now wouldn't be sent */
+  } else {
+    state.submitStatus = trn("Please try again. If it still doesn't work, call the FRC at {n}.", FRC_PHONE);
+  }
+  rerender();
 }
 function remoteSentScreen(){
   return shell({
@@ -4165,19 +4209,14 @@ function buildPrint(){
   for(const m of state.members){
     if(!(m.services && m.done)) continue;
     const name = esc(fullName(m)||"(no name)");
-    const a = m.a||{};
     /* signed: checked box (\uFE0E keeps ☑ a plain symbol, not a color emoji) */
     roiHtml += '<div class="p-roi-line">'+(m.releaseSigned?'\u2611\uFE0E':'\u2610')+' '+name+' - CFFS/JRI'+(m.releaseSigned?' \u2014 signed '+(REMOTE?'remotely':'on tablet'):'')+'</div>';
-    for(const ag of RELEASE_AGENCIES){
-      if((a.agencies||[]).includes(ag)){
-        roiHtml += '<div class="p-roi-line">\u2610 '+name+' - '+esc(ag.split(" ")[0])+'</div>';
-      }
+    for(const item of otherReleaseItems(m)){
+      const signed = (m.otherReleasesSigned||[]).includes(item);
+      roiHtml += '<div class="p-roi-line">'+(signed?'\u2611\uFE0E':'\u2610')+' '+name+' - '+esc(item)+(signed?' \u2014 signed on tablet':'')+'</div>';
     }
-    for(const c of (a.community||[])){
-      if(c && c.trim()) roiHtml += '<div class="p-roi-line">\u2610 '+name+' - '+esc(c.trim())+'</div>';
-    }
-    if(isChild(m)) roiHtml += '<div class="p-roi-line">\u2610 '+name+' - School release</div>';
   }
+  if(state.otherReleases) roiHtml += '<div class="p-roi-line">\u2611\uFE0E '+state.otherReleases+' other release'+(state.otherReleases>1?'s':'')+' signed on tablet</div>';
   h += '<div class="p-roi"><h3>RELEASES OF INFORMATION NEEDED</h3>'+
     (roiHtml || '<div class="p-roi-line">(no completed intakes)</div>')+'</div>';
 
@@ -4219,10 +4258,14 @@ function remotePrintNotice(){
 const RELEASE_FOR_EVERYONE = true;
 const RELEASE_ENABLED = RELEASE_FOR_EVERYONE || RELEASE_TEST;
 const RELEASE_FORM_URL = "https://form.jotform.com/262673921694064";
+/* the release for outside agencies and people (staff panel, after Submit) */
+const OTHER_RELEASE_FORM_URL = "https://form.jotform.com/262774481459066";
 const RELEASE_JOTFORM_LANG = {en:"en", es:"es", pt:"pt", ht:"bzj"};
 const RELEASE_THANKS_MS = 2500;   /* how long "Thank you" shows before the panel closes */
 /* same people as the printout's Releases box */
 function releasePeople(){ return state.members.filter(m=>m.services && m.done); }
+/* people whose CFFS/JRI release isn't signed yet (none while the buttons are switched off) */
+function unsignedReleasePeople(){ return RELEASE_ENABLED ? releasePeople().filter(m=>!m.releaseSigned) : []; }
 function legalName(m){ return [m.first.trim(), m.last.trim()].filter(Boolean).join(" "); }
 /* who consents for a child: the primary contact, else the first completed adult */
 function releaseConsentAdult(){
@@ -4269,23 +4312,70 @@ function releaseStaffButtons(){
       : el("button",{class:"btn-ghost", type:"button", onclick:()=>openRelease(m)}, "Open release for "+name);
   }));
 }
-let releasePanel = null;   /* {mid, overlay, frame, body, signed, timer, prevOverflow} while open */
+/* ---- Other releases (outside agencies and people), staff panel, after Submit ----
+   Suggestions are the printout's Releases list besides CFFS/JRI: the state
+   agencies checked (DCF, DDS, DMH, DYS), community agencies typed, and a
+   school release for each child. The intake can't see what's typed in
+   Jotform, so a signed suggestion is ticked by the button that opened it.
+   Only the consent name is prefilled. Staff-facing, so English only. */
+function otherReleaseItems(m){
+  const a = m.a||{}, out = [];
+  for(const ag of RELEASE_AGENCIES) if((a.agencies||[]).includes(ag)) out.push(ag.split(" ")[0]);
+  for(const c of (a.community||[])) if(c && c.trim()) out.push(c.trim());
+  if(isChild(m)) out.push("School release");
+  return out;
+}
+/* m: the person a suggestion is for, or null for "Complete another release" */
+function otherReleaseUrl(m){
+  const consent = (m && !isChild(m)) ? m : releaseConsentAdult();
+  return OTHER_RELEASE_FORM_URL + (consent ? "?input22[shorttext-1]="+encodeURIComponent(legalName(consent)) : "");
+}
+function openOtherRelease(m, item){
+  if(releasePanel || state.submitting) return;
+  if(m && (m.otherReleasesSigned||[]).includes(item)) return;   /* signed: no duplicates from the list */
+  openReleasePanel(m ? m.first.trim()+" — "+item : "Another release", otherReleaseUrl(m), ()=>{
+    if(m) (m.otherReleasesSigned = m.otherReleasesSigned||[]).push(item);
+    else state.otherReleases++;
+  });
+}
+function moreReleasesSection(){
+  if(!RELEASE_ENABLED) return null;
+  if(!state.submitted) return el("p",{class:"subtle"},"Releases appear here after you press Submit.");
+  const list = [];
+  for(const m of releasePeople()) for(const item of otherReleaseItems(m)){
+    const label = m.first.trim()+" — "+item;
+    list.push((m.otherReleasesSigned||[]).includes(item)
+      ? el("button",{class:"btn-quiet rel-signed", type:"button", disabled:true}, label+" ✓")
+      : el("button",{class:"btn-quiet", type:"button", onclick:()=>openOtherRelease(m, item)}, label));
+  }
+  return el("div",{class:"rel-more"},
+    el("h3",null,"Releases"),
+    list.length ? el("p",{class:"subtle"},"Suggested from the intake:") : null,
+    list.length ? el("div",{class:"rel-more-list"}, ...list) : null,
+    el("button",{class:"btn-quiet rel-another", type:"button", onclick:()=>openOtherRelease(null)}, "+ Complete another release"),
+    state.otherReleases ? el("p",{class:"subtle"},"Other releases signed: "+state.otherReleases) : null);
+}
+let releasePanel = null;   /* {onSigned, overlay, frame, body, signed, timer, prevOverflow} while open */
 function openRelease(m, redo){
   if(releasePanel || (m.releaseSigned && !redo)) return;   /* signed: only the staff panel's redo reopens it */
   if(state.submitting) return;   /* a release signed mid-submit would miss the submission */
-  const title = trn("Release form for {n}", m.first.trim());
+  openReleasePanel(trn("Release form for {n}", m.first.trim()), releaseUrl(m), ()=>{ m.releaseSigned = true; });
+}
+/* The full-screen release panel. onSigned runs when release-done.html reports
+   the release was signed. */
+function openReleasePanel(title, url, onSigned){
   const spinner = el("div",{class:"rel-spin", "aria-hidden":"true"});
   /* no allow-top-navigation of any kind: the release can never take the intake page away */
   const frame = el("iframe",{title:title, sandbox:"allow-scripts allow-forms allow-same-origin allow-popups"});
   frame.addEventListener("load", ()=>spinner.remove());
-  frame.src = releaseUrl(m);
+  frame.src = url;
   const body = el("div",{class:"rel-body"}, spinner, frame);
   const overlay = el("div",{class:"rel-overlay", role:"dialog", "aria-modal":"true", "aria-label":title},
     el("div",{class:"rel-head"},
       el("div",{class:"rel-title"}, title),
       el("button",{class:"btn-quiet rel-close", type:"button", onclick:closeRelease}, "Close")),
     body);
-  releasePanel = {mid:m.id, overlay:overlay, frame:frame, body:body, signed:false, timer:null,
+  releasePanel = {onSigned:onSigned, overlay:overlay, frame:frame, body:body, signed:false, timer:null,
     prevOverflow:document.documentElement.style.overflow};
   document.documentElement.style.overflow = "hidden";   /* the intake behind the panel stays put */
   document.body.appendChild(overlay);
@@ -4303,8 +4393,7 @@ function onReleaseMessage(e){
   if(!p || p.signed || e.origin!==location.origin || e.source!==p.frame.contentWindow) return;
   if(!e.data || e.data.type!=="release-signed") return;
   p.signed = true;
-  const m = state.members.find(x=>x.id===p.mid);
-  if(m) m.releaseSigned = true;   /* signed already, even if Close is tapped during the Thank you */
+  p.onSigned();   /* signed already, even if Close is tapped during the Thank you */
   p.body.appendChild(el("div",{class:"rel-thanks", role:"status"},
     el("div",{class:"check", "aria-hidden":"true"},"✓"), "Thank you"));
   p.timer = setTimeout(closeRelease, RELEASE_THANKS_MS);

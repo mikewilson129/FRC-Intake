@@ -124,10 +124,12 @@ staff can test on the live site:
 
 When the intake form moves to a new address, check each of these:
 
-- [ ] Jotform release form → Settings → Thank You page must redirect to
+- [ ] Jotform release forms → Settings → Thank You page must redirect to
   release-done.html at the form's current address. Update it whenever the
   intake form moves (e.g. to intake.pw4c.org), or the panel won't
-  auto-close.
+  auto-close. Both forms, each with its own `?form=` tag:
+  - CFFS/JRI release (`262673921694064`): `…/release-done.html?form=262673921694064`
+  - Other agencies/people release (`262774481459066`): `…/release-done.html?form=262774481459066`
 - [ ] Update the FRC tablet's bookmark / home-screen shortcut to the new
   address **with `?office`** (a plain link opens the family version).
 - [ ] Update the family and tablet links in "Staff links" above.
@@ -146,6 +148,13 @@ changes:
   completed intake (when the release buttons are on — see "Release of
   information"), then a **Submit** button the family presses. Releases are
   encouraged but not required. "‹ Back" works until they submit.
+  - **Unsigned releases:** if anyone listed hasn't signed their CFFS/JRI
+    release, Submit first shows "Please complete the releases for each
+    household member listed here. We need these releases completed for us
+    to appropriately serve your family." with **Go back** (the prominent
+    button) and **Submit anyway** (so staff doing an intake over the phone
+    can click past). It's asked once: a retry after a failed send isn't
+    asked again. Not shown when the release buttons are switched off.
   - Success → **"Intake sent"**: "Thank you! Your intake was sent to the
     FRC. Someone from the FRC will follow up with you." / "You can close
     this page now." No Back, Print, staff panel or Start over; the Notes
@@ -249,8 +258,10 @@ Everything prefilled can still be changed in Jotform.
   kind), so nothing in the release can take the intake page away. The panel
   always shows a **Close** button. The leave-page warning is unchanged.
 - **Jotform setting (one time):** set the form's Thank You page to redirect
-  to `https://mikewilson129.github.io/FRC-Intake/release-done.html`. It has
-  to be on the same site as the intake, or the intake ignores it. Adding
+  to `https://mikewilson129.github.io/FRC-Intake/release-done.html?form=262673921694064`. It has
+  to be on the same site as the intake, or the intake ignores it. The
+  `?form=` tag gives people who use the form directly (not in the intake)
+  a "Fill out another release" button on that page; it's optional. Adding
   `?lang=es` / `pt` / `ht` (or `bzj`) shows that page in another language,
   but it's optional: the intake covers it with its own translated "Thank you".
   Until the redirect is set, people can still sign, but the panel shows
@@ -269,12 +280,56 @@ Everything prefilled can still be changed in Jotform.
 - **Closed early, or the release doesn't load:** nothing else changes.
   Submit and Print work as before, and the button still says "Sign
   release for…", so it can be tried again.
+- **Unsigned releases are flagged (skippable):** on the tablet, tapping
+  "Next steps" on "All set!" first asks the family to complete them
+  ("Go back" / "Continue anyway"), and the staff panel's Submit names who
+  hasn't signed ("Go back" / "Submit anyway"); in remote mode, Submit asks
+  the family (see "Remote mode"). Each is asked once per intake.
 - **Staff panel (tablet):** "Next steps" shows, for each person with a
   completed intake, **"Open release for {first name}"** if they haven't
   signed (opens it straight away), or **"Redo release for {first name}"**
   if they have (warns first that signing again creates a second signed
   release in Jotform). Staff-facing, English only. Remote mode has no staff
   panel.
+
+### Other releases (tablet staff panel, after Submit)
+
+Added in Version 16.3, for releases to outside agencies and people, using a
+second Jotform form (`https://form.jotform.com/262774481459066`). Tablet
+(`?office`) only; remote mode doesn't have it.
+
+- **Only after Submit.** Until staff press Submit, the staff panel says
+  "Releases appear here after you press Submit." — a reminder not to skip
+  Submit. After a successful Submit a **Releases** section appears. If staff
+  tap Edit it hides until they Submit again (anything signed stays ticked).
+- **Suggested from the intake:** one button per item on the printout's
+  Releases list besides CFFS/JRI, e.g. "Testa — DCF", "Testa — Lahey
+  Health", "Kiddo — School release". That's each of DCF, DDS, DMH and DYS
+  checked on the agencies question, each community agency typed (as
+  typed), and a school release for each child — only for people with a
+  completed intake.
+- **"+ Complete another release"** for anything else; it can be used any
+  number of times.
+- **Prefill:** only the consent name, in the first blank of `input22`
+  (`input22[shorttext-1]`): an adult's own suggestion → that adult; a
+  child's suggestion or "Complete another release" → the primary contact
+  (as for CFFS/JRI). Everything else is filled in on the form.
+- **After signing** (same panel, Close button, 2.5-second "Thank you"): a
+  suggestion turns into e.g. "Testa — DCF ✓" and can't be opened again (no
+  duplicates; use "Complete another release" for a redo). "Complete another
+  release" shows a count ("Other releases signed: 2").
+- **Ticks follow the button, not the form.** The intake can't see what's
+  typed in Jotform, so it ticks the suggestion whose button opened the
+  panel. Jotform's submissions are the real record.
+- **Printout:** signed suggestions show `☑ Name - DCF — signed on tablet`,
+  plus `☑ 2 other releases signed on tablet` for "Complete another
+  release". These only appear on printouts made after signing; the copy
+  sent to the FRC at Submit doesn't have them.
+- **Jotform setting:** this form's Thank You page must redirect to
+  `https://mikewilson129.github.io/FRC-Intake/release-done.html?form=262774481459066`,
+  or the panel won't close by itself and nothing is ticked (tap Close).
+  The `?form=` tag gives people who use the form directly a "Fill out
+  another release" button back to it.
 
 ## Privacy / data handling
 
@@ -369,6 +424,35 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 16.3
+
+- **Other releases on the tablet staff panel, after Submit.** A Releases
+  section with buttons suggested from the intake (state agencies,
+  community agencies, school release for each child) and "+ Complete
+  another release" (any number of times), using the outside agencies/people
+  release form. Only the consent name is prefilled. Signed suggestions get
+  a ✓ on screen and ☑ on later printouts. Before Submit the panel says
+  "Releases appear here after you press Submit." Tablet only. See "Other
+  releases" under "Release of information".
+- **Warnings about unsigned CFFS/JRI releases** (skippable, each asked once
+  per intake; "Go back" is the prominent button):
+  - **Remote Submit** and the **tablet's "Next steps"** (the family's
+    hand-off): "Please complete the releases for each household member
+    listed here. We need these releases completed for us to appropriately
+    serve your family." — **Go back** / **Submit anyway** (remote) or
+    **Continue anyway** (tablet). Spanish, Portuguese and Haitian Creole are
+    drafts.
+  - **Tablet staff Submit** (staff-facing, English): "CFFS/JRI release not
+    signed yet for: Kiddo. Use "Open release for…" above, or submit
+    anyway." — **Go back** / **Submit anyway**.
+- **`release-done.html`:** opened directly (not inside the intake) with
+  `?form=` set to one of the two release forms, it shows a "Fill out another
+  release" button back to that form (English, Spanish, Portuguese, Haitian
+  Creole; translations are drafts).
+- **Jotform:** set the Thank You redirect of the new form to
+  `release-done.html?form=262774481459066`, and of the CFFS/JRI form to
+  `release-done.html?form=262673921694064` (see the hosting-move checklist).
 
 ### Version 16.2
 
