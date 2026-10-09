@@ -81,6 +81,15 @@ On the language links the family can still switch languages from the
 dropdown. On the CRA links, CRA mode stays on and can't be turned off on
 screen.
 
+### Hosting-move checklist
+
+When the intake form moves to a new address, check each of these:
+
+- [ ] Jotform release form → Settings → Thank You page must redirect to
+  release-done.html at the form's current address. Update it whenever the
+  intake form moves (e.g. to intake.pw4c.org), or the panel won't
+  auto-close.
+
 ## Remote submission (proof of concept)
 
 - `WORKER_URL` / `SUBMIT_TOKEN` and `submitIntake()` post the completed
@@ -131,15 +140,22 @@ Everything prefilled can still be changed in Jotform.
   but it's optional: the intake covers it with its own translated "Thank you".
   Until the redirect is set, people can still sign, but the panel shows
   Jotform's own thank-you page, doesn't close by itself, and nobody is
-  marked as signed; tap Close.
+  marked as signed; tap Close. If the form moves, see the hosting-move
+  checklist above.
 - **After signing:** the panel shows "Thank you" for 5 seconds and closes;
-  a check appears by that person's button; the printout's Releases box
+  that person's button changes to **"Release signed ✓"** and no longer
+  opens the release, so a tap can't create a duplicate signed release in
+  Jotform; the printout's Releases box
   shows `☐ Name - CFFS/JRI — signed on tablet ✓`; and the submitted JSON
   has `releaseSigned: true` on that person (the field is left out for
   anyone who didn't sign).
 - **Closed early, or the release doesn't load:** nothing else changes.
-  Submit and Print work as before. The button can be tapped again, but
-  signing twice makes two Jotform submissions.
+  Submit and Print work as before, and the button still says "Sign
+  release for…", so it can be tried again.
+- **Staff redo:** if a signed release really needs redoing, the staff panel
+  ("Next steps") shows "Redo release for {first name}" for each signed
+  person. It warns that signing again creates a second signed release in
+  Jotform, then opens the release as before. (Staff-facing, English only.)
 - **Off switch:** set `RELEASE_ENABLED = false` in `index.html`. The buttons
   disappear and the intake works exactly as in Version 15 (same screens,
   printout and submitted JSON).
@@ -233,20 +249,24 @@ Since everything is one file, a few conventions keep it maintainable:
   intake (usually 1–2). It opens the prefilled Jotform release in a
   full-screen panel inside the intake, with a Close button; the intake page
   itself never navigates, so nothing is lost. After signing, the panel says
-  "Thank you", closes after 5 seconds, and marks the person: a check by the
-  button, "signed on tablet ✓" next to their CFFS/JRI line in the
-  printout's Releases box, and `releaseSigned: true` in the submitted JSON.
-  Unsigned people print exactly as before. See "Release of information"
-  above, including the one-time Jotform Thank You redirect.
+  "Thank you", closes after 5 seconds, and marks the person: their button
+  changes to "Release signed ✓" and stops opening the release (no duplicate
+  signed releases in Jotform), "signed on tablet ✓" next to their CFFS/JRI
+  line in the printout's Releases box, and `releaseSigned: true` in the
+  submitted JSON.
+  Unsigned people print exactly as before. Staff can redo a signed release
+  from the staff panel ("Redo release for {first name}", after a warning).
+  See "Release of information" above, including the one-time Jotform Thank
+  You redirect and the new hosting-move checklist.
 - **New page: `release-done.html`.** Shows "Thank you" (English, Spanish,
   Portuguese or Haitian Creole via `?lang=`) and tells the intake the release
   was signed. The intake only accepts that message from its own site, from
   the open panel.
 - **Off switch:** `RELEASE_ENABLED = false` hides the buttons and the intake
   works exactly as in Version 15.
-- **Translations:** button label, panel title, Close and Thank you in
-  Spanish, Portuguese and Haitian Creole (drafts — review with bilingual
-  staff).
+- **Translations:** button labels ("Sign release for…", "Release signed ✓"),
+  panel title, Close and Thank you in Spanish, Portuguese and Haitian
+  Creole (drafts — review with bilingual staff).
 
 ### Version 15
 

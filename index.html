@@ -156,6 +156,9 @@
   /* ---------- release panel (full screen, above everything incl. Notes) ---------- */
   .rel-list{display:flex; flex-direction:column; gap:10px; margin-top:18px;}
   .rel-row{display:flex; align-items:center; gap:10px;}
+  .rel-signed:disabled{opacity:1; cursor:default; color:var(--good); border-color:var(--good); background:#fff; font-weight:600;}
+  .rel-redo{display:flex; flex-wrap:wrap; gap:0 16px; margin-top:4px;}
+  .rel-redo .btn-ghost{font-size:14.5px; padding:8px 2px;}
   .rel-overlay{position:fixed; inset:0; z-index:200; display:flex; flex-direction:column; background:var(--bg);}
   .rel-head{flex:none; display:flex; justify-content:space-between; align-items:center; gap:12px;
     padding:10px 16px; background:var(--card); border-bottom:1px solid var(--line);}
@@ -749,7 +752,8 @@ const I18N = { es: {
 "Sign release for {n}":"Firmar la autorización de {n}",
 "Release form for {n}":"Formulario de autorización de {n}",
 "Close":"Cerrar",
-"Thank you":"Gracias"
+"Thank you":"Gracias",
+"Release signed ✓":"Autorización firmada ✓"
 },
 pt: {
 /* --- chrome / navigation --- */
@@ -1296,7 +1300,8 @@ pt: {
 "Sign release for {n}":"Assinar a autorização de {n}",
 "Release form for {n}":"Formulário de autorização de {n}",
 "Close":"Fechar",
-"Thank you":"Obrigado"
+"Thank you":"Obrigado",
+"Release signed ✓":"Autorização assinada ✓"
 },
 ht: {
 /* --- chrome / navigation --- */
@@ -1843,7 +1848,8 @@ ht: {
 "Sign release for {n}":"Siyen otorizasyon pou {n}",
 "Release form for {n}":"Fòm otorizasyon pou {n}",
 "Close":"Fèmen",
-"Thank you":"Mèsi"
+"Thank you":"Mèsi",
+"Release signed ✓":"Otorizasyon siyen ✓"
 }
 };
 /* ============ DATA ============ */
@@ -3814,6 +3820,7 @@ SCREENS.finish = () => {
     body:[
       el("div",{class:"notice"},"Staff: use Print to make the data-entry copy. Nothing is saved on this device — closing or refreshing this page erases everything, so print first."),
       state.submitStatus ? el("div",{class:"notice"}, state.submitStatus) : null,
+      releaseRedoButtons(),
     ],
     noBack:true,
     next: async ()=>{
@@ -4022,9 +4029,11 @@ function buildPrint(){
    loads in a sandboxed iframe that can't navigate the top page. Jotform's
    Thank You setting redirects the panel to release-done.html, which posts
    {type:"release-signed"}; the intake then shows "Thank you", closes the
-   panel and marks the person (check by the button, "signed on tablet ✓" in
-   the printout's Releases box, releaseSigned:true in the submitted JSON).
-   Closing early or a failed load changes nothing.
+   panel and marks the person (their button turns into "Release signed ✓"
+   and stops opening the release, "signed on tablet ✓" in the printout's
+   Releases box, releaseSigned:true in the submitted JSON). Staff can redo
+   a signed release from the staff panel. Closing early or a failed load
+   changes nothing.
    The release URL holds the person's name and DOB: never log it, store it,
    or send it anywhere but the iframe.
    RELEASE_ENABLED = false hides the buttons; the intake works as before. */
@@ -4055,14 +4064,28 @@ function releaseButtons(){
   if(!RELEASE_ENABLED) return null;
   const people = releasePeople();
   if(!people.length) return null;
+  /* once signed, the button can't reopen the release (no duplicate signed
+     releases in Jotform); staff can redo it from the staff panel */
   return el("div",{class:"rel-list"}, ...people.map(m=>el("div",{class:"rel-row"},
-    el("button",{class:m.releaseSigned ? "btn-quiet" : "btn-primary", type:"button", onclick:()=>openRelease(m)},
-      trn("Sign release for {n}", m.first.trim())),
-    m.releaseSigned ? el("span",{class:"check"},"✓") : null)));
+    m.releaseSigned
+      ? el("button",{class:"btn-quiet rel-signed", type:"button", disabled:true}, "Release signed ✓")
+      : el("button",{class:"btn-primary", type:"button", onclick:()=>openRelease(m)},
+          trn("Sign release for {n}", m.first.trim())))));
+}
+/* Staff panel: reopen a signed release, after a warning. Staff-facing, so
+   English only (deliberately not in the dictionaries). */
+function releaseRedoButtons(){
+  if(!RELEASE_ENABLED) return null;
+  const signed = releasePeople().filter(m=>m.releaseSigned);
+  if(!signed.length) return null;
+  return el("div",{class:"rel-redo"}, ...signed.map(m=>el("button",{class:"btn-ghost", type:"button",
+    onclick:()=>confirmBox(m.first.trim()+"'s release is already signed. Open it again? Signing again creates a second signed release in Jotform.",
+      "Open release", "Cancel", ()=>openRelease(m, true))},
+    "Redo release for "+m.first.trim())));
 }
 let releasePanel = null;   /* {mid, overlay, frame, body, signed, timer, prevOverflow} while open */
-function openRelease(m){
-  if(releasePanel) return;
+function openRelease(m, redo){
+  if(releasePanel || (m.releaseSigned && !redo)) return;   /* signed: only the staff panel's redo reopens it */
   const title = trn("Release form for {n}", m.first.trim());
   const spinner = el("div",{class:"rel-spin", "aria-hidden":"true"});
   /* no allow-top-navigation of any kind: the release can never take the intake page away */
