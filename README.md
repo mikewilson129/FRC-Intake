@@ -17,6 +17,8 @@ required for the core flow — everything lives in one file.
   this is intentional (see Privacy below).
 - `#printRoot` holds a separate, staff-facing print layout (`@media print`
   CSS) that's built from the same in-memory answers when staff hit Print.
+- **`release-done.html`** — the small "Thank you" page the signed release
+  lands on (see "Release of information" below). It's the only other page.
 
 ## Language / translation
 
@@ -101,6 +103,47 @@ screen.
   a public commit, or a compromised tablet), and should not be treated as a
   real secret — it's a light deterrent, not access control.
 
+## Release of information (signed on the tablet)
+
+Added in Version 16. On the client "All set!" screen (before staff tap
+"Next steps"), each person with a completed intake gets a **"Sign release
+for {first name}"** button. It opens the CFFS/JRI release
+(`https://form.jotform.com/262673921694064`) in a full-screen panel inside
+the intake page, already filled in:
+
+| Jotform field | Filled with |
+|---|---|
+| `clientname[first]`, `clientname[last]` | the person's legal first/last name (not preferred name) |
+| `dob[month]`, `dob[day]`, `dob[year]` | their date of birth (`03`, `07`, `1985`) |
+| `input26[shorttext-1]` | the adult giving consent: an adult signs for themselves; for a child, the primary contact (the first adult whose intake was started; the printout marks them "Primary Contact: Yes"), or else the first adult with a completed intake. Jotform copies it to the second spot itself. |
+| `language` | the intake's language: `en`, `es`, `pt`, or `bzj` for Haitian Creole |
+
+Everything prefilled can still be changed in Jotform.
+
+- **The intake page never leaves.** The release loads in a sandboxed iframe
+  (scripts, forms, same-origin and popups allowed; no top navigation of any
+  kind), so nothing in the release can take the intake page away. The panel
+  always shows a **Close** button. The leave-page warning is unchanged.
+- **Jotform setting (one time):** set the form's Thank You page to redirect
+  to `https://mikewilson129.github.io/FRC-Intake/release-done.html`. It has
+  to be on the same site as the intake, or the intake ignores it. Adding
+  `?lang=es` / `pt` / `ht` (or `bzj`) shows that page in another language,
+  but it's optional: the intake covers it with its own translated "Thank you".
+  Until the redirect is set, people can still sign, but the panel shows
+  Jotform's own thank-you page, doesn't close by itself, and nobody is
+  marked as signed; tap Close.
+- **After signing:** the panel shows "Thank you" for 5 seconds and closes;
+  a check appears by that person's button; the printout's Releases box
+  shows `☐ Name - CFFS/JRI — signed on tablet ✓`; and the submitted JSON
+  has `releaseSigned: true` on that person (the field is left out for
+  anyone who didn't sign).
+- **Closed early, or the release doesn't load:** nothing else changes.
+  Submit and Print work as before. The button can be tapped again, but
+  signing twice makes two Jotform submissions.
+- **Off switch:** set `RELEASE_ENABLED = false` in `index.html`. The buttons
+  disappear and the intake works exactly as in Version 15 (same screens,
+  printout and submitted JSON).
+
 ## Privacy / data handling
 
 - Nothing is saved on the device. Closing or refreshing the page erases all
@@ -113,6 +156,12 @@ screen.
   their own generic wording for the warning, and **iPhone/iPad Safari often
   skips it**, so this reduces accidental data loss but can't fully prevent
   it on Apple devices. The "Start over" button deliberately skips the warning.
+- The release panel sends the person's name and date of birth to Jotform
+  in the release address (that's how prefilling works), so Jotform receives
+  them as soon as the panel opens, even if it's closed without signing. The
+  intake never logs, saves or submits that address. If Jotform ever tries to
+  navigate the intake page, the browser blocks it and may print the address
+  in its own developer-console warning; that stays on the device.
 
 ## Making changes
 
@@ -176,6 +225,28 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 16
+
+- **Sign the CFFS/JRI release on the tablet.** "All set!" now shows a
+  "Sign release for {first name}" button for each person with a completed
+  intake (usually 1–2). It opens the prefilled Jotform release in a
+  full-screen panel inside the intake, with a Close button; the intake page
+  itself never navigates, so nothing is lost. After signing, the panel says
+  "Thank you", closes after 5 seconds, and marks the person: a check by the
+  button, "signed on tablet ✓" next to their CFFS/JRI line in the
+  printout's Releases box, and `releaseSigned: true` in the submitted JSON.
+  Unsigned people print exactly as before. See "Release of information"
+  above, including the one-time Jotform Thank You redirect.
+- **New page: `release-done.html`.** Shows "Thank you" (English, Spanish,
+  Portuguese or Haitian Creole via `?lang=`) and tells the intake the release
+  was signed. The intake only accepts that message from its own site, from
+  the open panel.
+- **Off switch:** `RELEASE_ENABLED = false` hides the buttons and the intake
+  works exactly as in Version 15.
+- **Translations:** button label, panel title, Close and Thank you in
+  Spanish, Portuguese and Haitian Creole (drafts — review with bilingual
+  staff).
 
 ### Version 15
 
@@ -420,6 +491,7 @@ bugs found while investigating.
 ## Repo layout
 
 ```
-index.html   the entire application
-README.md    this file
+index.html          the entire application
+release-done.html   "Thank you" page the signed release redirects to (Version 16)
+README.md           this file
 ```

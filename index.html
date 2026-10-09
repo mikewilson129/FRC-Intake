@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 15 — see README.md changelog for what changed in this version -->
+<!-- Version 16 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -153,7 +153,23 @@
     cursor:pointer; padding:2px 4px;}
   .notes-panel textarea{flex:1; min-height:260px; width:100%; resize:vertical; font:inherit;
     padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink);}
-  @media print{ .notes-fab, .notes-panel, .modal-overlay{ display:none !important; } }
+  /* ---------- release panel (full screen, above everything incl. Notes) ---------- */
+  .rel-list{display:flex; flex-direction:column; gap:10px; margin-top:18px;}
+  .rel-row{display:flex; align-items:center; gap:10px;}
+  .rel-overlay{position:fixed; inset:0; z-index:200; display:flex; flex-direction:column; background:var(--bg);}
+  .rel-head{flex:none; display:flex; justify-content:space-between; align-items:center; gap:12px;
+    padding:10px 16px; background:var(--card); border-bottom:1px solid var(--line);}
+  .rel-title{font-weight:650; font-size:17px; line-height:1.25; min-width:0; overflow-wrap:anywhere;}  /* wraps on phones so the name stays visible */
+  .rel-close{flex:none; font-weight:600; min-height:48px;}
+  .rel-body{position:relative; flex:1; min-height:0; overflow:auto; -webkit-overflow-scrolling:touch; background:#fff;}
+  .rel-body iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+  .rel-spin{position:absolute; top:40%; left:50%; width:36px; height:36px; margin:-18px 0 0 -18px;
+    border:4px solid var(--accent-soft); border-top-color:var(--accent); border-radius:50%; animation:rel-spin 1s linear infinite;}
+  @keyframes rel-spin{to{transform:rotate(360deg);}}
+  .rel-thanks{position:absolute; inset:0; z-index:1; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:8px; padding:24px; background:var(--card); font-size:30px; font-weight:650; text-align:center;}
+  .rel-thanks .check{font-size:56px; line-height:1;}
+  @media print{ .notes-fab, .notes-panel, .modal-overlay, .rel-overlay{ display:none !important; } }
 </style>
 </head>
 <body>
@@ -728,7 +744,12 @@ const I18N = { es: {
 "We need to have a full intake for you and for your child who was referred to us. Please complete both before finishing. For other members of the family, we only need their name, date of birth, and whether they have health insurance.":"Necesitamos una admisión completa para usted y para su hijo/a que nos fue referido/a. Por favor, complete ambas antes de terminar. Para los demás miembros de la familia solo necesitamos el nombre, la fecha de nacimiento y si tienen seguro médico.",
 "If you're not on this list yet, tap “+ Add a household member” to add yourself.":"Si usted todavía no aparece en la lista, toque “+ Agregar un miembro del hogar” para agregarse.",
 "If your child isn't listed yet, tap “+ Add a household member”.":"Si su hijo/a todavía no aparece en la lista, toque “+ Agregar un miembro del hogar”.",
-"This button turns on once an adult's intake and a child's intake are both complete.":"Este botón se activa cuando la admisión de un adulto y la de un niño/a estén completas."
+"This button turns on once an adult's intake and a child's intake are both complete.":"Este botón se activa cuando la admisión de un adulto y la de un niño/a estén completas.",
+/* --- V16: release of information (signed on the tablet) --- */
+"Sign release for {n}":"Firmar la autorización de {n}",
+"Release form for {n}":"Formulario de autorización de {n}",
+"Close":"Cerrar",
+"Thank you":"Gracias"
 },
 pt: {
 /* --- chrome / navigation --- */
@@ -1270,7 +1291,12 @@ pt: {
 "We need to have a full intake for you and for your child who was referred to us. Please complete both before finishing. For other members of the family, we only need their name, date of birth, and whether they have health insurance.":"Precisamos de uma admissão completa para você e para o seu filho que foi encaminhado para nós. Por favor, complete as duas antes de finalizar. Para os outros membros da família, só precisamos do nome, da data de nascimento e se têm seguro de saúde.",
 "If you're not on this list yet, tap “+ Add a household member” to add yourself.":"Se você ainda não estiver na lista, toque em “+ Adicionar um membro do domicílio” para se adicionar.",
 "If your child isn't listed yet, tap “+ Add a household member”.":"Se seu filho ainda não estiver na lista, toque em “+ Adicionar um membro do domicílio”.",
-"This button turns on once an adult's intake and a child's intake are both complete.":"Este botão fica disponível quando a admissão de um adulto e a de uma criança estiverem completas."
+"This button turns on once an adult's intake and a child's intake are both complete.":"Este botão fica disponível quando a admissão de um adulto e a de uma criança estiverem completas.",
+/* --- V16: release of information (signed on the tablet) --- */
+"Sign release for {n}":"Assinar a autorização de {n}",
+"Release form for {n}":"Formulário de autorização de {n}",
+"Close":"Fechar",
+"Thank you":"Obrigado"
 },
 ht: {
 /* --- chrome / navigation --- */
@@ -1812,7 +1838,12 @@ ht: {
 "We need to have a full intake for you and for your child who was referred to us. Please complete both before finishing. For other members of the family, we only need their name, date of birth, and whether they have health insurance.":"Nou bezwen yon admisyon konplè pou ou ak pou pitit ou yo te refere ban nou an. Tanpri konplete toude anvan ou fini. Pou lòt manm fanmi an, nou bezwen sèlman non, dat nesans, ak si yo gen asirans sante.",
 "If you're not on this list yet, tap “+ Add a household member” to add yourself.":"Si ou poko sou lis la, touche “+ Ajoute yon manm nan kay la” pou ajoute tèt ou.",
 "If your child isn't listed yet, tap “+ Add a household member”.":"Si pitit ou a poko sou lis la, touche “+ Ajoute yon manm nan kay la”.",
-"This button turns on once an adult's intake and a child's intake are both complete.":"Bouton sa a ap mache lè admisyon yon granmoun ak admisyon yon timoun fini."
+"This button turns on once an adult's intake and a child's intake are both complete.":"Bouton sa a ap mache lè admisyon yon granmoun ak admisyon yon timoun fini.",
+/* --- V16: release of information (signed on the tablet) --- */
+"Sign release for {n}":"Siyen otorizasyon pou {n}",
+"Release form for {n}":"Fòm otorizasyon pou {n}",
+"Close":"Fèmen",
+"Thank you":"Mèsi"
 }
 };
 /* ============ DATA ============ */
@@ -3771,6 +3802,7 @@ SCREENS.finish = () => {
       title:"All set!",
       body:[
         el("p",null,"Thanks for completing the intake. You shouldn't have to complete one again in the future! Give yourself a high five, and hand the tablet over to an FRC staff member to take care of the rest."),
+        releaseButtons(),
       ],
       noBack:true,
       extraNav: el("button",{class:"btn-quiet", type:"button",
@@ -3960,7 +3992,7 @@ function buildPrint(){
     if(!(m.services && m.done)) continue;
     const name = esc(fullName(m)||"(no name)");
     const a = m.a||{};
-    roiHtml += '<div class="p-roi-line">\u2610 '+name+' - CFFS/JRI</div>';
+    roiHtml += '<div class="p-roi-line">\u2610 '+name+' - CFFS/JRI'+(m.releaseSigned?' \u2014 signed on tablet \u2713':'')+'</div>';
     for(const ag of RELEASE_AGENCIES){
       if((a.agencies||[]).includes(ag)){
         roiHtml += '<div class="p-roi-line">\u2610 '+name+' - '+esc(ag.split(" ")[0])+'</div>';
@@ -3982,6 +4014,93 @@ function buildPrint(){
   document.getElementById("printRoot").innerHTML = h;
   return h;
 }
+
+/* ============ RELEASE OF INFORMATION (Jotform, signed on the tablet) ============
+   "All set!" shows one "Sign release for {name}" button per completed intake.
+   It opens the prefilled CFFS/JRI release in a full-screen panel. The intake
+   page itself never navigates (leaving it erases the intake): the release
+   loads in a sandboxed iframe that can't navigate the top page. Jotform's
+   Thank You setting redirects the panel to release-done.html, which posts
+   {type:"release-signed"}; the intake then shows "Thank you", closes the
+   panel and marks the person (check by the button, "signed on tablet ✓" in
+   the printout's Releases box, releaseSigned:true in the submitted JSON).
+   Closing early or a failed load changes nothing.
+   The release URL holds the person's name and DOB: never log it, store it,
+   or send it anywhere but the iframe.
+   RELEASE_ENABLED = false hides the buttons; the intake works as before. */
+const RELEASE_ENABLED = true;
+const RELEASE_FORM_URL = "https://form.jotform.com/262673921694064";
+const RELEASE_JOTFORM_LANG = {en:"en", es:"es", pt:"pt", ht:"bzj"};
+const RELEASE_THANKS_MS = 5000;
+/* same people as the printout's Releases box */
+function releasePeople(){ return state.members.filter(m=>m.services && m.done); }
+function legalName(m){ return [m.first.trim(), m.last.trim()].filter(Boolean).join(" "); }
+/* who consents for a child: the primary contact, else the first completed adult */
+function releaseConsentAdult(){
+  return state.members.find(x=>x.isSelf && !isChild(x)) || state.members.find(x=>x.done && !isChild(x)) || null;
+}
+function releaseUrl(m){
+  const parts = [];
+  const add = (k, v)=>{ if(v) parts.push(k+"="+encodeURIComponent(v)); };
+  const [y, mo, d] = (m.dob||"").split("-");   /* m.dob is YYYY-MM-DD, already zero-padded */
+  const consent = isChild(m) ? releaseConsentAdult() : m;
+  add("clientname[first]", m.first.trim());
+  add("clientname[last]", m.last.trim());
+  add("dob[month]", mo); add("dob[day]", d); add("dob[year]", y);
+  add("input26[shorttext-1]", consent ? legalName(consent) : "");   /* Jotform copies it to the second spot */
+  add("language", RELEASE_JOTFORM_LANG[LANG] || "en");
+  return RELEASE_FORM_URL+"?"+parts.join("&");
+}
+function releaseButtons(){
+  if(!RELEASE_ENABLED) return null;
+  const people = releasePeople();
+  if(!people.length) return null;
+  return el("div",{class:"rel-list"}, ...people.map(m=>el("div",{class:"rel-row"},
+    el("button",{class:m.releaseSigned ? "btn-quiet" : "btn-primary", type:"button", onclick:()=>openRelease(m)},
+      trn("Sign release for {n}", m.first.trim())),
+    m.releaseSigned ? el("span",{class:"check"},"✓") : null)));
+}
+let releasePanel = null;   /* {mid, overlay, frame, body, signed, timer, prevOverflow} while open */
+function openRelease(m){
+  if(releasePanel) return;
+  const title = trn("Release form for {n}", m.first.trim());
+  const spinner = el("div",{class:"rel-spin", "aria-hidden":"true"});
+  /* no allow-top-navigation of any kind: the release can never take the intake page away */
+  const frame = el("iframe",{title:title, sandbox:"allow-scripts allow-forms allow-same-origin allow-popups"});
+  frame.addEventListener("load", ()=>spinner.remove());
+  frame.src = releaseUrl(m);
+  const body = el("div",{class:"rel-body"}, spinner, frame);
+  const overlay = el("div",{class:"rel-overlay", role:"dialog", "aria-modal":"true", "aria-label":title},
+    el("div",{class:"rel-head"},
+      el("div",{class:"rel-title"}, title),
+      el("button",{class:"btn-quiet rel-close", type:"button", onclick:closeRelease}, "Close")),
+    body);
+  releasePanel = {mid:m.id, overlay:overlay, frame:frame, body:body, signed:false, timer:null,
+    prevOverflow:document.documentElement.style.overflow};
+  document.documentElement.style.overflow = "hidden";   /* the intake behind the panel stays put */
+  document.body.appendChild(overlay);
+}
+function closeRelease(){
+  const p = releasePanel; if(!p) return;
+  clearTimeout(p.timer);
+  p.overlay.remove();   /* the iframe goes with it, and so does the release URL */
+  document.documentElement.style.overflow = p.prevOverflow;
+  releasePanel = null;
+}
+/* Only counts when it comes from the open panel's iframe, on the intake's own site (release-done.html) */
+function onReleaseMessage(e){
+  const p = releasePanel;
+  if(!p || p.signed || e.origin!==location.origin || e.source!==p.frame.contentWindow) return;
+  if(!e.data || e.data.type!=="release-signed") return;
+  p.signed = true;
+  const m = state.members.find(x=>x.id===p.mid);
+  if(m) m.releaseSigned = true;   /* signed already, even if Close is tapped during the Thank you */
+  p.body.appendChild(el("div",{class:"rel-thanks", role:"status"},
+    el("div",{class:"check", "aria-hidden":"true"},"✓"), "Thank you"));
+  p.timer = setTimeout(closeRelease, RELEASE_THANKS_MS);
+  if(current && current.id==="finish") rerender();
+}
+if(RELEASE_ENABLED) window.addEventListener("message", onReleaseMessage);
 
 /* ============ NOTES WIDGET (persistent floating note, all screens) ============
    Built once, outside the #app render cycle, so it survives every screen
