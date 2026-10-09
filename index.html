@@ -786,7 +786,8 @@ const I18N = { es: {
 "How we can help":"Cómo podemos ayudarle",
 /* --- V16.3: unsigned-release warning (remote Submit) — DRAFT --- */
 "Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.":"Por favor, complete las autorizaciones de cada miembro del hogar que aparece aquí. Necesitamos estas autorizaciones para poder atender adecuadamente a su familia.",
-"Submit anyway":"Enviar de todos modos"
+"Submit anyway":"Enviar de todos modos",
+"Continue anyway":"Continuar de todos modos"
 },
 pt: {
 /* --- chrome / navigation --- */
@@ -1361,7 +1362,8 @@ pt: {
 "How we can help":"Como podemos ajudar",
 /* --- V16.3: unsigned-release warning (remote Submit) — DRAFT --- */
 "Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.":"Por favor, complete as autorizações de cada membro do domicílio listado aqui. Precisamos dessas autorizações para atender sua família adequadamente.",
-"Submit anyway":"Enviar mesmo assim"
+"Submit anyway":"Enviar mesmo assim",
+"Continue anyway":"Continuar mesmo assim"
 },
 ht: {
 /* --- chrome / navigation --- */
@@ -1936,7 +1938,8 @@ ht: {
 "How we can help":"Kijan nou ka ede",
 /* --- V16.3: unsigned-release warning (remote Submit) — DRAFT --- */
 "Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.":"Tanpri ranpli otorizasyon yo pou chak manm nan kay la ki sou lis la. Nou bezwen otorizasyon sa yo pou nou ka sèvi fanmi ou kòmsadwa.",
-"Submit anyway":"Soumèt kanmenm"
+"Submit anyway":"Soumèt kanmenm",
+"Continue anyway":"Kontinye kanmenm"
 }
 };
 /* ============ DATA ============ */
@@ -2295,7 +2298,8 @@ const state = {
   members:[],
   cra:false,       /* CRA mode: finishing needs a completed adult AND child intake */
   otherReleases:0, /* releases signed through the staff panel's "Complete another release" */
-  releaseWarned:false /* remote Submit: the unsigned-release warning was clicked past */
+  releaseWarned:false,  /* Submit (remote, or staff on the tablet): the unsigned-release warning was clicked past */
+  handoffWarned:false   /* tablet "Next steps": the unsigned-release warning was clicked past */
 };
 
 /* ============ URL TAGS ============
@@ -3941,8 +3945,14 @@ SCREENS.finish = () => {
         releaseButtons(),
       ],
       noBack:true,
-      extraNav: el("button",{class:"btn-quiet", type:"button",
-        onclick:()=>{ state.showStaffPanel=true; rerender(); }}, "Next steps")
+      extraNav: el("button",{class:"btn-quiet", type:"button", onclick:()=>{
+        const handOff = ()=>{ state.showStaffPanel=true; rerender(); };
+        /* last chance for the family to sign before handing over: discourage skipping (asked once) */
+        if(unsignedReleasePeople().length && !state.handoffWarned)
+          return confirmBox("Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.",
+            "Continue anyway", "Go back", ()=>{ state.handoffWarned = true; handOff(); }, true);
+        handOff();
+      }}, "Next steps")
     });
   }
   return shell({
@@ -3954,14 +3964,13 @@ SCREENS.finish = () => {
       moreReleasesSection(),
     ],
     noBack:true,
-    next: async ()=>{
+    next: ()=>{
       if(!finishRule().ok){ goTo("rosterSelect"); return; }   /* never send an intake that doesn't meet the rule */
-      state.submitStatus = "Submitting…";
-      const outcome = await sendIntake();
-      state.submitStatus = outcome.success ? "Submitted."
-        : outcome.timedOut ? "Submission timed out — please submit again, or print a copy to send to the FRC."
-        : "Submission failed — please try again or download/print a copy to send to the FRC.";
-      rerender();
+      const unsigned = unsignedReleasePeople();
+      if(unsigned.length && !state.releaseWarned)   /* staff-facing, English only */
+        return confirmBox("CFFS/JRI release not signed yet for: "+unsigned.map(m=>m.first.trim()).join(", ")+". Use \u201COpen release for\u2026\u201D above, or submit anyway.",
+          "Submit anyway", "Go back", ()=>{ state.releaseWarned = true; staffSubmit(); }, true);
+      staffSubmit();
     },
     nextLabel: state.submitting ? "Submitting…" : (state.submitted ? "Submitted ✓" : "Submit"),
     canNext: !state.submitting && !state.submitted && finishRule().ok,
@@ -3988,6 +3997,14 @@ SCREENS.finish = () => {
   });
 };
 
+async function staffSubmit(){
+  state.submitStatus = "Submitting…";
+  const outcome = await sendIntake();
+  state.submitStatus = outcome.success ? "Submitted."
+    : outcome.timedOut ? "Submission timed out — please submit again, or print a copy to send to the FRC."
+    : "Submission failed — please try again or download/print a copy to send to the FRC.";
+  rerender();
+}
 /* Sends the intake (staff panel Submit and remote mode's Submit). Shows the
    button as "Submitting…" meanwhile; try/finally: any error still releases
    the button (it used to stay on "Submitting…" for good). */
@@ -4036,7 +4053,7 @@ function remoteFinishScreen(){
       if(!finishRule().ok){ goTo("rosterSelect"); return; }   /* never send an intake that doesn't meet the rule */
       /* Unsigned releases: discourage skipping them, but allow it (e.g. staff doing
          the intake over the phone). Asked once; a retry after a failed send isn't asked again. */
-      if(RELEASE_ENABLED && !state.releaseWarned && releasePeople().some(m=>!m.releaseSigned)){
+      if(unsignedReleasePeople().length && !state.releaseWarned){
         confirmBox("Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.",
           "Submit anyway", "Go back", ()=>{ state.releaseWarned = true; remoteSubmit(); }, true);
         return;
@@ -4247,6 +4264,8 @@ const RELEASE_JOTFORM_LANG = {en:"en", es:"es", pt:"pt", ht:"bzj"};
 const RELEASE_THANKS_MS = 2500;   /* how long "Thank you" shows before the panel closes */
 /* same people as the printout's Releases box */
 function releasePeople(){ return state.members.filter(m=>m.services && m.done); }
+/* people whose CFFS/JRI release isn't signed yet (none while the buttons are switched off) */
+function unsignedReleasePeople(){ return RELEASE_ENABLED ? releasePeople().filter(m=>!m.releaseSigned) : []; }
 function legalName(m){ return [m.first.trim(), m.last.trim()].filter(Boolean).join(" "); }
 /* who consents for a child: the primary contact, else the first completed adult */
 function releaseConsentAdult(){

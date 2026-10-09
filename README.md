@@ -280,6 +280,11 @@ Everything prefilled can still be changed in Jotform.
 - **Closed early, or the release doesn't load:** nothing else changes.
   Submit and Print work as before, and the button still says "Sign
   release for…", so it can be tried again.
+- **Unsigned releases are flagged (skippable):** on the tablet, tapping
+  "Next steps" on "All set!" first asks the family to complete them
+  ("Go back" / "Continue anyway"), and the staff panel's Submit names who
+  hasn't signed ("Go back" / "Submit anyway"); in remote mode, Submit asks
+  the family (see "Remote mode"). Each is asked once per intake.
 - **Staff panel (tablet):** "Next steps" shows, for each person with a
   completed intake, **"Open release for {first name}"** if they haven't
   signed (opens it straight away), or **"Redo release for {first name}"**
@@ -430,11 +435,17 @@ Since everything is one file, a few conventions keep it maintainable:
   a ✓ on screen and ☑ on later printouts. Before Submit the panel says
   "Releases appear here after you press Submit." Tablet only. See "Other
   releases" under "Release of information".
-- **Remote Submit warns about unsigned releases** (skippable): "Please
-  complete the releases for each household member listed here. We need
-  these releases completed for us to appropriately serve your family." —
-  **Go back** / **Submit anyway**. Asked once per intake. The tablet's staff
-  Submit isn't warned. Spanish, Portuguese and Haitian Creole are drafts.
+- **Warnings about unsigned CFFS/JRI releases** (skippable, each asked once
+  per intake; "Go back" is the prominent button):
+  - **Remote Submit** and the **tablet's "Next steps"** (the family's
+    hand-off): "Please complete the releases for each household member
+    listed here. We need these releases completed for us to appropriately
+    serve your family." — **Go back** / **Submit anyway** (remote) or
+    **Continue anyway** (tablet). Spanish, Portuguese and Haitian Creole are
+    drafts.
+  - **Tablet staff Submit** (staff-facing, English): "CFFS/JRI release not
+    signed yet for: Kiddo. Use "Open release for…" above, or submit
+    anyway." — **Go back** / **Submit anyway**.
 - **`release-done.html`:** opened directly (not inside the intake) with
   `?form=` set to one of the two release forms, it shows a "Fill out another
   release" button back to that form (English, Spanish, Portuguese, Haitian
