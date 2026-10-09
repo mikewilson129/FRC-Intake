@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 16.3 — see README.md changelog for what changed in this version -->
+<!-- Version 16.4 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -4328,7 +4328,8 @@ function otherReleaseItems(m){
 /* m: the person a suggestion is for, or null for "Complete another release" */
 function otherReleaseUrl(m){
   const consent = (m && !isChild(m)) ? m : releaseConsentAdult();
-  return OTHER_RELEASE_FORM_URL + (consent ? "?input22[shorttext-1]="+encodeURIComponent(legalName(consent)) : "");
+  /* the consent line's first blank is a "first name"-type blank: firstname-1 (read off the live form) */
+  return OTHER_RELEASE_FORM_URL + (consent ? "?input22[firstname-1]="+encodeURIComponent(legalName(consent)) : "");
 }
 function openOtherRelease(m, item){
   if(releasePanel || state.submitting) return;
