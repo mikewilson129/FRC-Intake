@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 16.1 — see README.md changelog for what changed in this version -->
+<!-- Version 16.2 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -754,7 +754,7 @@ const I18N = { es: {
 "Close":"Cerrar",
 "Thank you":"Gracias",
 "Release signed ✓":"Autorización firmada ✓",
-/* --- V16: remote mode (?remote) — Spanish reviewed by staff --- */
+/* --- V16: remote mode (the default link) — Spanish reviewed by staff --- */
 "If anything is confusing, call us at {n}. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":"Si algo no está claro, llámenos al {n}. La mayoría de las preguntas se pueden omitir si prefiere no contestarlas — igual podrá recibir nuestra ayuda.",
 "Nothing is saved on this device. If this page is closed before you submit, everything on it is erased.":"Nada se guarda en este dispositivo. Si cierra esta página antes de enviar, toda la información se borra.",
 "If you have a reason to go in a different order, you can continue anyway.":"Si tiene una razón para seguir otro orden, puede continuar de todos modos.",
@@ -1326,7 +1326,7 @@ pt: {
 "Close":"Fechar",
 "Thank you":"Obrigado",
 "Release signed ✓":"Autorização assinada ✓",
-/* --- V16: remote mode (?remote) --- */
+/* --- V16: remote mode (the default link) --- */
 "If anything is confusing, call us at {n}. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":"Se algo não estiver claro, ligue para nós no {n}. A maioria das perguntas pode ser pulada se você preferir não responder — você ainda poderá receber nossa ajuda.",
 "Nothing is saved on this device. If this page is closed before you submit, everything on it is erased.":"Nada é salvo neste dispositivo. Se esta página for fechada antes de você enviar, tudo será apagado.",
 "If you have a reason to go in a different order, you can continue anyway.":"Se você tiver um motivo para seguir outra ordem, pode continuar mesmo assim.",
@@ -1898,7 +1898,7 @@ ht: {
 "Close":"Fèmen",
 "Thank you":"Mèsi",
 "Release signed ✓":"Otorizasyon siyen ✓",
-/* --- V16: remote mode (?remote) --- */
+/* --- V16: remote mode (the default link) --- */
 "If anything is confusing, call us at {n}. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":"Si yon bagay pa klè, rele nou nan {n}. Ou ka sote pifò kesyon yo si ou pa vle reponn — ou ap toujou ka jwenn èd nan men nou.",
 "Nothing is saved on this device. If this page is closed before you submit, everything on it is erased.":"Anyen pa anrejistre sou aparèy sa a. Si paj sa a fèmen anvan ou soumèt, tout bagay efase.",
 "If you have a reason to go in a different order, you can continue anyway.":"Si ou gen yon rezon pou swiv yon lòt lòd, ou ka kontinye kanmenm.",
@@ -2287,17 +2287,19 @@ const state = {
    Read once at load (never stored):
    ?cra          CRA mode on and locked for the session (the link staff send to CRA families)
    ?lang=xx      start in es, pt or ht; anything else starts in English
-   ?remote       remote mode, locked on: the family finishes on their own device
-                 (Almost done → Submit → Intake sent), no staff hand-off
-   ?releasetest  staff only: shows the release buttons before they're on for everyone
-   They combine: ?remote&cra&lang=es */
+   ?office       the FRC tablet (in-office) version: staff hand-off, staff panel,
+                 Print, Start over. Without it the form is in remote mode, for
+                 families on their own device (Almost done → Submit → Intake sent).
+   ?releasetest  staff only: shows the release buttons if they're switched off for everyone
+   They combine: ?office&cra&lang=es */
 const URL_TAGS = new URLSearchParams(location.search);
 function urlTag(name){ for(const [k,v] of URL_TAGS) if(k.toLowerCase()===name) return v; return null; }
 const CRA_LOCKED = urlTag("cra")!==null;
 state.cra = CRA_LOCKED;
 const URL_LANG = (urlTag("lang")||"").trim().toLowerCase();
 if(hasOwn(I18N, URL_LANG)) LANG = URL_LANG;   /* set before the first render */
-const REMOTE = urlTag("remote")!==null;
+const OFFICE = urlTag("office")!==null;
+const REMOTE = !OFFICE;
 const RELEASE_TEST = urlTag("releasetest")!==null;
 /* the number remote mode's "call us" lines give */
 const FRC_PHONE = "978-296-8080";
@@ -3997,7 +3999,7 @@ async function sendIntake(){
   return outcome;
 }
 
-/* ---- Remote mode (?remote): the family finishes on their own device ----
+/* ---- Remote mode (the default; ?office is the tablet): the family finishes on their own device ----
    "Almost done" (release buttons, encouraged but not required) → Submit →
    "Intake sent". No staff panel, Print or Start over. */
 function remoteFinishScreen(){
@@ -4164,7 +4166,8 @@ function buildPrint(){
     if(!(m.services && m.done)) continue;
     const name = esc(fullName(m)||"(no name)");
     const a = m.a||{};
-    roiHtml += '<div class="p-roi-line">\u2610 '+name+' - CFFS/JRI'+(m.releaseSigned?' \u2014 signed '+(REMOTE?'remotely':'on tablet')+' \u2713':'')+'</div>';
+    /* signed: checked box (\uFE0E keeps ☑ a plain symbol, not a color emoji) */
+    roiHtml += '<div class="p-roi-line">'+(m.releaseSigned?'\u2611\uFE0E':'\u2610')+' '+name+' - CFFS/JRI'+(m.releaseSigned?' \u2014 signed '+(REMOTE?'remotely':'on tablet'):'')+'</div>';
     for(const ag of RELEASE_AGENCIES){
       if((a.agencies||[]).includes(ag)){
         roiHtml += '<div class="p-roi-line">\u2610 '+name+' - '+esc(ag.split(" ")[0])+'</div>';
