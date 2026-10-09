@@ -311,7 +311,7 @@ second Jotform form (`https://form.jotform.com/262774481459066`). Tablet
 - **"+ Complete another release"** for anything else; it can be used any
   number of times.
 - **Prefill:** only the consent name, in the first blank of `input22`
-  (`input22[shorttext-1]`): an adult's own suggestion → that adult; a
+  (`input22[firstname-1]`): an adult's own suggestion → that adult; a
   child's suggestion or "Complete another release" → the primary contact
   (as for CFFS/JRI). Everything else is filled in on the form.
 - **After signing** (same panel, Close button, 2.5-second "Thank you"): a
@@ -424,6 +424,13 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 16.4
+
+- **Fix: the consent name now fills in on the agency/people release.** The
+  first blank of its consent line is a "first name"-type blank, so its
+  prefill address is `input22[firstname-1]` (Version 16.3 used
+  `input22[shorttext-1]`, which Jotform ignored).
 
 ### Version 16.3
 
