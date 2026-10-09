@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<!-- Release "Thank you" page (Version 16). Jotform's Thank You setting redirects the
+     release here after it's signed in the intake's panel; this page tells the intake
+     (its parent window) so the panel can close. ?lang=es|pt|ht picks the language
+     (Jotform's bzj also means Haitian Creole); anything else shows English. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thank you</title>
+<style>
+  html,body{margin:0; height:100%; background:#FFFFFF; color:#22302D;
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;}
+  body{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+    padding:24px; box-sizing:border-box; text-align:center;}
+  .check{color:#2E7D4F; font-size:56px; font-weight:700; line-height:1;}
+  h1{font-size:30px; font-weight:650; margin:0;}
+</style>
+</head>
+<body>
+<div class="check" aria-hidden="true">✓</div>
+<h1 id="msg">Thank you</h1>
+<script>
+"use strict";
+/* Drafts for staff review — keep in step with "Thank you" in index.html's dictionaries */
+const THANKS = {en:"Thank you", es:"Gracias", pt:"Obrigado", ht:"Mèsi"};
+let lang = (new URLSearchParams(location.search).get("lang")||"").trim().toLowerCase();
+if(lang==="bzj") lang = "ht";   /* Jotform's code for Haitian Creole */
+if(!Object.prototype.hasOwnProperty.call(THANKS, lang)) lang = "en";
+document.documentElement.lang = lang;
+document.title = document.getElementById("msg").textContent = THANKS[lang];
+/* Tell the intake the release was signed. Targeting our own origin means the
+   message only reaches the intake page, never another site framing this one. */
+if(window.parent!==window && location.origin && location.origin!=="null"){
+  window.parent.postMessage({type:"release-signed"}, location.origin);
+}
+</script>
+</body>
+</html>

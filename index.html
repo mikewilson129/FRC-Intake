@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 15 — see README.md changelog for what changed in this version -->
+<!-- Version 16 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -137,6 +137,7 @@
     .p-roi{border:2px solid #000; border-radius:6px; padding:10px 12px; margin-top:10px; font-weight:700; page-break-inside:avoid;}
     .p-roi h3{font-size:14px; margin-bottom:6px;}
     .p-roi-line{margin:3px 0; font-size:12.5px;}
+    .p-remote-note{font-size:16px; padding:24px 0;}
     .p-cra{display:inline-block; border:2px solid #000; border-radius:6px; padding:4px 10px; margin:0 0 10px; font-weight:700; font-size:12.5px;}
   }
   /* ---------- persistent Notes widget ---------- */
@@ -153,7 +154,27 @@
     cursor:pointer; padding:2px 4px;}
   .notes-panel textarea{flex:1; min-height:260px; width:100%; resize:vertical; font:inherit;
     padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink);}
-  @media print{ .notes-fab, .notes-panel, .modal-overlay{ display:none !important; } }
+  /* ---------- release panel (full screen, above everything incl. Notes) ---------- */
+  .phone{white-space:nowrap;}
+  .rel-list{display:flex; flex-direction:column; gap:10px; margin-top:18px;}
+  .rel-row{display:flex; align-items:center; gap:10px;}
+  .rel-signed:disabled{opacity:1; cursor:default; color:var(--good); border-color:var(--good); background:#fff; font-weight:600;}
+  .rel-staff{display:flex; flex-wrap:wrap; gap:0 16px; margin-top:4px;}
+  .rel-staff .btn-ghost{font-size:14.5px; padding:8px 2px;}
+  .rel-overlay{position:fixed; inset:0; z-index:200; display:flex; flex-direction:column; background:var(--bg);}
+  .rel-head{flex:none; display:flex; justify-content:space-between; align-items:center; gap:12px;
+    padding:10px 16px; background:var(--card); border-bottom:1px solid var(--line);}
+  .rel-title{font-weight:650; font-size:17px; line-height:1.25; min-width:0; overflow-wrap:anywhere;}  /* wraps on phones so the name stays visible */
+  .rel-close{flex:none; font-weight:600; min-height:48px;}
+  .rel-body{position:relative; flex:1; min-height:0; overflow:auto; -webkit-overflow-scrolling:touch; background:#fff;}
+  .rel-body iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+  .rel-spin{position:absolute; top:40%; left:50%; width:36px; height:36px; margin:-18px 0 0 -18px;
+    border:4px solid var(--accent-soft); border-top-color:var(--accent); border-radius:50%; animation:rel-spin 1s linear infinite;}
+  @keyframes rel-spin{to{transform:rotate(360deg);}}
+  .rel-thanks{position:absolute; inset:0; z-index:1; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:8px; padding:24px; background:var(--card); font-size:30px; font-weight:650; text-align:center;}
+  .rel-thanks .check{font-size:56px; line-height:1;}
+  @media print{ .notes-fab, .notes-panel, .modal-overlay, .rel-overlay{ display:none !important; } }
 </style>
 </head>
 <body>
@@ -245,7 +266,6 @@ const I18N = { es: {
 "Answer however you're comfortable.":"Conteste como se sienta cómodo/a.",
 "Answer however you're comfortable — none of this changes what help is available.":"Conteste como se sienta cómodo/a — nada de esto cambia la ayuda disponible.",
 "This helps us avoid duplicating supports already in place.":"Esto nos ayuda a no duplicar los apoyos que ya existen.",
-"We'll add everyone in your household — starting with you. We do need a name, date of birth, and the insurance answer.":"Vamos a agregar a todas las personas de su hogar — comenzando con usted. Necesitamos el nombre, la fecha de nacimiento y la respuesta sobre el seguro médico.",
 "We do need a name, date of birth, and the insurance answer.":"Necesitamos el nombre, la fecha de nacimiento y la respuesta sobre el seguro médico.",
 /* --- family screens --- */
 "Your family":"Su familia","Family last name":"Apellido de la familia","Last name":"Apellido",
@@ -345,7 +365,6 @@ const I18N = { es: {
 /* --- roster / household flow --- */
 "Your household":"Su hogar",
 "Are there any other people in your house you haven't told us about yet?":"¿Hay otras personas en su casa de las que aún no nos ha hablado?",
-"We'd like to include everyone who lives with you — adults and children.":"Queremos incluir a todas las personas que viven con usted — adultos y niños.",
 "Yes — add someone":"Sí — agregar a alguien","No — that's everyone":"No — ya están todos",
 "+ Add a household member":"+ Agregar un miembro del hogar",
 "(no name yet)":"(sin nombre todavía)",
@@ -728,7 +747,39 @@ const I18N = { es: {
 "We need to have a full intake for you and for your child who was referred to us. Please complete both before finishing. For other members of the family, we only need their name, date of birth, and whether they have health insurance.":"Necesitamos una admisión completa para usted y para su hijo/a que nos fue referido/a. Por favor, complete ambas antes de terminar. Para los demás miembros de la familia solo necesitamos el nombre, la fecha de nacimiento y si tienen seguro médico.",
 "If you're not on this list yet, tap “+ Add a household member” to add yourself.":"Si usted todavía no aparece en la lista, toque “+ Agregar un miembro del hogar” para agregarse.",
 "If your child isn't listed yet, tap “+ Add a household member”.":"Si su hijo/a todavía no aparece en la lista, toque “+ Agregar un miembro del hogar”.",
-"This button turns on once an adult's intake and a child's intake are both complete.":"Este botón se activa cuando la admisión de un adulto y la de un niño/a estén completas."
+"This button turns on once an adult's intake and a child's intake are both complete.":"Este botón se activa cuando la admisión de un adulto y la de un niño/a estén completas.",
+/* --- V16: release of information (signed on the tablet) — Spanish reviewed by staff --- */
+"Sign release for {n}":"Firmar la autorización de {n}",
+"Release form for {n}":"Formulario de autorización de {n}",
+"Close":"Cerrar",
+"Thank you":"Gracias",
+"Release signed ✓":"Autorización firmada ✓",
+/* --- V16: remote mode (?remote) — Spanish reviewed by staff --- */
+"If anything is confusing, call us at {n}. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":"Si algo no está claro, llámenos al {n}. La mayoría de las preguntas se pueden omitir si prefiere no contestarlas — igual podrá recibir nuestra ayuda.",
+"Nothing is saved on this device. If this page is closed before you submit, everything on it is erased.":"Nada se guarda en este dispositivo. Si cierra esta página antes de enviar, toda la información se borra.",
+"If you have a reason to go in a different order, you can continue anyway.":"Si tiene una razón para seguir otro orden, puede continuar de todos modos.",
+"If you're unsure, call us at {n} — that's what we're here for.":"Si tiene dudas, llámenos al {n} — para eso estamos.",
+"A few words is plenty — we can help you sort it out later.":"Con pocas palabras basta — más adelante podemos ayudarle a aclararlo.",
+"Almost done":"Ya casi termina",
+"If you can, please sign a release for each person below. Then tap Submit to send your intake to the FRC.":"Si puede, por favor firme una autorización para cada persona de abajo. Luego toque Enviar para mandar su admisión al FRC.",
+"Tap Submit to send your intake to the FRC.":"Toque Enviar para mandar su admisión al FRC.",
+"Please try again. If it still doesn't work, call the FRC at {n}.":"Por favor, intente de nuevo. Si todavía no funciona, llame al FRC al {n}.",
+"Intake sent":"Admisión enviada",
+"Thank you! Your intake was sent to the FRC. Someone from the FRC will follow up with you.":"¡Gracias! Su admisión fue enviada al FRC. Alguien del FRC se comunicará con usted.",
+"You can close this page now.":"Ya puede cerrar esta página.",
+/* --- V16 pre-merge changes: DRAFT — review with bilingual staff --- */
+"State: Massachusetts — if you live in a different state, please let us know in the Notes section.":"Estado: Massachusetts — si vive en otro estado, por favor avísenos en la sección de Notas.",
+"First, what kind of person or place told you about us? Pick the closest fit — if you're not sure, try your best and tell us in the Notes section in your own words.":"Primero, ¿qué tipo de persona o lugar le habló de nosotros? Elija la opción más cercana — si no está seguro/a, haga lo mejor que pueda y cuéntenos en la sección de Notas con sus propias palabras.",
+"Now the specific one. This question can't be skipped — if none of these look right, try your best and tell us in the Notes section in your own words.":"Ahora la opción específica. Esta pregunta no se puede omitir — si ninguna corresponde, haga lo mejor que pueda y cuéntenos en la sección de Notas con sus propias palabras.",
+"If you're not sure, just try your best.":"Si no está seguro/a, responda lo mejor que pueda.",
+"What can we help you with?":"¿En qué le podemos ayudar?",
+"What can we help you with for {n}?":"¿En qué le podemos ayudar con {n}?",
+"Is {n} with you and able to answer a few questions directly?":"¿Está {n} con usted y puede contestar unas preguntas directamente?",
+"We'll add everyone that lives in your home — starting with you. We do need a name, date of birth, and the insurance answer.":"Vamos a agregar a todas las personas que viven en su casa — comenzando con usted. Necesitamos el nombre, la fecha de nacimiento y la respuesta sobre el seguro médico.",
+"Please add everyone that lives in your home — adults and children.":"Por favor, agregue a todas las personas que viven en su casa — adultos y niños.",
+"Printing isn't available. Your intake was sent to the FRC.":"No es posible imprimir. Su admisión fue enviada al FRC.",
+"Printing isn't available.":"No es posible imprimir.",
+"How we can help":"Cómo podemos ayudarle"
 },
 pt: {
 /* --- chrome / navigation --- */
@@ -788,7 +839,6 @@ pt: {
 "Answer however you're comfortable.":"Responda como se sentir à vontade.",
 "Answer however you're comfortable — none of this changes what help is available.":"Responda como se sentir à vontade — nada disso muda a ajuda disponível.",
 "This helps us avoid duplicating supports already in place.":"Isto nos ajuda a não duplicar os apoios que já existem.",
-"We'll add everyone in your household — starting with you. We do need a name, date of birth, and the insurance answer.":"Vamos incluir todas as pessoas do seu domicílio — começando por você. Precisamos do nome, da data de nascimento e da resposta sobre o seguro de saúde.",
 "We do need a name, date of birth, and the insurance answer.":"Precisamos do nome, da data de nascimento e da resposta sobre o seguro de saúde.",
 /* --- family screens --- */
 "Your family":"Sua família","Family last name":"Sobrenome da família","Last name":"Sobrenome",
@@ -889,7 +939,6 @@ pt: {
 /* --- roster / household flow --- */
 "Your household":"Seu domicílio",
 "Are there any other people in your house you haven't told us about yet?":"Há outras pessoas na sua casa que você ainda não nos contou?",
-"We'd like to include everyone who lives with you — adults and children.":"Queremos incluir todas as pessoas que moram com você — adultos e crianças.",
 "Yes — add someone":"Sim — adicionar alguém","No — that's everyone":"Não — já são todos",
 "+ Add a household member":"+ Adicionar um membro do domicílio",
 "(no name yet)":"(ainda sem nome)",
@@ -1149,7 +1198,7 @@ pt: {
 /* --- roles (typeahead) --- */
 "Adopted Child/Youth":"Criança/Jovem adotado(a)","Adopted Daughter":"Filha adotiva","Adopted Son":"Filho adotivo",
 "Aunt":"Tia","Biological Daughter":"Filha biológica","Biological Son":"Filho biológico",
-"Boyfriend/Girlfriend":"Namorado(a)","Brother":"Irmão","Child/Youth":"Criança/Jovem","Co-partner":"Coparceiro(a)",
+"Boyfriend/Girlfriend":"Namorado(a)","Brother":"Irmão","Child/Youth":"Criança/Jovem","Co-partner":"Co-responsável Legal (Guarda Compartilhada / Coparentalidade)",
 "Cousin":"Primo(a)","Daughter":"Filha","Ex-Husband":"Ex-marido","Ex-Wife":"Ex-esposa","Family Friend":"Amigo(a) da família",
 "Father":"Pai","Fiance":"Noivo(a)","Foster Child/Youth":"Criança/Jovem de criação (foster)",
 "Friend":"Amigo(a)","Grandchild":"Neto(a)","Grandfather":"Avô","Grandmother":"Avó",
@@ -1270,7 +1319,39 @@ pt: {
 "We need to have a full intake for you and for your child who was referred to us. Please complete both before finishing. For other members of the family, we only need their name, date of birth, and whether they have health insurance.":"Precisamos de uma admissão completa para você e para o seu filho que foi encaminhado para nós. Por favor, complete as duas antes de finalizar. Para os outros membros da família, só precisamos do nome, da data de nascimento e se têm seguro de saúde.",
 "If you're not on this list yet, tap “+ Add a household member” to add yourself.":"Se você ainda não estiver na lista, toque em “+ Adicionar um membro do domicílio” para se adicionar.",
 "If your child isn't listed yet, tap “+ Add a household member”.":"Se seu filho ainda não estiver na lista, toque em “+ Adicionar um membro do domicílio”.",
-"This button turns on once an adult's intake and a child's intake are both complete.":"Este botão fica disponível quando a admissão de um adulto e a de uma criança estiverem completas."
+"This button turns on once an adult's intake and a child's intake are both complete.":"Este botão fica disponível quando a admissão de um adulto e a de uma criança estiverem completas.",
+/* --- V16: release of information (signed on the tablet) --- */
+"Sign release for {n}":"Assinar a autorização de {n}",
+"Release form for {n}":"Formulário de autorização de {n}",
+"Close":"Fechar",
+"Thank you":"Obrigado",
+"Release signed ✓":"Autorização assinada ✓",
+/* --- V16: remote mode (?remote) --- */
+"If anything is confusing, call us at {n}. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":"Se algo não estiver claro, ligue para nós no {n}. A maioria das perguntas pode ser pulada se você preferir não responder — você ainda poderá receber nossa ajuda.",
+"Nothing is saved on this device. If this page is closed before you submit, everything on it is erased.":"Nada é salvo neste dispositivo. Se esta página for fechada antes de você enviar, tudo será apagado.",
+"If you have a reason to go in a different order, you can continue anyway.":"Se você tiver um motivo para seguir outra ordem, pode continuar mesmo assim.",
+"If you're unsure, call us at {n} — that's what we're here for.":"Se tiver dúvida, ligue para nós no {n} — estamos aqui para isso.",
+"A few words is plenty — we can help you sort it out later.":"Poucas palavras já bastam — podemos ajudar você a esclarecer depois.",
+"Almost done":"Quase pronto",
+"If you can, please sign a release for each person below. Then tap Submit to send your intake to the FRC.":"Se puder, assine uma autorização para cada pessoa abaixo. Depois toque em Enviar para mandar sua admissão ao FRC.",
+"Tap Submit to send your intake to the FRC.":"Toque em Enviar para mandar sua admissão ao FRC.",
+"Please try again. If it still doesn't work, call the FRC at {n}.":"Por favor, tente novamente. Se ainda não funcionar, ligue para o FRC no {n}.",
+"Intake sent":"Admissão enviada",
+"Thank you! Your intake was sent to the FRC. Someone from the FRC will follow up with you.":"Obrigado! Sua admissão foi enviada ao FRC. Alguém do FRC vai entrar em contato com você.",
+"You can close this page now.":"Você já pode fechar esta página.",
+/* --- V16 pre-merge changes: DRAFT — wording from the Portuguese review doc --- */
+"State: Massachusetts — if you live in a different state, please let us know in the Notes section.":"Estado: Massachusetts — se você mora em outro estado, por favor, avise-nos na seção de Notas.",
+"First, what kind of person or place told you about us? Pick the closest fit — if you're not sure, try your best and tell us in the Notes section in your own words.":"Primeiro, que tipo de pessoa ou lugar falou de nós para você? Escolha a opção mais próxima — se não tiver certeza, escolha da melhor forma que puder e conte para nós na seção de Notas, com suas próprias palavras.",
+"Now the specific one. This question can't be skipped — if none of these look right, try your best and tell us in the Notes section in your own words.":"Agora a opção específica. Esta pergunta não pode ser pulada — se nenhuma delas estiver certa, escolha da melhor forma que puder e conte para nós na seção de Notas, com suas próprias palavras.",
+"If you're not sure, just try your best.":"Se você não tiver certeza, responda da melhor forma que puder.",
+"What can we help you with?":"Como podemos ajudar você?",
+"What can we help you with for {n}?":"Como podemos ajudar você com {n}?",
+"Is {n} with you and able to answer a few questions directly?":"{n} está com você e pode responder algumas perguntas diretamente?",
+"We'll add everyone that lives in your home — starting with you. We do need a name, date of birth, and the insurance answer.":"Vamos incluir todas as pessoas que moram na sua casa — começando por você. Precisamos do nome, da data de nascimento e da resposta sobre o seguro de saúde.",
+"Please add everyone that lives in your home — adults and children.":"Por favor, inclua todas as pessoas que moram na sua casa — adultos e crianças.",
+"Printing isn't available. Your intake was sent to the FRC.":"Não é possível imprimir. Sua admissão foi enviada ao FRC.",
+"Printing isn't available.":"Não é possível imprimir.",
+"How we can help":"Como podemos ajudar"
 },
 ht: {
 /* --- chrome / navigation --- */
@@ -1330,7 +1411,6 @@ ht: {
 "Answer however you're comfortable.":"Reponn jan ou santi ou alèz.",
 "Answer however you're comfortable — none of this changes what help is available.":"Reponn jan ou santi ou alèz — anyen nan sa pa chanje èd ki disponib.",
 "This helps us avoid duplicating supports already in place.":"Sa ede nou pa double sipò ki deja egziste.",
-"We'll add everyone in your household — starting with you. We do need a name, date of birth, and the insurance answer.":"Nou pral ajoute tout moun nan kay ou a — kòmanse ak ou menm. Nou bezwen non an, dat nesans lan, ak repons lan sou asirans sante.",
 "We do need a name, date of birth, and the insurance answer.":"Nou bezwen non an, dat nesans lan, ak repons lan sou asirans sante.",
 /* --- family screens --- */
 "Your family":"Fanmi ou","Family last name":"Siyati fanmi an","Last name":"Siyati",
@@ -1431,7 +1511,6 @@ ht: {
 /* --- roster / household flow --- */
 "Your household":"Kay ou",
 "Are there any other people in your house you haven't told us about yet?":"Èske gen lòt moun nan kay ou a ou poko pale nou de yo?",
-"We'd like to include everyone who lives with you — adults and children.":"Nou vle enkli tout moun k ap viv ak ou — granmoun ak timoun.",
 "Yes — add someone":"Wi — ajoute yon moun","No — that's everyone":"Non — se tout",
 "+ Add a household member":"+ Ajoute yon manm nan kay la",
 "(no name yet)":"(poko gen non)",
@@ -1812,7 +1891,39 @@ ht: {
 "We need to have a full intake for you and for your child who was referred to us. Please complete both before finishing. For other members of the family, we only need their name, date of birth, and whether they have health insurance.":"Nou bezwen yon admisyon konplè pou ou ak pou pitit ou yo te refere ban nou an. Tanpri konplete toude anvan ou fini. Pou lòt manm fanmi an, nou bezwen sèlman non, dat nesans, ak si yo gen asirans sante.",
 "If you're not on this list yet, tap “+ Add a household member” to add yourself.":"Si ou poko sou lis la, touche “+ Ajoute yon manm nan kay la” pou ajoute tèt ou.",
 "If your child isn't listed yet, tap “+ Add a household member”.":"Si pitit ou a poko sou lis la, touche “+ Ajoute yon manm nan kay la”.",
-"This button turns on once an adult's intake and a child's intake are both complete.":"Bouton sa a ap mache lè admisyon yon granmoun ak admisyon yon timoun fini."
+"This button turns on once an adult's intake and a child's intake are both complete.":"Bouton sa a ap mache lè admisyon yon granmoun ak admisyon yon timoun fini.",
+/* --- V16: release of information (signed on the tablet) --- */
+"Sign release for {n}":"Siyen otorizasyon pou {n}",
+"Release form for {n}":"Fòm otorizasyon pou {n}",
+"Close":"Fèmen",
+"Thank you":"Mèsi",
+"Release signed ✓":"Otorizasyon siyen ✓",
+/* --- V16: remote mode (?remote) --- */
+"If anything is confusing, call us at {n}. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.":"Si yon bagay pa klè, rele nou nan {n}. Ou ka sote pifò kesyon yo si ou pa vle reponn — ou ap toujou ka jwenn èd nan men nou.",
+"Nothing is saved on this device. If this page is closed before you submit, everything on it is erased.":"Anyen pa anrejistre sou aparèy sa a. Si paj sa a fèmen anvan ou soumèt, tout bagay efase.",
+"If you have a reason to go in a different order, you can continue anyway.":"Si ou gen yon rezon pou swiv yon lòt lòd, ou ka kontinye kanmenm.",
+"If you're unsure, call us at {n} — that's what we're here for.":"Si ou pa sèten, rele nou nan {n} — se pou sa nou la.",
+"A few words is plenty — we can help you sort it out later.":"Kèk mo sifi — nou ka ede ou klarifye sa pita.",
+"Almost done":"Prèske fini",
+"If you can, please sign a release for each person below. Then tap Submit to send your intake to the FRC.":"Si ou kapab, tanpri siyen yon otorizasyon pou chak moun ki anba a. Apre sa, touche Soumèt pou voye admisyon ou bay FRC a.",
+"Tap Submit to send your intake to the FRC.":"Touche Soumèt pou voye admisyon ou bay FRC a.",
+"Please try again. If it still doesn't work, call the FRC at {n}.":"Tanpri eseye ankò. Si li toujou pa mache, rele FRC a nan {n}.",
+"Intake sent":"Admisyon an voye",
+"Thank you! Your intake was sent to the FRC. Someone from the FRC will follow up with you.":"Mèsi! Admisyon ou an te voye bay FRC a. Yon moun nan FRC a ap kontakte ou.",
+"You can close this page now.":"Ou ka fèmen paj sa a kounye a.",
+/* --- V16 pre-merge changes: DRAFT — review with bilingual staff --- */
+"State: Massachusetts — if you live in a different state, please let us know in the Notes section.":"Eta: Massachusetts — si ou abite nan yon lòt eta, tanpri fè nou konnen nan seksyon Nòt la.",
+"First, what kind of person or place told you about us? Pick the closest fit — if you're not sure, try your best and tell us in the Notes section in your own words.":"Premyèman, ki kalite moun oswa kote ki te pale ou de nou? Chwazi sa ki pi pre a — si ou pa sèten, fè sa ou kapab epi di nou nan seksyon Nòt la ak pwòp mo pa ou.",
+"Now the specific one. This question can't be skipped — if none of these look right, try your best and tell us in the Notes section in your own words.":"Kounye a chwa espesifik la. Kesyon sa a pa ka sote — si okenn nan yo pa kòrèk, fè sa ou kapab epi di nou nan seksyon Nòt la ak pwòp mo pa ou.",
+"If you're not sure, just try your best.":"Si ou pa sèten, jis reponn jan ou kapab.",
+"What can we help you with?":"Ki jan nou ka ede ou?",
+"What can we help you with for {n}?":"Ki jan nou ka ede ou pou {n}?",
+"Is {n} with you and able to answer a few questions directly?":"Èske {n} avè ou epi li ka reponn kèk kesyon dirèkteman?",
+"We'll add everyone that lives in your home — starting with you. We do need a name, date of birth, and the insurance answer.":"Nou pral ajoute tout moun ki abite lakay ou — kòmanse ak ou menm. Nou bezwen non an, dat nesans lan, ak repons lan sou asirans sante.",
+"Please add everyone that lives in your home — adults and children.":"Tanpri ajoute tout moun ki abite lakay ou — granmoun ak timoun.",
+"Printing isn't available. Your intake was sent to the FRC.":"Ou pa ka enprime. Admisyon ou an te voye bay FRC a.",
+"Printing isn't available.":"Ou pa ka enprime.",
+"How we can help":"Kijan nou ka ede"
 }
 };
 /* ============ DATA ============ */
@@ -1993,7 +2104,7 @@ const ROLE_ALIASES = {
  "noivo":["Fiance"],"noiva":["Fiance"],
  "padrasto":["Step-Parent"],"madrasta":["Step-Parent"],"enteado":["Step-Child"],"enteada":["Step-Child"],
  "sogra":["Mother-In-Law"],"parceiro":["Partner","Co-partner"],"parceira":["Partner","Co-partner"],
- "responsavel":["Legal Guardian Parent","Temporary Guardian"],
+ "responsavel":["Legal Guardian Parent","Temporary Guardian","Co-partner"],"guarda":["Co-partner"],"coparentalidade":["Co-partner"],
  "cuidador":["Kinship","Foster Parent","Legal Guardian Parent"],"cuidadora":["Kinship","Foster Parent","Legal Guardian Parent"],
  "amigo":["Friend","Family Friend"],"amiga":["Friend","Family Friend"],
  "eu":["Self"],
@@ -2174,15 +2285,39 @@ const state = {
 
 /* ============ URL TAGS ============
    Read once at load (never stored):
-   ?cra       CRA mode on and locked for the session (the link staff send to CRA families)
-   ?lang=xx   start in es, pt or ht; anything else starts in English
-   They combine: ?cra&lang=es */
+   ?cra          CRA mode on and locked for the session (the link staff send to CRA families)
+   ?lang=xx      start in es, pt or ht; anything else starts in English
+   ?remote       remote mode, locked on: the family finishes on their own device
+                 (Almost done → Submit → Intake sent), no staff hand-off
+   ?releasetest  staff only: shows the release buttons before they're on for everyone
+   They combine: ?remote&cra&lang=es */
 const URL_TAGS = new URLSearchParams(location.search);
 function urlTag(name){ for(const [k,v] of URL_TAGS) if(k.toLowerCase()===name) return v; return null; }
 const CRA_LOCKED = urlTag("cra")!==null;
 state.cra = CRA_LOCKED;
 const URL_LANG = (urlTag("lang")||"").trim().toLowerCase();
 if(hasOwn(I18N, URL_LANG)) LANG = URL_LANG;   /* set before the first render */
+const REMOTE = urlTag("remote")!==null;
+const RELEASE_TEST = urlTag("releasetest")!==null;
+/* the number remote mode's "call us" lines give */
+const FRC_PHONE = "978-296-8080";
+/* A client line written for the FRC tablet, and its remote version. Returns
+   the untranslated line; where it has {n}, the caller fills it in with trn()
+   (FRC_PHONE or a name). Add both versions to the dictionaries. */
+function byMode(kiosk, remote){ return REMOTE ? remote : kiosk; }
+/* keep the phone number on one line wherever a screen shows it */
+function keepPhoneTogether(root){
+  const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), hits = [];
+  while(walk.nextNode()) if(walk.currentNode.nodeValue.includes(FRC_PHONE)) hits.push(walk.currentNode);
+  for(const t of hits){
+    const frag = document.createDocumentFragment();
+    t.nodeValue.split(FRC_PHONE).forEach((part, i)=>{
+      if(i) frag.appendChild(el("span",{class:"phone"}, FRC_PHONE));
+      if(part) frag.appendChild(document.createTextNode(part));
+    });
+    t.replaceWith(frag);
+  }
+}
 
 let nextId = 1;
 function newMember(){
@@ -2405,7 +2540,7 @@ function render(preserveScroll){
   const LANG_OPTIONS = [
     ["en","English",false],
     ["es","Espa\u00f1ol",false],
-    ["pt","Portugu\u00eas",true],
+    ["pt","Portugu\u00eas",false],
     ["ht","Krey\u00f2l",true],
   ];
   const langSel = el("select",{id:"langSelect", style:"padding:8px 10px; font-size:15px; border-radius:8px; border:1px solid var(--border,#ccc); background:#fff;",
@@ -2426,6 +2561,7 @@ function render(preserveScroll){
   try{ scr = SCREENS[current.id](current.ctx); }
   catch(err){ console.error("Screen failed:", current.id, err); PS_TR = false; scr = crashScreen(); }
   app.appendChild(scr);
+  if(REMOTE){ keepPhoneTogether(app); remotePrintNotice(); }
   if(preserveScroll) window.scrollTo(x, y);
   else window.scrollTo(0,0);
 }
@@ -2439,7 +2575,7 @@ function crashScreen(){
       el("button",{class:"btn-primary", type:"button", onclick:()=>{
         if(history.length>1){ history.pop(); current = history[history.length-1]; render(false); }
       }}, tr("Go back")),
-      el("button",{class:"btn-ghost", type:"button", onclick:()=>{
+      REMOTE ? null : el("button",{class:"btn-ghost", type:"button", onclick:()=>{
         try{ buildPrint(); }
         catch(e){ const r=document.getElementById("printRoot"); r.style.whiteSpace="pre-wrap"; r.textContent=JSON.stringify(state,null,2); }
         window.print();
@@ -2456,7 +2592,7 @@ function progressInfo(id, ctx){
   if(id==="welcome") return null;
   const anyDone = state.members.some(x=>x.done);
   const listStep = anyDone ? 3 : 2;
-  if(id==="finish") return {step:4, pct:null};
+  if(id==="finish") return (REMOTE && state.submitted) ? null : {step:4, pct:null};
   if(state.phase==="build" && STEP1_SCREENS.includes(id)){
     /* adding extra household members loops basics <-> anyoneElse; hold the bar steady */
     const pos = (id==="basics" && !ctx.first) ? "anyoneElse" : id;
@@ -2537,19 +2673,22 @@ SCREENS.welcome = () => shell({
   noBack:true,
   body:[
     el("p",null,"This will walk you through our intake, one small step at a time."),
-    el("div",{class:"notice"},"A staff member is nearby if anything is confusing — just ask. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us."),
+    el("div",{class:"notice"},trn(byMode("A staff member is nearby if anything is confusing — just ask. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us.",
+      "If anything is confusing, call us at {n}. Most questions can be skipped if you'd rather not answer — you'll still be able to get help from us."), FRC_PHONE)),
     el("p",{class:"subtle"},"You can change the language at any time using the dropdown in the top corner."),
-    el("p",{class:"subtle"},"Nothing is saved on this tablet. When this page is closed, everything on it is erased."),
+    el("p",{class:"subtle"},byMode("Nothing is saved on this tablet. When this page is closed, everything on it is erased.",
+      "Nothing is saved on this device. If this page is closed before you submit, everything on it is erased.")),
     craControl()
   ],
   next:()=>goTo("famBasics"), nextLabel:"Start"
 });
 /* Staff-facing CRA mode switch on Welcome. English only: the text node
    skips tr(), so it never picks up a translation. On the ?cra link it's
-   locked on and shown as a plain label. */
+   locked on and shown as a plain label. Hidden in remote mode. */
 function craControl(){
   const txt = ()=>document.createTextNode("CRA mode");
   if(CRA_LOCKED) return el("div",{class:"cra-row"}, el("span",{class:"cra-tag"}, txt()));
+  if(REMOTE) return null;   /* families' own devices: no staff switch */
   return el("div",{class:"cra-row"}, el("button",{type:"button", class:state.cra ? "cra-tag" : "cra-off",
     "aria-pressed":String(state.cra), onclick:()=>{ state.cra = !state.cra; rerender(); }}, txt()));
 }
@@ -2633,7 +2772,8 @@ SCREENS.famHome = () => {
         el("div",null, qLabel("City/Town"), (function(){
           const i=qText(a,"city",{ph:"City or town", oninput:()=>{a.cityAuto=false;}});
           i.id="cityInp"; return i; })())),
-      el("p",{class:"subtle"},"State: Massachusetts (tell a staff member if that's not right)")
+      el("p",{class:"subtle"},byMode("State: Massachusetts (tell a staff member if that's not right)",
+        "State: Massachusetts — if you live in a different state, please let us know in the Notes section."))
     ],
     canNext: !!f.living,
     why:"To continue, please answer the question above.",
@@ -2664,14 +2804,16 @@ SCREENS.refSource = () => {
   const cat = REFERRAL_CATS.find(c=>c.cat===r.category);
   const body = [];
   if(!cat){
-    body.push(el("p",{class:"hint"},"First, what kind of person or place told you about us? Pick the closest fit — a staff member can help if you're not sure."));
+    body.push(el("p",{class:"hint"},byMode("First, what kind of person or place told you about us? Pick the closest fit — a staff member can help if you're not sure.",
+      "First, what kind of person or place told you about us? Pick the closest fit — if you're not sure, try your best and tell us in the Notes section in your own words.")));
     body.push(qSingle(REFERRAL_CATS.map(c=>({v:c.cat, ex:c.ex})), ()=>r.category,
       v=>{ r.category=v; r.value=null; }, {stack:true, toggle:false, bold:true}));
   } else {
     body.push(el("div",{class:"notice"},"Category: ", el("b",null,cat.cat), " ",
       el("button",{class:"skiplink", type:"button",
         onclick:()=>{ r.category=null; r.value=null; rerender(); }},"change")));
-    body.push(el("p",{class:"hint"},"Now the specific one. This question can't be skipped — ask a staff member if none of these look right."));
+    body.push(el("p",{class:"hint"},byMode("Now the specific one. This question can't be skipped — ask a staff member if none of these look right.",
+      "Now the specific one. This question can't be skipped — if none of these look right, try your best and tell us in the Notes section in your own words.")));
     body.push(qSingle(cat.items, ()=>r.value, v=>r.value=v, {stack:true, toggle:false}));
   }
   return shell({
@@ -2723,7 +2865,7 @@ SCREENS.basics = (ctx) => {
     title:title,
     comfort:el("span",null,
       el("b",{style:"color:var(--ink);"}, firstEver ?
-        "We'll add everyone in your household — starting with you. We do need a name, date of birth, and the insurance answer." :
+        "We'll add everyone that lives in your home — starting with you. We do need a name, date of birth, and the insurance answer." :
         "We do need a name, date of birth, and the insurance answer."),
       COMFORT_TAIL),
     body:[
@@ -2780,7 +2922,7 @@ SCREENS.anyoneElse = () => shell({
   body:[
     rosterList(false),
     qLabel("Are there any other people in your house you haven't told us about yet?"),
-    el("p",{class:"hint"},"We'd like to include everyone who lives with you — adults and children.")
+    el("p",{class:"hint"}, el("b",{style:"color:var(--ink);"},"Please add everyone that lives in your home — adults and children."))
   ],
   next:()=>openDraft(),
   nextLabel:"Yes — add someone",
@@ -2857,7 +2999,8 @@ SCREENS.redirect = (ctx) => {
     title:"One suggestion first",
     body:[
       el("p",null,"Usually the adult filling this out completes their own intake first — it helps us understand the whole family."),
-      el("p",{class:"subtle"},"If you're staff or have a reason to go in a different order, you can continue anyway.")
+      el("p",{class:"subtle"},byMode("If you're staff or have a reason to go in a different order, you can continue anyway.",
+        "If you have a reason to go in a different order, you can continue anyway."))
     ],
     next:()=>{ back(); },
     nextLabel:"Okay — I'll do mine first",
@@ -2920,7 +3063,8 @@ SCREENS.rosterSelect = (ctx) => {
   body.push(el("p",{class:"hint"},"A green check means that person's intake is complete."));
   body.push(rosterList(true, suggestId));
   if(anyDone){
-    body.push(el("div",{class:"notice", style:"font-size:16.5px; font-weight:600;"},"If you're unsure, just ask a staff member — that's what we're here for."));
+    body.push(el("div",{class:"notice", style:"font-size:16.5px; font-weight:600;"},trn(byMode("If you're unsure, just ask a staff member — that's what we're here for.",
+      "If you're unsure, call us at {n} — that's what we're here for."), FRC_PHONE)));
   }
   body.push(el("button",{class:"btn-quiet", type:"button", style:"margin-top:6px;",
     onclick:()=>openDraft({returnTo:"rosterSelect"})},
@@ -3133,7 +3277,8 @@ function reasonBlock(m){
   const a=m.a; if(!a.reasonPicks) a.reasonPicks=[];
   const child = isChild(m);
   return [
-    qLabel(child ? trn("What brings you in for {n} today?", displayName(m)) : "What brings you in today?"),
+    qLabel(child ? trn(byMode("What brings you in for {n} today?", "What can we help you with for {n}?"), displayName(m))
+      : byMode("What brings you in today?", "What can we help you with?")),
     el("p",{class:"hint"},"Tap anything that fits — then add anything else in your own words. A few words is plenty, no story needed."),
     qMulti(reasonPickOptions(m), ()=>a.reasonPicks),
     qLabel("Anything else, in your own words"),
@@ -3182,8 +3327,9 @@ function adultSteps(m){
       skipRow(()=>a.marital, v=>a.marital=v)
     ], canNext:true }),
   /* 4 */
-  (m)=>({ title:"What brings you in",
-    comfort:comfort("A few words is plenty — a staff member can help you sort it out."),
+  (m)=>({ title:byMode("What brings you in", "How we can help"),
+    comfort:comfort(byMode("A few words is plenty — a staff member can help you sort it out.",
+      "A few words is plenty — we can help you sort it out later.")),
     body: reasonBlock(m),
     canNext:true }),
   /* 5 */
@@ -3313,7 +3459,7 @@ function childSteps(m){
     if(a.craUnder12) a.craActive=null;   /* was auto-set while under 12 — ask it now */
     a.craUnder12=false;
     return { title:trn("Court status for {n}", kid()),
-    comfort:"If you're not sure, a staff member can help.",
+    comfort:byMode("If you're not sure, a staff member can help.", "If you're not sure, just try your best."),
     body:[
       qLabel(trn("Is there an active CRA for {n}?", kid()),"CRA stands for Child Requiring Assistance — a type of juvenile court case, sometimes filed by a parent or a school."),
       qSingle(["Yes","No"], ()=>a.craActive, v=>a.craActive=v, {toggle:false}),
@@ -3342,8 +3488,9 @@ function childSteps(m){
       famStatusBlock(m)
     ], canNext:true }),
   /* 4: reason for visit */
-  (m)=>({ title:trn("What brings {n} in", kid()),
-    comfort:comfort("A few words is plenty — a staff member can help you sort it out."),
+  (m)=>({ title:trn(byMode("What brings {n} in", "How we can help"), kid()),
+    comfort:comfort(byMode("A few words is plenty — a staff member can help you sort it out.",
+      "A few words is plenty — we can help you sort it out later.")),
     body: reasonBlock(m),
     canNext:true }),
   /* 5: school part 1 */
@@ -3455,7 +3602,8 @@ function childSteps(m){
     return { title:trn("A few questions for {n}", kid()),
     comfort:"It's okay if they're not here or would rather not.",
     body:[
-      qLabel(trn("Is {n} present and able to answer a few questions directly?", kid())),
+      qLabel(trn(byMode("Is {n} present and able to answer a few questions directly?",
+        "Is {n} with you and able to answer a few questions directly?"), kid())),
       qSingle(["Yes","No"], ()=>a.childPresent, v=>{
         a.childPresent=v;
         if(v==="No"){ a.safeHome="Did not answer"; a.safeSchool="Did not answer"; a.safeStreets="Did not answer";
@@ -3765,12 +3913,14 @@ SCREENS.review = (ctx) => {
 
 /* ============ FINISH & PRINT ============ */
 SCREENS.finish = () => {
+  if(REMOTE) return state.submitted ? remoteSentScreen() : remoteFinishScreen();
   if(!state.showStaffPanel){
     /* Client-facing — no exit option at all. Only the plain staff-reveal button moves forward. */
     return shell({
       title:"All set!",
       body:[
         el("p",null,"Thanks for completing the intake. You shouldn't have to complete one again in the future! Give yourself a high five, and hand the tablet over to an FRC staff member to take care of the rest."),
+        releaseButtons(),
       ],
       noBack:true,
       extraNav: el("button",{class:"btn-quiet", type:"button",
@@ -3782,33 +3932,13 @@ SCREENS.finish = () => {
     body:[
       el("div",{class:"notice"},"Staff: use Print to make the data-entry copy. Nothing is saved on this device — closing or refreshing this page erases everything, so print first."),
       state.submitStatus ? el("div",{class:"notice"}, state.submitStatus) : null,
+      releaseStaffButtons(),
     ],
     noBack:true,
     next: async ()=>{
       if(!finishRule().ok){ goTo("rosterSelect"); return; }   /* never send an intake that doesn't meet the rule */
-      state.submitting = true;
       state.submitStatus = "Submitting…";
-      rerender();
-      let outcome;
-      /* try/finally: any error still releases the button (it used to stay on "Submitting…" for good) */
-      try{
-        const printHtml = buildPrint();
-        const payload = {
-          family: state.family,
-          referral: state.referral,
-          /* m.stash (answers parked by a DOB change) is never sent */
-          members: state.members.map(({stash, ...m})=>m),
-          submittedAt: new Date().toISOString(),
-          printHtml: printHtml
-        };
-        outcome = await submitIntake(payload);
-      }catch(err){
-        console.error("Submit failed before sending:", err);
-        outcome = {success:false};
-      }finally{
-        state.submitting = false;
-      }
-      state.submitted = outcome.success;
+      const outcome = await sendIntake();
       state.submitStatus = outcome.success ? "Submitted."
         : outcome.timedOut ? "Submission timed out — please submit again, or print a copy to send to the FRC."
         : "Submission failed — please try again or download/print a copy to send to the FRC.";
@@ -3838,6 +3968,79 @@ SCREENS.finish = () => {
     )
   });
 };
+
+/* Sends the intake (staff panel Submit and remote mode's Submit). Shows the
+   button as "Submitting…" meanwhile; try/finally: any error still releases
+   the button (it used to stay on "Submitting…" for good). */
+async function sendIntake(){
+  state.submitting = true;
+  rerender();
+  let outcome;
+  try{
+    const printHtml = buildPrint();
+    const payload = {
+      family: state.family,
+      referral: state.referral,
+      /* m.stash (answers parked by a DOB change) is never sent */
+      members: state.members.map(({stash, ...m})=>m),
+      submittedAt: new Date().toISOString(),
+      printHtml: printHtml
+    };
+    outcome = await submitIntake(payload);
+  }catch(err){
+    console.error("Submit failed before sending:", err);
+    outcome = {success:false};
+  }finally{
+    state.submitting = false;
+  }
+  state.submitted = outcome.success;
+  return outcome;
+}
+
+/* ---- Remote mode (?remote): the family finishes on their own device ----
+   "Almost done" (release buttons, encouraged but not required) → Submit →
+   "Intake sent". No staff panel, Print or Start over. */
+function remoteFinishScreen(){
+  const releases = releaseButtons();
+  const rule = finishRule();
+  return shell({
+    title:"Almost done",
+    body:[
+      el("p",null, releases
+        ? "If you can, please sign a release for each person below. Then tap Submit to send your intake to the FRC."
+        : "Tap Submit to send your intake to the FRC."),
+      releases,
+      state.submitStatus ? el("div",{class:"notice"}, state.submitStatus) : null
+    ],
+    noBack: state.submitting,
+    next: async ()=>{
+      if(!finishRule().ok){ goTo("rosterSelect"); return; }   /* never send an intake that doesn't meet the rule */
+      state.submitStatus = null;
+      const outcome = await sendIntake();
+      if(outcome.success){
+        allowLeave = true;   /* it's been sent: closing the page needs no warning */
+        notesPanel.classList.remove("open"); notesFab.style.display = "none";   /* a note typed now wouldn't be sent */
+      } else {
+        state.submitStatus = trn("Please try again. If it still doesn't work, call the FRC at {n}.", FRC_PHONE);
+      }
+      rerender();
+    },
+    nextLabel: state.submitting ? "Submitting…" : "Submit",
+    canNext: !state.submitting && rule.ok,
+    why: rule.ok ? undefined : rule.why
+  });
+}
+function remoteSentScreen(){
+  return shell({
+    title:"Intake sent",
+    noBack:true,
+    body:[
+      el("p",null, el("span",{class:"check"},"✓ "),
+        "Thank you! Your intake was sent to the FRC. Someone from the FRC will follow up with you."),
+      el("p",{class:"subtle"},"You can close this page now.")
+    ]
+  });
+}
 
 function miniCard(m){
   return '<div class="p-card">'+
@@ -3879,7 +4082,8 @@ function buildPrint(){
   const f = state.family, ad = f.address;
   const kids = state.members.filter(m=>isChild(m)).length;
   let h = '<div class="p-title">Family Intake — '+esc(f.lastName||"(no family name)")+'</div>';
-  h += '<div class="p-meta">Completed '+todayStr()+' · Printed from the intake tablet · Enter into CRM, then shred.</div>';
+  h += '<div class="p-meta">Completed '+todayStr()+(REMOTE ? ' · Submitted from the family\'s own device' : ' · Printed from the intake tablet')+' · Enter into CRM, then shred.</div>';
+  if(REMOTE) h += '<div class="p-cra">Completed remotely — the family filled out and submitted this intake on their own device.</div>';
   if(state.cra) h += '<div class="p-cra">CRA mode — this visit required an adult intake and a child intake.</div>';
 
   h += '<div class="p-section"><h3>FAMILY — Family Information</h3>'+
@@ -3901,7 +4105,7 @@ function buildPrint(){
 
   h += '<div class="p-section"><h3>FAMILY — Referral Source (exactly one)</h3>'+
     pLine("How did you hear about us?", state.referral.value) +
-    '<div class="p-line">Category chosen on tablet: '+esc(state.referral.category||"—")+'</div></div>';
+    '<div class="p-line">Category chosen '+(REMOTE ? 'by the family' : 'on tablet')+': '+esc(state.referral.category||"—")+'</div></div>';
 
   /* Family member mini-cards — quick reference for CRM entry */
   h += '<div class="p-section"><h3>FAMILY MEMBERS — quick reference (add each to CRM)</h3><div class="p-cards">';
@@ -3960,7 +4164,7 @@ function buildPrint(){
     if(!(m.services && m.done)) continue;
     const name = esc(fullName(m)||"(no name)");
     const a = m.a||{};
-    roiHtml += '<div class="p-roi-line">\u2610 '+name+' - CFFS/JRI</div>';
+    roiHtml += '<div class="p-roi-line">\u2610 '+name+' - CFFS/JRI'+(m.releaseSigned?' \u2014 signed '+(REMOTE?'remotely':'on tablet')+' \u2713':'')+'</div>';
     for(const ag of RELEASE_AGENCIES){
       if((a.agencies||[]).includes(ag)){
         roiHtml += '<div class="p-roi-line">\u2610 '+name+' - '+esc(ag.split(" ")[0])+'</div>';
@@ -3979,9 +4183,131 @@ function buildPrint(){
       esc(state.notesText).replace(/\n/g,'<br>')+'</div></div>';
   }
 
-  document.getElementById("printRoot").innerHTML = h;
+  /* remote mode: only the submitted string; the staff copy never goes in #printRoot */
+  if(!REMOTE) document.getElementById("printRoot").innerHTML = h;
   return h;
 }
+/* Remote mode: if the page is printed anyway (browser Print, Share > Print),
+   this is all that prints — never the staff copy or the screen. */
+function remotePrintNotice(){
+  document.getElementById("printRoot").replaceChildren(el("div",{class:"p-remote-note"},
+    state.submitted ? "Printing isn't available. Your intake was sent to the FRC." : "Printing isn't available."));
+}
+
+/* ============ RELEASE OF INFORMATION (Jotform, signed in the intake) ============
+   "All set!" (remote mode: "Almost done") shows one "Sign release for {name}"
+   button per completed intake.
+   It opens the prefilled CFFS/JRI release in a full-screen panel. The intake
+   page itself never navigates (leaving it erases the intake): the release
+   loads in a sandboxed iframe that can't navigate the top page. Jotform's
+   Thank You setting redirects the panel to release-done.html, which posts
+   {type:"release-signed"}; the intake then shows "Thank you", closes the
+   panel and marks the person (their button turns into "Release signed ✓"
+   and stops opening the release, "signed on tablet ✓" (remote: "signed
+   remotely ✓") in the printout's Releases box, releaseSigned:true in the
+   submitted JSON). On the kiosk, the staff panel can open the release for
+   anyone who hasn't signed and redo a signed one. Closing early or a failed
+   load changes nothing.
+   The release URL holds the person's name and DOB: never log it, store it,
+   or send it anywhere but the iframe.
+   Release buttons stay hidden (the intake works exactly as before) until
+   RELEASE_FOR_EVERYONE is true. Until then, staff can test them on the live
+   site with the staff-only ?releasetest link. */
+const RELEASE_FOR_EVERYONE = false;
+const RELEASE_ENABLED = RELEASE_FOR_EVERYONE || RELEASE_TEST;
+const RELEASE_FORM_URL = "https://form.jotform.com/262673921694064";
+const RELEASE_JOTFORM_LANG = {en:"en", es:"es", pt:"pt", ht:"bzj"};
+const RELEASE_THANKS_MS = 5000;
+/* same people as the printout's Releases box */
+function releasePeople(){ return state.members.filter(m=>m.services && m.done); }
+function legalName(m){ return [m.first.trim(), m.last.trim()].filter(Boolean).join(" "); }
+/* who consents for a child: the primary contact, else the first completed adult */
+function releaseConsentAdult(){
+  return state.members.find(x=>x.isSelf && !isChild(x)) || state.members.find(x=>x.done && !isChild(x)) || null;
+}
+function releaseUrl(m){
+  const parts = [];
+  const add = (k, v)=>{ if(v) parts.push(k+"="+encodeURIComponent(v)); };
+  const [y, mo, d] = (m.dob||"").split("-");   /* m.dob is YYYY-MM-DD, already zero-padded */
+  const consent = isChild(m) ? releaseConsentAdult() : m;
+  add("clientname[first]", m.first.trim());
+  add("clientname[last]", m.last.trim());
+  add("dob[month]", mo); add("dob[day]", d); add("dob[year]", y);
+  add("input26[shorttext-1]", consent ? legalName(consent) : "");   /* Jotform copies it to the second spot */
+  add("language", RELEASE_JOTFORM_LANG[LANG] || "en");
+  return RELEASE_FORM_URL+"?"+parts.join("&");
+}
+function releaseButtons(){
+  if(!RELEASE_ENABLED) return null;
+  const people = releasePeople();
+  if(!people.length) return null;
+  /* once signed, the button can't reopen the release (no duplicate signed
+     releases in Jotform); on the kiosk, staff can redo it from the staff panel */
+  return el("div",{class:"rel-list"}, ...people.map(m=>el("div",{class:"rel-row"},
+    m.releaseSigned
+      ? el("button",{class:"btn-quiet rel-signed", type:"button", disabled:true}, "Release signed ✓")
+      : el("button",{class:"btn-primary", type:"button", onclick:()=>openRelease(m)},
+          trn("Sign release for {n}", m.first.trim())))));
+}
+/* Staff panel (kiosk): open the release for anyone who hasn't signed, or redo
+   a signed one after a warning. Staff-facing, so English only (deliberately
+   not in the dictionaries). */
+function releaseStaffButtons(){
+  if(!RELEASE_ENABLED) return null;
+  const people = releasePeople();
+  if(!people.length) return null;
+  return el("div",{class:"rel-staff"}, ...people.map(m=>{
+    const name = m.first.trim();
+    return m.releaseSigned
+      ? el("button",{class:"btn-ghost", type:"button",
+          onclick:()=>confirmBox(name+"'s release is already signed. Open it again? Signing again creates a second signed release in Jotform.",
+            "Open release", "Cancel", ()=>openRelease(m, true))},
+          "Redo release for "+name)
+      : el("button",{class:"btn-ghost", type:"button", onclick:()=>openRelease(m)}, "Open release for "+name);
+  }));
+}
+let releasePanel = null;   /* {mid, overlay, frame, body, signed, timer, prevOverflow} while open */
+function openRelease(m, redo){
+  if(releasePanel || (m.releaseSigned && !redo)) return;   /* signed: only the staff panel's redo reopens it */
+  if(state.submitting) return;   /* a release signed mid-submit would miss the submission */
+  const title = trn("Release form for {n}", m.first.trim());
+  const spinner = el("div",{class:"rel-spin", "aria-hidden":"true"});
+  /* no allow-top-navigation of any kind: the release can never take the intake page away */
+  const frame = el("iframe",{title:title, sandbox:"allow-scripts allow-forms allow-same-origin allow-popups"});
+  frame.addEventListener("load", ()=>spinner.remove());
+  frame.src = releaseUrl(m);
+  const body = el("div",{class:"rel-body"}, spinner, frame);
+  const overlay = el("div",{class:"rel-overlay", role:"dialog", "aria-modal":"true", "aria-label":title},
+    el("div",{class:"rel-head"},
+      el("div",{class:"rel-title"}, title),
+      el("button",{class:"btn-quiet rel-close", type:"button", onclick:closeRelease}, "Close")),
+    body);
+  releasePanel = {mid:m.id, overlay:overlay, frame:frame, body:body, signed:false, timer:null,
+    prevOverflow:document.documentElement.style.overflow};
+  document.documentElement.style.overflow = "hidden";   /* the intake behind the panel stays put */
+  document.body.appendChild(overlay);
+}
+function closeRelease(){
+  const p = releasePanel; if(!p) return;
+  clearTimeout(p.timer);
+  p.overlay.remove();   /* the iframe goes with it, and so does the release URL */
+  document.documentElement.style.overflow = p.prevOverflow;
+  releasePanel = null;
+}
+/* Only counts when it comes from the open panel's iframe, on the intake's own site (release-done.html) */
+function onReleaseMessage(e){
+  const p = releasePanel;
+  if(!p || p.signed || e.origin!==location.origin || e.source!==p.frame.contentWindow) return;
+  if(!e.data || e.data.type!=="release-signed") return;
+  p.signed = true;
+  const m = state.members.find(x=>x.id===p.mid);
+  if(m) m.releaseSigned = true;   /* signed already, even if Close is tapped during the Thank you */
+  p.body.appendChild(el("div",{class:"rel-thanks", role:"status"},
+    el("div",{class:"check", "aria-hidden":"true"},"✓"), "Thank you"));
+  p.timer = setTimeout(closeRelease, RELEASE_THANKS_MS);
+  if(current && current.id==="finish") rerender();
+}
+if(RELEASE_ENABLED) window.addEventListener("message", onReleaseMessage);
 
 /* ============ NOTES WIDGET (persistent floating note, all screens) ============
    Built once, outside the #app render cycle, so it survives every screen
