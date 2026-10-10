@@ -2,7 +2,7 @@
 <!-- Release "Thank you" page (Version 16). Jotform's Thank You setting redirects the
      release here after it's signed in the intake's panel; this page tells the intake
      (its parent window) so the panel can close. ?lang=es|pt|ht picks the language
-     (Jotform's bzj also means Haitian Creole); anything else shows English.
+     (bzj, the old code, still means Haitian Creole); anything else shows English.
      ?form=<Jotform form ID> (Version 16.3): opened directly (not in the intake), the
      page also shows "Fill out another release", back to that form. Only the two
      release forms below are linked; any other value shows no button. -->
@@ -35,9 +35,9 @@ const THANKS = {en:"Thank you", es:"Gracias", pt:"Obrigado", ht:"Mèsi"};
 const AGAIN = {en:"Fill out another release", es:"Llenar otra autorización", pt:"Preencher outra autorização", ht:"Ranpli yon lòt otorizasyon"};
 /* the release forms this page may link back to: CFFS/JRI, and other agencies/people */
 const FORMS = ["262673921694064", "262774481459066"];
-const JOTFORM_LANG = {en:"en", es:"es", pt:"pt", ht:"bzj"};
+const JOTFORM_LANG = {en:"en", es:"es", pt:"pt", ht:"ht"};   /* Jotform translation codes */
 let lang = (new URLSearchParams(location.search).get("lang")||"").trim().toLowerCase();
-if(lang==="bzj") lang = "ht";   /* Jotform's code for Haitian Creole */
+if(lang==="bzj") lang = "ht";   /* old code for Haitian Creole (before Version 16.6); still accepted */
 if(!Object.prototype.hasOwnProperty.call(THANKS, lang)) lang = "en";
 document.documentElement.lang = lang;
 document.title = document.getElementById("msg").textContent = THANKS[lang];
