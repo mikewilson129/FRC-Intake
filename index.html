@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 16.5 — see README.md changelog for what changed in this version -->
+<!-- Version 16.6 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -4264,7 +4264,9 @@ const RELEASE_ENABLED = RELEASE_FOR_EVERYONE || RELEASE_TEST;
 const RELEASE_FORM_URL = "https://form.jotform.com/262673921694064";
 /* the release for outside agencies and people (staff panel, after Submit) */
 const OTHER_RELEASE_FORM_URL = "https://form.jotform.com/262774481459066";
-const RELEASE_JOTFORM_LANG = {en:"en", es:"es", pt:"pt", ht:"bzj"};
+/* Jotform translation codes. Haitian Creole (Kreyòl Ayisyen) is "ht" (until
+   Version 16.6 the form's Kreyòl translation was under "bzj", Belize Kriol). */
+const RELEASE_JOTFORM_LANG = {en:"en", es:"es", pt:"pt", ht:"ht"};
 const RELEASE_THANKS_MS = 2500;   /* how long "Thank you" shows before the panel closes */
 /* same people as the printout's Releases box */
 function releasePeople(){ return state.members.filter(m=>m.services && m.done); }

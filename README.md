@@ -244,7 +244,7 @@ a full-screen panel inside the intake page, already filled in:
 | `clientname[first]`, `clientname[last]` | the person's legal first/last name (not preferred name) |
 | `dob[month]`, `dob[day]`, `dob[year]` | their date of birth (`03`, `07`, `1985`) |
 | `input26[shorttext-1]` | the adult giving consent: an adult signs for themselves; for a child, the primary contact (the first adult whose intake was started; the printout marks them "Primary Contact: Yes"), or else the first adult with a completed intake. Jotform copies it to the second spot itself. |
-| `language` | the intake's language: `en`, `es`, `pt`, or `bzj` for Haitian Creole |
+| `language` | the intake's language: `en`, `es`, `pt`, or `ht` (Haitian Creole / Kreyòl Ayisyen) |
 
 Everything prefilled can still be changed in Jotform.
 
@@ -263,7 +263,7 @@ Everything prefilled can still be changed in Jotform.
   to be on the same site as the intake, or the intake ignores it. The
   `?form=` tag gives people who use the form directly (not in the intake)
   a "Fill out another release" button on that page; it's optional. Adding
-  `?lang=es` / `pt` / `ht` (or `bzj`) shows that page in another language,
+  `?lang=es` / `pt` / `ht` shows that page in another language (the old `bzj` still works),
   but it's optional: the intake covers it with its own translated "Thank you".
   Until the redirect is set, people can still sign, but the panel shows
   Jotform's own thank-you page, doesn't close by itself, and nobody is
@@ -425,6 +425,17 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 16.6
+
+- **Fix: Haitian Creole releases open in Kreyòl again.** The release form's
+  Kreyòl translation in Jotform was moved to the correct language, Kreyòl
+  Ayisyen, whose code is `ht` (it had been under `bzj`, Belize Kriol). The
+  intake now opens the release with `language=ht`, and the release "Thank
+  you" page's "Fill out another release" link uses `ht` too. Without this,
+  Haitian Creole families saw the release in English. The "Thank you" page
+  still accepts the old `?lang=bzj`. Name, date of birth and consent
+  prefill were never affected.
 
 ### Version 16.5
 
