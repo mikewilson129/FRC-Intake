@@ -265,9 +265,12 @@ saves it as a PDF in SharePoint.
   (`pdfDocument()`), not the page fragment the Cloudflare copy gets: the
   flow turns it into the PDF with OneDrive's "Convert file", which isn't a
   full browser. It has its own `<style>` block and the same styles inline
-  on each element; no flexbox, grid or `::before`; the family member boxes
-  are a table, three across; each bordered box is a one-cell table. The
-  on-screen Print output and the Cloudflare copy are unchanged.
+  on each element; no flexbox, grid or `::before`; US Letter with 0.5in
+  margins; the family member boxes are a table, three equal columns; each
+  section is its own bordered box (a one-cell table) with a small gap
+  between; checkboxes are plain text, `[X]` and `[ ]`, in case the
+  converter has no symbol or emoji font. The on-screen Print output and
+  the Cloudflare copy are unchanged.
 - **Never affects what the family sees.** It's sent alongside the
   Cloudflare copy with its own 30-second timeout and isn't waited on;
   failures and timeouts are only logged to the browser console. (If the

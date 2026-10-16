@@ -4155,16 +4155,20 @@ function remotePrintButton(){
 
 function miniCard(m){
   return '<div class="p-card">'+
-    '<div class="p-card-name">'+esc(fullName(m)||"(no name)")+' — '+(isChild(m)?"Child":"Adult")+'</div>'+
-    pLine("Last Name", m.last)+
+    '<div class="p-card-name">'+miniCardName(m)+'</div>'+
+    miniCardLines(m)+
+    '</div>';
+}
+function miniCardName(m){ return esc(fullName(m)||"(no name)")+' — '+(isChild(m)?"Child":"Adult"); }
+function miniCardLines(m){
+  return pLine("Last Name", m.last)+
     pFree("Preferred name", m.preferred)+
     pLine("Gender", genderOut(m))+
     pLine("Pronouns", pronounOut(m))+
     pLine("Health insurance", m.insurance)+
     pLine("First Name", m.first)+
     pLine("Birthday", dobOut(m))+
-    pLine("Services needed", servicesOut(m))+
-    '</div>';
+    pLine("Services needed", servicesOut(m));
 }
 
 function needsFor(m){
@@ -4223,11 +4227,14 @@ function buildPrint(forPdf){
 
   /* Family member mini-cards — quick reference for CRM entry */
   if(forPdf){
-    h += '<div class="p-section"><h3>FAMILY MEMBERS — quick reference (add each to CRM)</h3><table class="p-cards">';
+    /* three equal columns; each name is its own cell so the line under it spans the cell */
+    h += '<div class="p-section"><h3>FAMILY MEMBERS — quick reference (add each to CRM)</h3>'+
+      '<table class="p-cards" width="100%" cellspacing="0" cellpadding="0">';
     for(let i=0; i<state.members.length; i+=3){
-      h += '<tr>';
-      for(let j=i; j<i+3; j++) h += j<state.members.length ? '<td class="p-card" width="33%">'+miniCard(state.members[j])+'</td>' : '<td class="p-empty" width="33%"></td>';
-      h += '</tr>';
+      const row = state.members.slice(i, i+3);
+      const pad = '<td class="p-empty" width="33%"></td>'.repeat(3-row.length);
+      h += '<tr>'+row.map(m=>'<td class="p-card-name" width="33%">'+miniCardName(m)+'</td>').join('')+pad+'</tr>'+
+           '<tr>'+row.map(m=>'<td class="p-card" width="33%">'+miniCardLines(m)+'</td>').join('')+pad+'</tr>';
     }
     h += '</table></div>';
   } else {
@@ -4273,7 +4280,7 @@ function buildPrint(forPdf){
       const items = list.filter(x=>x.group===g);
       if(!items.length) continue;
       if(forPdf){
-        needsHtml += '<h4>'+esc(g)+'</h4>';
+        needsHtml += '<div class="p-cat">'+esc(g)+'</div>';
         for(const n of items) needsHtml += '<div class="p-need'+(n.bold?' b':'')+'">\u2610 '+esc(n.txt)+'</div>';
         continue;
       }
@@ -4326,39 +4333,51 @@ function buildPrint(forPdf){
    - one rule per line in the <style> block (LibreOffice, at least, drops
      a rule that directly follows a "}").
    Rule order matters: a later rule wins, inline as in the style block. */
-const PDF_FONT = 'font-family:Arial,Helvetica,"Segoe UI Symbol",sans-serif;';
+const PDF_FONT = 'font-family:Arial,Helvetica,sans-serif;';
 const PDF_RULES = [
   ['.p-title', 'font-size:18px; font-weight:bold; margin:0 0 2px;'],
-  ['.p-person > .p-title', 'page-break-before:always; border-top:3px solid #000; padding-top:8px; margin-top:8px;'],
-  ['.p-meta', 'font-size:11px; margin:0 0 10px;'],
-  ['.p-cra', 'border:2px solid #000; padding:4px 10px; margin:0 0 10px; font-weight:bold; font-size:12.5px;'],
-  ['.p-section', 'border:1px solid #999; padding:10px 12px; margin:0 0 10px; page-break-inside:avoid;'],
+  ['.p-person > .p-title', 'page-break-before:always; border-top:3px solid #000; padding-top:8px; margin-top:0;'],
+  ['.p-meta', 'font-size:11px; margin:0 0 8px;'],
+  ['.p-cra', 'border:2px solid #000; padding:4px 10px; font-weight:bold; font-size:12.5px;'],
+  ['.p-section', 'border:1px solid #999; padding:10px 12px; page-break-inside:avoid;'],
   ['h3', PDF_FONT+' font-size:13.5px; font-weight:bold; margin:0 0 6px; padding:0 0 3px; border-bottom:1px solid #bbb;'],
   ['.p-needs h3, .p-roi h3', 'font-size:14px; padding:0; border-bottom:none;'],
-  ['h4', PDF_FONT+' font-size:11.5px; font-weight:bold; text-transform:uppercase; letter-spacing:.04em; margin:6px 0 1px;'],
   ['.p-line', 'margin:2.5px 0;'],
-  ['.p-staff', 'color:#444; border:1px dashed #999; padding:4px 8px; margin:5px 0; font-size:11.5px;'],
+  ['.p-staff', 'color:#444; border:1px dashed #999; padding:4px 8px; font-size:11.5px;'],
   ['.p-primary', 'font-weight:bold;'],
   ['.p-check', 'margin:1.5px 0 1.5px 10px;'],
-  ['table.p-cards', 'width:100%; border-collapse:separate; border-spacing:6px;'],
-  ['td.p-card', 'width:33%; border:1px solid #999; padding:6px 8px; font-size:10.5px; vertical-align:top;'],
+  ['table.p-cards', 'width:100%; border-collapse:collapse; table-layout:fixed;'],
+  ['td.p-card-name', 'width:33%; border:1px solid #999; border-bottom:1px solid #bbb; padding:5px 8px 3px; font-weight:bold; font-size:11.5px; vertical-align:top;'],
+  ['td.p-card', 'width:33%; border:1px solid #999; border-top:none; padding:3px 8px 6px; font-size:10.5px; vertical-align:top;'],
   ['td.p-empty', 'width:33%;'],
-  ['.p-card-name', 'font-weight:bold; font-size:11.5px; border-bottom:1px solid #bbb; padding-bottom:2px; margin-bottom:3px;'],
   ['td.p-card .p-line', 'margin:1.5px 0;'],
-  ['.p-needs', 'border:2px solid #000; padding:10px 12px; margin:12px 0 0; page-break-inside:avoid;'],
-  ['.who', 'font-weight:bold; margin-top:6px;'],
-  ['.p-need', 'margin:2px 0 2px 8px;'],
+  ['.p-needs', 'border:2px solid #000; padding:10px 12px; page-break-inside:avoid;'],
+  ['.who', 'font-weight:bold; font-size:13.5px; margin-top:10px; margin-bottom:2px; margin-left:0;'],
+  ['.p-cat', 'font-size:11px; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px; margin-top:5px; margin-bottom:1px; margin-left:8px;'],
+  ['.p-need', 'margin-top:1px; margin-bottom:1px; margin-left:18px;'],
   ['.p-need.b', 'font-weight:bold;'],
-  ['.cra-flag', 'font-weight:bold; font-size:12.5px; margin:2px 0 4px; padding-left:8px;'],
-  ['.p-mfb', 'border:2px dashed #000; padding:6px 9px; margin:8px 0 0; font-size:12.5px; font-weight:normal;'],
-  ['.p-roi', 'border:2px solid #000; padding:10px 12px; margin:10px 0 0; font-weight:bold; page-break-inside:avoid;'],
+  ['.cra-flag', 'font-weight:bold; font-size:12.5px; margin-top:2px; margin-bottom:4px; margin-left:8px;'],
+  ['.p-mfb', 'border:2px dashed #000; padding:6px 9px; font-size:12.5px; font-weight:normal;'],
+  ['.p-roi', 'border:2px solid #000; padding:10px 12px; font-weight:bold; page-break-inside:avoid;'],
   ['.p-roi-line', 'margin:3px 0; font-size:12.5px; font-weight:bold;']
 ];
-/* these become one-cell tables: margin and page-break on the table, the rest on the cell */
+/* these become one-cell tables; the gaps around them are spacer lines,
+   since converters ignore margins on tables */
 const PDF_BOXES = ['p-cra','p-section','p-staff','p-needs','p-mfb','p-roi'];
+function pdfSpacer(px){
+  const d = document.createElement("div");
+  d.className = "p-gap";
+  d.setAttribute("style", "height:"+px+"px; font-size:1px; line-height:"+px+"px;");
+  d.innerHTML = "&nbsp;";
+  return d;
+}
 function pdfDocument(bodyHtml){
   const tpl = document.createElement("template");
   tpl.innerHTML = bodyHtml;
+  /* plain-text boxes: the converter may have no symbol or emoji font */
+  const walker = document.createTreeWalker(tpl.content, NodeFilter.SHOW_TEXT);
+  for(let t = walker.nextNode(); t; t = walker.nextNode())
+    t.nodeValue = t.nodeValue.replace(/☑︎?/g, "[X]").replace(/☐/g, "[ ]");
   /* inline styles first, while the elements are still where the selectors expect them */
   for(const node of tpl.content.querySelectorAll("*")){
     let css = "";
@@ -4376,27 +4395,44 @@ function pdfDocument(bodyHtml){
   /* then wrap the boxes, innermost first */
   const boxes = [...tpl.content.querySelectorAll(PDF_BOXES.map(c=>"."+c).join(","))].reverse();
   for(const box of boxes){
+    const nested = !!box.parentElement?.closest("."+PDF_BOXES.join(",."));
     const decls = (box.getAttribute("style")||"").split(";").map(d=>d.trim()).filter(Boolean);
-    const outer = decls.filter(d=>/^(margin|page-break)/.test(d));
-    const inner = decls.filter(d=>!/^(margin|page-break)/.test(d));
+    const outer = decls.filter(d=>/^page-break/.test(d));
+    const inner = decls.filter(d=>!/^page-break/.test(d));
     const table = document.createElement("table");
     table.setAttribute("width","100%"); table.setAttribute("cellspacing","0"); table.setAttribute("cellpadding","0");
-    table.setAttribute("style", ["width:100%","border-collapse:collapse"].concat(outer).join("; ")+";");
+    /* fixed layout keeps a box inside the box around it */
+    table.setAttribute("style", ["width:100%","border-collapse:collapse","table-layout:fixed"].concat(outer).join("; ")+";");
     const td = document.createElement("td");
     td.className = box.className;   /* the <style> block still matches */
     td.setAttribute("style", inner.join("; ")+";");
     td.append(...box.childNodes);
     table.appendChild(document.createElement("tr")).appendChild(td);
+    if(nested) box.before(pdfSpacer(5));
+    /* one spacer between two boxes, not two */
+    if(!box.nextSibling?.classList?.contains("p-gap")) box.after(pdfSpacer(nested ? 5 : 10));
     box.replaceWith(table);
   }
   const holder = document.createElement("div");
   holder.appendChild(tpl.content);
-  const css = '@page{margin:0.5in;}\n'+
+  /* a cell holding bare text gets it as one block: converters can add an
+     empty line under bare text in a cell */
+  for(const td of holder.querySelectorAll("td")){
+    if(!td.firstChild || [...td.children].some(c=>/^(DIV|P|TABLE|H[1-6])$/.test(c.tagName))) continue;
+    const d = document.createElement("div");
+    d.append(...td.childNodes);
+    td.appendChild(d);
+  }
+  /* US Letter, 0.5in margins (the WordSection1 lines are the same for Word-based converters) */
+  const css = '@page{size:8.5in 11in; margin:0.5in;}\n'+
+    '@page WordSection1{size:8.5in 11in; margin:0.5in;}\n'+
+    'div.WordSection1{page:WordSection1;}\n'+
     'body{'+PDF_FONT+' font-size:12px; color:#000; background:#fff; margin:0;}\n'+
     PDF_RULES.map(([sel, rule])=>sel+'{'+rule+'}').join('\n')+'\n';
   return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'+
     '<title>Family Intake — '+esc(state.family.lastName||"(no family name)")+'</title>'+
-    '<style>\n'+css+'</style></head><body style="'+PDF_FONT.replace(/"/g,"'")+' font-size:12px; color:#000;">'+holder.innerHTML+'</body></html>';
+    '<style>\n'+css+'</style></head><body style="'+PDF_FONT+' font-size:12px; color:#000;">'+
+    '<div class="WordSection1">'+holder.innerHTML+'</div></body></html>';
 }
 /* Remote mode: if the page is printed anyway (browser Print, Share > Print),
    this is all that prints — never the staff copy or the screen. */
