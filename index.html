@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 16.7 — see README.md changelog for what changed in this version -->
+<!-- Version 16.8 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1950,7 +1950,11 @@ function todayStr(){ const d = new Date(); return (d.getMonth()+1)+"/"+d.getDate
 
 /* ============ REMOTE SUBMIT (proof of concept — see README) ============
    Not a BAA-covered channel. Staff-only action; print-and-shred remains
-   the fallback if this fails. */
+   the fallback if this fails.
+   TEMPORARY — Cloudflare Worker (WORKER_URL, SUBMIT_TOKEN, submitIntake):
+   remove once the Power Automate submission (below) is confirmed working.
+   Until then the intake goes to both, and what the family sees (sent /
+   failed / timed out) comes ONLY from this Cloudflare result. */
 const WORKER_URL = "https://frc-intake-poc.mikewilson129.workers.dev/submit";
 const SUBMIT_TOKEN = "WYGZk2kM3o81QczfKbRIIYo2uSthVaVk";
 /* Give up after this long so a stalled connection can't leave Submit stuck on "Submitting…" */
@@ -1978,6 +1982,36 @@ async function submitIntake(payload){
     }
     console.error("Network error submitting intake:", err);
     return {success:false, error: err.message};
+  }finally{
+    clearTimeout(timer);
+  }
+}
+/* END TEMPORARY Cloudflare Worker */
+
+/* ---- Power Automate submission (see README "Power Automate submission") ----
+   The flow saves each intake as a PDF in SharePoint. The URL is the only
+   access key (its sig= part); no token header. The flow reads printHtml
+   and family.lastName — don't rename payload fields. Sent alongside the
+   Cloudflare copy with its own timeout, and never awaited by the Submit
+   button: its result is only logged to the console and never changes what
+   the family sees. Never throws. */
+const POWER_AUTOMATE_URL = "https://default6a4d2f0228674e458696badb4e0eb2.87.environment.api.powerplatform.com/powerautomate/automations/direct/cu/25/workflows/ea04d5d9f9cf4046b9121b2c22cb8317/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=qdPIv464bOZfWElmIxffAJQqOHv35AAJ0eDldHbVmTk";
+async function submitPowerAutomate(payload){
+  const ctrl = new AbortController();
+  const timer = setTimeout(()=>ctrl.abort(), SUBMIT_TIMEOUT_MS);
+  try{
+    const res = await fetch(POWER_AUTOMATE_URL, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify(payload),
+      signal: ctrl.signal
+    });
+    const result = await res.json().catch(()=>({}));
+    if(!res.ok || !result.ok) console.error("Power Automate submission failed:", res.status, result);
+    else console.log("Power Automate submission OK");
+  }catch(err){
+    if(err.name==="AbortError") console.error("Power Automate submission timed out after "+(SUBMIT_TIMEOUT_MS/1000)+"s");
+    else console.error("Network error submitting to Power Automate:", err);
   }finally{
     clearTimeout(timer);
   }
@@ -4024,7 +4058,9 @@ async function sendIntake(){
       submittedAt: new Date().toISOString(),
       printHtml: printHtml
     };
-    outcome = await submitIntake(payload);
+    const cloudflare = submitIntake(payload);   /* TEMPORARY — see WORKER_URL */
+    sendPowerAutomateCopy(payload);             /* not awaited: never affects outcome */
+    outcome = await cloudflare;
   }catch(err){
     console.error("Submit failed before sending:", err);
     outcome = {success:false};
@@ -4033,6 +4069,16 @@ async function sendIntake(){
   }
   state.submitted = outcome.success;
   return outcome;
+}
+
+/* The Power Automate copy: the same payload, but printHtml is the
+   self-contained document (pdfDocument). Any error here is logged only. */
+function sendPowerAutomateCopy(payload){
+  try{
+    submitPowerAutomate({...payload, printHtml: pdfDocument(buildPrint(true))});
+  }catch(err){
+    console.error("Power Automate copy not sent:", err);
+  }
 }
 
 /* ---- Remote mode (the default; ?office is the tablet): the family finishes on their own device ----
@@ -4142,7 +4188,10 @@ function formatPhonePrint(phone){
   return d.length===10 ? (d.slice(0,3)+"-"+d.slice(3,6)+"-"+d.slice(6)) : phone;
 }
 
-function buildPrint(){
+/* forPdf: the Power Automate copy (see pdfDocument): the member boxes are
+   a table, three across, instead of flexbox, and the needs list is plain
+   lines with the ☐ in the text (no ::before). Never touches #printRoot. */
+function buildPrint(forPdf){
   PS_TR = false;                   /* print is ALWAYS English for CRM entry */
   const f = state.family, ad = f.address;
   const kids = state.members.filter(m=>isChild(m)).length;
@@ -4173,9 +4222,19 @@ function buildPrint(){
     '<div class="p-line">Category chosen '+(REMOTE ? 'by the family' : 'on tablet')+': '+esc(state.referral.category||"—")+'</div></div>';
 
   /* Family member mini-cards — quick reference for CRM entry */
-  h += '<div class="p-section"><h3>FAMILY MEMBERS — quick reference (add each to CRM)</h3><div class="p-cards">';
-  for(const m of state.members) h += miniCard(m);
-  h += '</div></div>';
+  if(forPdf){
+    h += '<div class="p-section"><h3>FAMILY MEMBERS — quick reference (add each to CRM)</h3><table class="p-cards">';
+    for(let i=0; i<state.members.length; i+=3){
+      h += '<tr>';
+      for(let j=i; j<i+3; j++) h += j<state.members.length ? '<td class="p-card" width="33%">'+miniCard(state.members[j])+'</td>' : '<td class="p-empty" width="33%"></td>';
+      h += '</tr>';
+    }
+    h += '</table></div>';
+  } else {
+    h += '<div class="p-section"><h3>FAMILY MEMBERS — quick reference (add each to CRM)</h3><div class="p-cards">';
+    for(const m of state.members) h += miniCard(m);
+    h += '</div></div>';
+  }
 
   /* Full pages: only people who completed/have services */
   for(const m of state.members){
@@ -4213,6 +4272,11 @@ function buildPrint(){
     for(const g of NEED_GROUPS){
       const items = list.filter(x=>x.group===g);
       if(!items.length) continue;
+      if(forPdf){
+        needsHtml += '<h4>'+esc(g)+'</h4>';
+        for(const n of items) needsHtml += '<div class="p-need'+(n.bold?' b':'')+'">\u2610 '+esc(n.txt)+'</div>';
+        continue;
+      }
       needsHtml += '<h4>'+esc(g)+'</h4><ul>';
       for(const n of items) needsHtml += '<li'+(n.bold?' class="b"':'')+'>'+esc(n.txt)+'</li>';
       needsHtml += '</ul>';
@@ -4245,8 +4309,86 @@ function buildPrint(){
   }
 
   /* remote mode: only the submitted string; the staff copy never goes in #printRoot */
-  if(!REMOTE) document.getElementById("printRoot").innerHTML = h;
+  if(!REMOTE && !forPdf) document.getElementById("printRoot").innerHTML = h;
   return h;
+}
+/* The Power Automate copy of the printout as a complete HTML document that
+   looks right on its own: the flow turns it into a PDF with OneDrive's
+   "Convert file", which isn't a full browser. Mirrors the @media print
+   styles (the on-screen print is unchanged), kept converter-friendly:
+   - no flexbox, grid or ::before (buildPrint(true) builds those parts as
+     a table and plain text);
+   - every style is also written inline on each element, from the same
+     rules as the <style> block, since converters often skip class and
+     descendant selectors;
+   - each bordered box is a one-cell table (a converter can otherwise copy
+     a box's border onto every line inside it);
+   - one rule per line in the <style> block (LibreOffice, at least, drops
+     a rule that directly follows a "}").
+   Rule order matters: a later rule wins, inline as in the style block. */
+const PDF_FONT = 'font-family:Arial,Helvetica,"Segoe UI Symbol",sans-serif;';
+const PDF_RULES = [
+  ['.p-title', 'font-size:18px; font-weight:bold; margin:0 0 2px;'],
+  ['.p-person > .p-title', 'page-break-before:always; border-top:3px solid #000; padding-top:8px; margin-top:8px;'],
+  ['.p-meta', 'font-size:11px; margin:0 0 10px;'],
+  ['.p-cra', 'border:2px solid #000; padding:4px 10px; margin:0 0 10px; font-weight:bold; font-size:12.5px;'],
+  ['.p-section', 'border:1px solid #999; padding:10px 12px; margin:0 0 10px; page-break-inside:avoid;'],
+  ['h3', PDF_FONT+' font-size:13.5px; font-weight:bold; margin:0 0 6px; padding:0 0 3px; border-bottom:1px solid #bbb;'],
+  ['.p-needs h3, .p-roi h3', 'font-size:14px; padding:0; border-bottom:none;'],
+  ['h4', PDF_FONT+' font-size:11.5px; font-weight:bold; text-transform:uppercase; letter-spacing:.04em; margin:6px 0 1px;'],
+  ['.p-line', 'margin:2.5px 0;'],
+  ['.p-staff', 'color:#444; border:1px dashed #999; padding:4px 8px; margin:5px 0; font-size:11.5px;'],
+  ['.p-primary', 'font-weight:bold;'],
+  ['.p-check', 'margin:1.5px 0 1.5px 10px;'],
+  ['table.p-cards', 'width:100%; border-collapse:separate; border-spacing:6px;'],
+  ['td.p-card', 'width:33%; border:1px solid #999; padding:6px 8px; font-size:10.5px; vertical-align:top;'],
+  ['td.p-empty', 'width:33%;'],
+  ['.p-card-name', 'font-weight:bold; font-size:11.5px; border-bottom:1px solid #bbb; padding-bottom:2px; margin-bottom:3px;'],
+  ['td.p-card .p-line', 'margin:1.5px 0;'],
+  ['.p-needs', 'border:2px solid #000; padding:10px 12px; margin:12px 0 0; page-break-inside:avoid;'],
+  ['.who', 'font-weight:bold; margin-top:6px;'],
+  ['.p-need', 'margin:2px 0 2px 8px;'],
+  ['.p-need.b', 'font-weight:bold;'],
+  ['.cra-flag', 'font-weight:bold; font-size:12.5px; margin:2px 0 4px; padding-left:8px;'],
+  ['.p-mfb', 'border:2px dashed #000; padding:6px 9px; margin:8px 0 0; font-size:12.5px; font-weight:normal;'],
+  ['.p-roi', 'border:2px solid #000; padding:10px 12px; margin:10px 0 0; font-weight:bold; page-break-inside:avoid;'],
+  ['.p-roi-line', 'margin:3px 0; font-size:12.5px; font-weight:bold;']
+];
+/* these become one-cell tables: margin and page-break on the table, the rest on the cell */
+const PDF_BOXES = ['p-cra','p-section','p-staff','p-needs','p-mfb','p-roi'];
+function pdfDocument(bodyHtml){
+  const tpl = document.createElement("template");
+  tpl.innerHTML = bodyHtml;
+  /* inline styles first, while the elements are still where the selectors expect them */
+  for(const node of tpl.content.querySelectorAll("*")){
+    let css = "";
+    for(const [sel, rule] of PDF_RULES) if(node.matches(sel)) css += rule+" ";
+    if(css) node.setAttribute("style", css.trim());
+  }
+  /* then wrap the boxes, innermost first */
+  const boxes = [...tpl.content.querySelectorAll(PDF_BOXES.map(c=>"."+c).join(","))].reverse();
+  for(const box of boxes){
+    const decls = (box.getAttribute("style")||"").split(";").map(d=>d.trim()).filter(Boolean);
+    const outer = decls.filter(d=>/^(margin|page-break)/.test(d));
+    const inner = decls.filter(d=>!/^(margin|page-break)/.test(d));
+    const table = document.createElement("table");
+    table.setAttribute("width","100%"); table.setAttribute("cellspacing","0"); table.setAttribute("cellpadding","0");
+    table.setAttribute("style", ["width:100%","border-collapse:collapse"].concat(outer).join("; ")+";");
+    const td = document.createElement("td");
+    td.className = box.className;   /* the <style> block still matches */
+    td.setAttribute("style", inner.join("; ")+";");
+    td.append(...box.childNodes);
+    table.appendChild(document.createElement("tr")).appendChild(td);
+    box.replaceWith(table);
+  }
+  const holder = document.createElement("div");
+  holder.appendChild(tpl.content);
+  const css = '@page{margin:0.5in;}\n'+
+    'body{'+PDF_FONT+' font-size:12px; color:#000; background:#fff; margin:0;}\n'+
+    PDF_RULES.map(([sel, rule])=>sel+'{'+rule+'}').join('\n')+'\n';
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'+
+    '<title>Family Intake — '+esc(state.family.lastName||"(no family name)")+'</title>'+
+    '<style>\n'+css+'</style></head><body style="'+PDF_FONT.replace(/"/g,"'")+' font-size:12px; color:#000;">'+holder.innerHTML+'</body></html>';
 }
 /* Remote mode: if the page is printed anyway (browser Print, Share > Print),
    this is all that prints — never the staff copy or the screen. */
