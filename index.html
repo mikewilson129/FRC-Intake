@@ -4365,6 +4365,14 @@ function pdfDocument(bodyHtml){
     for(const [sel, rule] of PDF_RULES) if(node.matches(sel)) css += rule+" ";
     if(css) node.setAttribute("style", css.trim());
   }
+  /* each person's heading as a <p>: converters (LibreOffice, at least)
+     ignore page-break-before on a <div>, so a person wouldn't start a new page */
+  for(const div of tpl.content.querySelectorAll(".p-person > .p-title")){
+    const p = document.createElement("p");
+    for(const at of div.attributes) p.setAttribute(at.name, at.value);
+    p.append(...div.childNodes);
+    div.replaceWith(p);
+  }
   /* then wrap the boxes, innermost first */
   const boxes = [...tpl.content.querySelectorAll(PDF_BOXES.map(c=>"."+c).join(","))].reverse();
   for(const box of boxes){
