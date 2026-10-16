@@ -300,6 +300,9 @@ referral?", an in-page box opens:
 > You do not need to change your answer.
 > **[OK, continue]**
 
+- Look: the 911 line sits in a soft red box; program names are bold;
+  "Call 988" / "Text 988" are small buttons; "You do not need to change
+  your answer." is in quieter grey italics.
 - Phone numbers are tap-to-call links (`tel:`); "Text 988" opens a text
   message (`sms:`). On a device that can't make calls (e.g. a Wi-Fi-only
   tablet), tapping one may do nothing or offer another app.

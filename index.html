@@ -109,12 +109,16 @@
   /* safety resources pop-up (see safetyPopup) */
   .safety-modal{max-height:calc(100vh - 32px); overflow-y:auto;}
   .safety-modal h2{margin-bottom:10px;}
-  .safety-modal p{font-size:16px; margin-bottom:10px;}
+  .safety-modal p{font-size:16px; line-height:1.4; margin-bottom:10px;}
   .safety-modal ul{list-style:none; margin:0 0 12px; padding:0;}
-  .safety-modal li{font-size:16px; margin:0 0 10px; padding-left:12px; border-left:3px solid var(--accent);}
+  .safety-modal li{font-size:16px; line-height:1.4; margin:0 0 9px; padding-left:12px; border-left:3px solid var(--accent);}
+  .safety-modal b{font-weight:700;}
   .safety-modal a{color:var(--accent); font-weight:700; white-space:nowrap;}
-  .safety-988{display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;}
-  .safety-988 a{display:inline-block; text-decoration:none; padding:8px 14px; font-size:15px;}
+  .safety-modal .safety-urgent{background:#FBECEA; border-left:4px solid #B3261E; border-radius:8px; padding:9px 12px; font-weight:600;}
+  .safety-modal .safety-urgent a{color:#B3261E;}
+  .safety-modal .safety-soft{color:var(--soft); font-size:15px; font-style:italic;}
+  .safety-988{display:flex; gap:6px; flex-wrap:wrap; margin-top:5px;}
+  .safety-988 a{display:inline-block; text-decoration:none; padding:4px 11px; font-size:13.5px; border-radius:10px;}
   /* ---------- print ---------- */
   #printRoot{display:none;}
   @media print{
@@ -2795,11 +2799,22 @@ function safetyNote(m){
     ? '<div class="p-note">Safety resources pop-up shown.</div>' : '';
 }
 function telLink(num){ return el("a",{href:"tel:"+digitsOf(num)}, num); }
+/* program names stay in English in every language, so they're found and bolded as-is */
+const SAFETY_NAMES = ["Eliot Community Behavioral Health Center (Mobile Crisis)", "988 Suicide & Crisis Lifeline", "SafeLink"];
+function boldNames(text){
+  const frag = document.createDocumentFragment();
+  const re = new RegExp("("+SAFETY_NAMES.map(n=>n.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|")+")");
+  text.split(re).forEach((part, i)=>{
+    if(!part) return;
+    frag.appendChild(i%2 ? el("b",null,document.createTextNode(part)) : document.createTextNode(part));
+  });
+  return frag;
+}
 /* a translated line with one tap-to-call number where its {n} is */
-function telLine(tag, template, num){
+function telLine(tag, template, num, attrs){
   const [before, after] = tr(template).split("{n}");
-  const n = el(tag);
-  n.append(document.createTextNode(before), telLink(num), document.createTextNode(after||""));
+  const n = el(tag, attrs);
+  n.append(boldNames(before), telLink(num), boldNames(after||""));
   return n;
 }
 function safetyPopup(){
@@ -2807,18 +2822,18 @@ function safetyPopup(){
   const ok = el("button",{class:"btn-primary", type:"button", onclick:()=>overlay.remove()}, "OK, continue");
   overlay.appendChild(el("div",{class:"modal safety-modal", role:"dialog", "aria-modal":"true", "aria-labelledby":"safetyTitle"},
     el("h2",{id:"safetyTitle"},"Your safety matters"),
-    telLine("p", "If you are in danger right now, call {n}.", "911"),
+    telLine("p", "If you are in danger right now, call {n}.", "911", {class:"safety-urgent"}),
     el("p",null, byMode("You can also talk to a staff member here today.",
       "We do not see this form right away. It may take up to a week for our staff to read your answers.")),
     el("p",null,"If you need support now, you can reach someone any time, day or night:"),
     el("ul",null,
       telLine("li", "Mental health crisis support: Eliot Community Behavioral Health Center (Mobile Crisis), {n}", "888-769-5201"),
-      el("li",null, "988 Suicide & Crisis Lifeline: call or text 988",
+      el("li",null, boldNames(tr("988 Suicide & Crisis Lifeline: call or text 988")),
         el("div",{class:"safety-988"},
           el("a",{class:"btn-quiet", href:"tel:988"},"Call 988"),
           el("a",{class:"btn-quiet", href:"sms:988"},"Text 988"))),
       telLine("li", "Domestic violence support: SafeLink, {n}", "877-785-2020")),
-    el("p",null,"You do not need to change your answer."),
+    el("p",{class:"safety-soft"},"You do not need to change your answer."),
     el("div",{class:"modal-actions"}, ok)));
   document.body.appendChild(overlay);
   ok.focus();
