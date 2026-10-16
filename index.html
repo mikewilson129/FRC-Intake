@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 16.8 — see README.md changelog for what changed in this version -->
+<!-- Version 16.9 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -105,6 +105,20 @@
   .rev-section .p-line b{font-weight:600;}
   .rev-section .p-check{margin:2px 0 2px 12px; font-size:14.5px;}
   .rev-section .p-staff{display:none;}
+  .rev-section .p-note{display:none;}   /* staff-only printout notes */
+  /* safety resources pop-up (see safetyPopup) */
+  .safety-modal{max-height:calc(100vh - 32px); overflow-y:auto;}
+  .safety-modal h2{margin-bottom:10px;}
+  .safety-modal p{font-size:16px; line-height:1.4; margin-bottom:10px;}
+  .safety-modal ul{list-style:none; margin:0 0 12px; padding:0;}
+  .safety-modal li{font-size:16px; line-height:1.4; margin:0 0 9px; padding-left:12px; border-left:3px solid var(--accent);}
+  .safety-modal b{font-weight:700;}
+  .safety-modal a{color:var(--accent); font-weight:700; white-space:nowrap;}
+  .safety-modal .safety-urgent{background:#FBECEA; border-left:4px solid #B3261E; border-radius:8px; padding:9px 12px; font-weight:600;}
+  .safety-modal .safety-urgent a{color:#B3261E;}
+  .safety-modal .safety-soft{color:var(--soft); font-size:15px; font-style:italic;}
+  .safety-988{display:flex; gap:6px; flex-wrap:wrap; margin-top:5px;}
+  .safety-988 a{display:inline-block; text-decoration:none; padding:4px 11px; font-size:13.5px; border-radius:10px;}
   /* ---------- print ---------- */
   #printRoot{display:none;}
   @media print{
@@ -139,6 +153,7 @@
     .p-roi h3{font-size:14px; margin-bottom:6px;}
     .p-roi-line{margin:3px 0; font-size:12.5px;}
     .p-remote-note{font-size:16px; padding:24px 0;}
+    .p-note{font-size:10.5px; color:#444; font-style:italic; margin-top:4px;}
     .p-cra{display:inline-block; border:2px solid #000; border-radius:6px; padding:4px 10px; margin:0 0 10px; font-weight:700; font-size:12.5px;}
   }
   /* ---------- persistent Notes widget ---------- */
@@ -788,7 +803,20 @@ const I18N = { es: {
 /* --- V16.3: unsigned-release warning (remote Submit) — DRAFT --- */
 "Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.":"Por favor, complete las autorizaciones de cada miembro del hogar que aparece aquí. Necesitamos estas autorizaciones para poder atender adecuadamente a su familia.",
 "Submit anyway":"Enviar de todos modos",
-"Continue anyway":"Continuar de todos modos"
+"Continue anyway":"Continuar de todos modos",
+/* --- V16.9: safety resources pop-up — DRAFT, for staff review --- */
+"Your safety matters":"Su seguridad es importante",
+"If you are in danger right now, call {n}.":"Si está en peligro en este momento, llame al {n}.",
+"We do not see this form right away. It may take up to a week for our staff to read your answers.":"No vemos este formulario de inmediato. Nuestro personal puede tardar hasta una semana en leer sus respuestas.",
+"You can also talk to a staff member here today.":"También puede hablar hoy con un miembro del personal aquí.",
+"If you need support now, you can reach someone any time, day or night:":"Si necesita apoyo ahora, puede comunicarse con alguien a cualquier hora, de día o de noche:",
+"Mental health crisis support: Eliot Community Behavioral Health Center (Mobile Crisis), {n}":"Apoyo en crisis de salud mental: Eliot Community Behavioral Health Center (Mobile Crisis), {n}",
+"988 Suicide & Crisis Lifeline: call or text 988":"988 Suicide & Crisis Lifeline: llame o envíe un mensaje de texto al 988",
+"Call 988":"Llamar al 988",
+"Text 988":"Enviar texto al 988",
+"Domestic violence support: SafeLink, {n}":"Apoyo en violencia doméstica: SafeLink, {n}",
+"You do not need to change your answer.":"No necesita cambiar su respuesta.",
+"OK, continue":"De acuerdo, continuar"
 },
 pt: {
 /* --- chrome / navigation --- */
@@ -1364,7 +1392,20 @@ pt: {
 /* --- V16.3: unsigned-release warning (remote Submit) — DRAFT --- */
 "Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.":"Por favor, complete as autorizações de cada membro do domicílio listado aqui. Precisamos dessas autorizações para atender sua família adequadamente.",
 "Submit anyway":"Enviar mesmo assim",
-"Continue anyway":"Continuar mesmo assim"
+"Continue anyway":"Continuar mesmo assim",
+/* --- V16.9: safety resources pop-up — DRAFT, needs native-speaker review --- */
+"Your safety matters":"Sua segurança é importante",
+"If you are in danger right now, call {n}.":"Se você estiver em perigo agora, ligue para o {n}.",
+"We do not see this form right away. It may take up to a week for our staff to read your answers.":"Não vemos este formulário imediatamente. Pode levar até uma semana para a nossa equipe ler suas respostas.",
+"You can also talk to a staff member here today.":"Você também pode falar com um membro da equipe aqui hoje.",
+"If you need support now, you can reach someone any time, day or night:":"Se precisar de apoio agora, você pode falar com alguém a qualquer hora, de dia ou de noite:",
+"Mental health crisis support: Eliot Community Behavioral Health Center (Mobile Crisis), {n}":"Apoio em crises de saúde mental: Eliot Community Behavioral Health Center (Mobile Crisis), {n}",
+"988 Suicide & Crisis Lifeline: call or text 988":"988 Suicide & Crisis Lifeline: ligue ou envie uma mensagem de texto para o 988",
+"Call 988":"Ligar para o 988",
+"Text 988":"Enviar mensagem para o 988",
+"Domestic violence support: SafeLink, {n}":"Apoio em violência doméstica: SafeLink, {n}",
+"You do not need to change your answer.":"Você não precisa mudar sua resposta.",
+"OK, continue":"OK, continuar"
 },
 ht: {
 /* --- chrome / navigation --- */
@@ -1940,7 +1981,20 @@ ht: {
 /* --- V16.3: unsigned-release warning (remote Submit) — DRAFT --- */
 "Please complete the releases for each household member listed here. We need these releases completed for us to appropriately serve your family.":"Tanpri ranpli otorizasyon yo pou chak manm nan kay la ki sou lis la. Nou bezwen otorizasyon sa yo pou nou ka sèvi fanmi ou kòmsadwa.",
 "Submit anyway":"Soumèt kanmenm",
-"Continue anyway":"Kontinye kanmenm"
+"Continue anyway":"Kontinye kanmenm",
+/* --- V16.9: safety resources pop-up — DRAFT, needs native-speaker review --- */
+"Your safety matters":"Sekirite ou enpòtan",
+"If you are in danger right now, call {n}.":"Si ou an danje kounye a, rele {n}.",
+"We do not see this form right away. It may take up to a week for our staff to read your answers.":"Nou pa wè fòm sa a tousuit. Li ka pran jiska yon semèn pou anplwaye nou yo li repons ou yo.",
+"You can also talk to a staff member here today.":"Ou kapab pale ak yon anplwaye isit la jodi a tou.",
+"If you need support now, you can reach someone any time, day or night:":"Si ou bezwen sipò kounye a, ou ka jwenn yon moun nenpòt ki lè, lajounen kou lannwit:",
+"Mental health crisis support: Eliot Community Behavioral Health Center (Mobile Crisis), {n}":"Sipò pou kriz sante mantal: Eliot Community Behavioral Health Center (Mobile Crisis), {n}",
+"988 Suicide & Crisis Lifeline: call or text 988":"988 Suicide & Crisis Lifeline: rele oswa voye yon tèks bay 988",
+"Call 988":"Rele 988",
+"Text 988":"Voye tèks bay 988",
+"Domestic violence support: SafeLink, {n}":"Sipò pou vyolans domestik: SafeLink, {n}",
+"You do not need to change your answer.":"Ou pa bezwen chanje repons ou.",
+"OK, continue":"OK, kontinye"
 }
 };
 /* ============ DATA ============ */
@@ -2334,7 +2388,8 @@ const state = {
   cra:false,       /* CRA mode: finishing needs a completed adult AND child intake */
   otherReleases:0, /* releases signed through the staff panel's "Complete another release" */
   releaseWarned:false,  /* Submit (remote, or staff on the tablet): the unsigned-release warning was clicked past */
-  handoffWarned:false   /* tablet "Next steps": the unsigned-release warning was clicked past */
+  handoffWarned:false,  /* tablet "Next steps": the unsigned-release warning was clicked past */
+  safetyShown:{}        /* "memberId:question" for each safety pop-up already shown (never sent) */
 };
 
 /* ============ URL TAGS ============
@@ -2721,6 +2776,67 @@ function confirmBox(message, yesLabel, noLabel, onYes, stayPrimary){
       el("button",{class:stayPrimary ? "btn-primary" : "btn-quiet", type:"button", onclick:close}, noLabel),
       el("button",{class:stayPrimary ? "btn-quiet" : "btn-primary", type:"button", onclick:()=>{ close(); onYes(); }}, yesLabel))));
   document.body.appendChild(overlay);
+}
+
+/* ============ SAFETY RESOURCES POP-UP ============
+   On a "Disagree"/"Strongly disagree" to any "I feel safe…" question
+   (adult home/work-school/streets, child home/school/streets) or "Yes" to
+   the domestic violence referral, show crisis resources. Tablet and remote
+   alike (one line differs, see byMode). Once per question per person;
+   never changes or blocks the answer. No FRC contact info here. It's an
+   in-page box, not a browser window, so pop-up blockers don't affect it. */
+const SAFETY_QS = ["safeHome","safeWork","safeSchool","safeStreets","dvReferral"];
+function safetyAnswer(m, key, v){
+  const flagged = key==="dvReferral" ? v==="Yes" : LOW_SAFETY.includes(v);
+  const id = m.id+":"+key;
+  if(!flagged || state.safetyShown[id]) return;
+  state.safetyShown[id] = true;
+  safetyPopup();
+}
+/* the staff printout's note in that person's S3 Safety section */
+function safetyNote(m){
+  return SAFETY_QS.some(k=>state.safetyShown[m.id+":"+k])
+    ? '<div class="p-note">Safety resources pop-up shown.</div>' : '';
+}
+function telLink(num){ return el("a",{href:"tel:"+digitsOf(num)}, num); }
+/* program names stay in English in every language, so they're found and bolded as-is */
+const SAFETY_NAMES = ["Eliot Community Behavioral Health Center (Mobile Crisis)", "988 Suicide & Crisis Lifeline", "SafeLink"];
+function boldNames(text){
+  const frag = document.createDocumentFragment();
+  const re = new RegExp("("+SAFETY_NAMES.map(n=>n.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|")+")");
+  text.split(re).forEach((part, i)=>{
+    if(!part) return;
+    frag.appendChild(i%2 ? el("b",null,document.createTextNode(part)) : document.createTextNode(part));
+  });
+  return frag;
+}
+/* a translated line with one tap-to-call number where its {n} is */
+function telLine(tag, template, num, attrs){
+  const [before, after] = tr(template).split("{n}");
+  const n = el(tag, attrs);
+  n.append(boldNames(before), telLink(num), boldNames(after||""));
+  return n;
+}
+function safetyPopup(){
+  const overlay = el("div",{class:"modal-overlay"});
+  const ok = el("button",{class:"btn-primary", type:"button", onclick:()=>overlay.remove()}, "OK, continue");
+  overlay.appendChild(el("div",{class:"modal safety-modal", role:"dialog", "aria-modal":"true", "aria-labelledby":"safetyTitle"},
+    el("h2",{id:"safetyTitle"},"Your safety matters"),
+    telLine("p", "If you are in danger right now, call {n}.", "911", {class:"safety-urgent"}),
+    el("p",null, byMode("You can also talk to a staff member here today.",
+      "We do not see this form right away. It may take up to a week for our staff to read your answers.")),
+    el("p",null,"If you need support now, you can reach someone any time, day or night:"),
+    el("ul",null,
+      telLine("li", "Mental health crisis support: Eliot Community Behavioral Health Center (Mobile Crisis), {n}", "888-769-5201"),
+      el("li",null, boldNames(tr("988 Suicide & Crisis Lifeline: call or text 988")),
+        el("div",{class:"safety-988"},
+          el("a",{class:"btn-quiet", href:"tel:988"},"Call 988"),
+          el("a",{class:"btn-quiet", href:"sms:988"},"Text 988"))),
+      telLine("li", "Domestic violence support: SafeLink, {n}", "877-785-2020")),
+    el("p",{class:"safety-soft"},"You do not need to change your answer."),
+    el("div",{class:"modal-actions"}, ok)));
+  document.body.appendChild(overlay);
+  ok.focus();
 }
 
 /* ============ SCREENS ============ */
@@ -3439,9 +3555,9 @@ function adultSteps(m){
   (m)=>({ title:"Feeling safe",
     comfort:comfort("Nothing here changes what help you can get."),
     body:[
-      qLabel("I feel safe in my home"), scaleRow(()=>a.safeHome, v=>a.safeHome=v),
-      qLabel("I feel safe at work or school"), scaleRow(()=>a.safeWork, v=>a.safeWork=v),
-      qLabel("I feel safe on the streets in my neighborhood"), scaleRow(()=>a.safeStreets, v=>a.safeStreets=v)
+      qLabel("I feel safe in my home"), scaleRow(()=>a.safeHome, v=>{a.safeHome=v; safetyAnswer(m,"safeHome",v);}),
+      qLabel("I feel safe at work or school"), scaleRow(()=>a.safeWork, v=>{a.safeWork=v; safetyAnswer(m,"safeWork",v);}),
+      qLabel("I feel safe on the streets in my neighborhood"), scaleRow(()=>a.safeStreets, v=>{a.safeStreets=v; safetyAnswer(m,"safeStreets",v);})
     ], canNext:true }),
   /* 10 */
   (m)=>({ title:"A few more",
@@ -3455,7 +3571,7 @@ function adultSteps(m){
         qLabel("Which court?"), qText(a,"courtWhich",{ph:"e.g., Salem District Court"}),
         qLabel("For what reason?"), qText(a,"courtReason",{ph:"A few words is fine"})) : null),
       qLabel("Would you like a domestic violence referral?"),
-      ynd(()=>a.dvReferral, v=>a.dvReferral=v)
+      ynd(()=>a.dvReferral, v=>{a.dvReferral=v; safetyAnswer(m,"dvReferral",v);})
     ], canNext:true }),
   /* 11 */
   (m)=>{
@@ -3677,9 +3793,9 @@ function childSteps(m){
     return { title:trn("Feeling safe — for {n}", kid()),
     comfort:comfort("There are no wrong answers."),
     body:[
-      qLabel("I feel safe in my home"), scaleRow(()=>a.safeHome, v=>a.safeHome=v),
-      qLabel("I feel safe at my school"), scaleRow(()=>a.safeSchool, v=>a.safeSchool=v),
-      qLabel("I feel safe on the streets in my neighborhood"), scaleRow(()=>a.safeStreets, v=>a.safeStreets=v),
+      qLabel("I feel safe in my home"), scaleRow(()=>a.safeHome, v=>{a.safeHome=v; safetyAnswer(m,"safeHome",v);}),
+      qLabel("I feel safe at my school"), scaleRow(()=>a.safeSchool, v=>{a.safeSchool=v; safetyAnswer(m,"safeSchool",v);}),
+      qLabel("I feel safe on the streets in my neighborhood"), scaleRow(()=>a.safeStreets, v=>{a.safeStreets=v; safetyAnswer(m,"safeStreets",v);}),
       qLabel("At any point, have you witnessed violence?","\u201CWitness\u201D means whatever it means to you — no wrong answer, and you don't need to share what it was."),
       ynd(()=>a.witnessed, v=>a.witnessed=v),
       qLabel("Have you ever been in a situation where you were being used or taken advantage of (exploited)?","This means being taken advantage of, or made to do something physically or sexually against your will. This is kept confidential."),
@@ -3848,6 +3964,7 @@ function personSections(m, printOrder){
       pLine("Are you involved in the court?", a.court);
     if(a.court==="Yes") s3 += pFree("Which Court?", a.courtWhich) + pFree("What reason?", a.courtReason);
     s3 += pLine("Would you like a domestic violence referral?", a.dvReferral);
+    s3 += safetyNote(m);
     S.push({title:"S3 — Safety", range:[9,10], inner:s3});
     S.push({title:"S4 — Basic Needs", range:[11,11], inner:
       pLine("Food", a.s4food) + pLine("Clothing", a.s4clothing)});
@@ -3913,6 +4030,7 @@ function personSections(m, printOrder){
     s3 += printOrder
       ? (violenceLine + courtBlock + detainedBlock + ranAwayBlock + exploitedLine + gangLine)
       : (violenceLine + exploitedLine + gangLine + courtBlock + detainedBlock + ranAwayBlock);
+    s3 += safetyNote(m);
     S.push({title:"S3 — Safety", range:[9,11], inner:s3});
     let s4 = pLine("Is this child/youth currently living with their family?", a.livingWithFamily);
     if(a.livingWithFamily==="No"){
@@ -4251,16 +4369,21 @@ function buildPrint(forPdf){
     h += '<div class="p-title">'+esc(fullName(m)||"(no name)")+(m.isSelf&&m.done?" (completed own intake)":"")+(child?" — CHILD":" — ADULT")+(m.done?"":" — INTAKE NOT COMPLETED")+'</div>';
     if(!m.done) h += '<div class="p-staff">Intake was started but not finished — the family chose to finish without it. Unanswered questions show as Did Not Answer.</div>';
     const secs = personSections(m, true);
+    /* PDF copy: the person's name, small and right-aligned, on each section heading */
+    const head = t => forPdf
+      ? '<table class="p-head" width="100%" cellspacing="0" cellpadding="0"><tr>'+
+        '<td class="p-head-t" width="72%">'+esc(t)+'</td><td class="p-head-who" width="28%" align="right">'+esc(fullName(m)||"(no name)")+'</td></tr></table>'
+      : '<h3>'+esc(t)+'</h3>';
     let screeningHeaderDone = false;
     for(const s of secs){
       /* insert screening header before S1 */
       if(!screeningHeaderDone && s.title.startsWith("S1")){
-        h += '<div class="p-section"><h3>'+(child?"CHILD":"ADULT")+' SCREENING — Family Member Information</h3>'+
+        h += '<div class="p-section">'+head((child?"CHILD":"ADULT")+' SCREENING — Family Member Information')+
           pLine("Date", todayStr()) +
           '<div class="p-staff">Staff Completed: ______________________</div></div>';
         screeningHeaderDone = true;
       }
-      h += '<div class="p-section"><h3>'+esc(s.title)+'</h3>'+s.inner+'</div>';
+      h += '<div class="p-section">'+head(s.title)+s.inner+'</div>';
       if(m.isSelf && s.title==="Family Member Info — Demographics"){
         h += '<div class="p-section p-primary">Primary Contact: Yes - Select in CRM</div>';
       }
@@ -4342,6 +4465,10 @@ const PDF_RULES = [
   ['.p-section', 'border:1px solid #999; padding:10px 12px; page-break-inside:avoid;'],
   ['h3', PDF_FONT+' font-size:13.5px; font-weight:bold; margin:0 0 6px; padding:0 0 3px; border-bottom:1px solid #bbb;'],
   ['.p-needs h3, .p-roi h3', 'font-size:14px; padding:0; border-bottom:none;'],
+  ['table.p-head', 'width:100%; border-collapse:collapse; table-layout:fixed;'],
+  ['td.p-head-t', PDF_FONT+' font-size:13.5px; font-weight:bold; padding:0 0 3px; border-bottom:1px solid #bbb; vertical-align:bottom;'],
+  ['td.p-head-who', 'font-size:10px; color:#444; text-align:right; padding:0 0 3px; border-bottom:1px solid #bbb; vertical-align:bottom;'],
+  ['.p-note', 'font-size:10.5px; color:#444; font-style:italic; margin-top:4px;'],
   ['.p-line', 'margin:2.5px 0;'],
   ['.p-staff', 'color:#444; border:1px dashed #999; padding:4px 8px; font-size:11.5px;'],
   ['.p-primary', 'font-weight:bold;'],
@@ -4423,16 +4550,27 @@ function pdfDocument(bodyHtml){
     d.append(...td.childNodes);
     td.appendChild(d);
   }
-  /* US Letter, 0.5in margins (the WordSection1 lines are the same for Word-based converters) */
-  const css = '@page{size:8.5in 11in; margin:0.5in;}\n'+
-    '@page WordSection1{size:8.5in 11in; margin:0.5in;}\n'+
+  /* US Letter, 0.5in margins. The footer on every page (family name,
+     "Page X of Y") is in Word's own HTML format: the flow's converter
+     (OneDrive "Convert file") is Word-based and ignores CSS page footers.
+     Word lifts the mso-element:footer block into each page's footer and
+     fills in the PAGE / NUMPAGES fields; anything else shows it once, at
+     the end. Tested on the live flow before building it in. */
+  const css = '@page{size:8.5in 11in; margin:0.5in 0.5in 0.75in 0.5in;}\n'+
+    '@page WordSection1{size:8.5in 11.0in; margin:0.5in 0.5in 0.75in 0.5in; mso-header-margin:0.3in; mso-footer-margin:0.3in; mso-footer:f1;}\n'+
     'div.WordSection1{page:WordSection1;}\n'+
+    'p.MsoFooter{margin:0in; font-size:9.0pt; font-family:Arial; color:#444444;}\n'+
     'body{'+PDF_FONT+' font-size:12px; color:#000; background:#fff; margin:0;}\n'+
     PDF_RULES.map(([sel, rule])=>sel+'{'+rule+'}').join('\n')+'\n';
-  return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'+
+  const field = code => "<!--[if supportFields]><span style='mso-element:field-begin'></span> "+code+
+    " <span style='mso-element:field-separator'></span><![endif]-->1<!--[if supportFields]><span style='mso-element:field-end'></span><![endif]-->";
+  const footer = "<div style='mso-element:footer' id='f1'><p class='MsoFooter'>Family Intake — "+esc(state.family.lastName||"(no family name)")+
+    "<span style='mso-tab-count:1'></span>&nbsp;&nbsp;&nbsp;&nbsp;Page "+field("PAGE")+" of "+field("NUMPAGES")+"</p></div>";
+  return '<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40" lang="en">'+
+    '<head><meta charset="UTF-8"><meta name="ProgId" content="Word.Document"><meta name="Generator" content="Microsoft Word 15">'+
     '<title>Family Intake — '+esc(state.family.lastName||"(no family name)")+'</title>'+
     '<style>\n'+css+'</style></head><body style="'+PDF_FONT+' font-size:12px; color:#000;">'+
-    '<div class="WordSection1">'+holder.innerHTML+'</div></body></html>';
+    '<div class="WordSection1">'+holder.innerHTML+footer+'</div></body></html>';
 }
 /* Remote mode: if the page is printed anyway (browser Print, Share > Print),
    this is all that prints — never the staff copy or the screen. */
