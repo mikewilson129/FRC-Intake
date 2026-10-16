@@ -216,6 +216,14 @@ changes:
 
 ## Remote submission (proof of concept)
 
+> **TEMPORARY — the Cloudflare Worker submission is being replaced by
+> Power Automate** (see "Power Automate submission" below). During the
+> transition the intake goes to both. Remove `WORKER_URL`, `SUBMIT_TOKEN`
+> and `submitIntake()` (all marked TEMPORARY in `index.html`) once the
+> Power Automate submission is confirmed working. Until then, what the
+> family sees after Submit (sent / failed / timed out) comes only from the
+> Cloudflare result.
+
 - `WORKER_URL` / `SUBMIT_TOKEN` and `submitIntake()` post the completed
   intake as JSON to a Cloudflare Worker endpoint, in addition to the
   in-browser print flow.
@@ -235,6 +243,39 @@ changes:
   should be rotated whenever it may have leaked (e.g. after sharing the file,
   a public commit, or a compromised tablet), and should not be treated as a
   real secret — it's a light deterrent, not access control.
+
+## Power Automate submission
+
+Added in Version 16.8. Every Submit (remote "Almost done" and the tablet
+staff panel) also posts the intake to a Power Automate flow
+(`POWER_AUTOMATE_URL`, `submitPowerAutomate()` in `index.html`), which
+saves it as a PDF in SharePoint.
+
+- **The URL is the only access key.** Its `sig=` part works like a
+  password: anyone with the full URL can post to the flow. There's no
+  token header. If it may have leaked, regenerate the flow's trigger URL
+  in Power Automate and update `POWER_AUTOMATE_URL`. (Like the Cloudflare
+  token, it's visible to anyone who views the live page's source.)
+- **Payload:** `POST`, `Content-Type: application/json`, the same fields as
+  the Cloudflare copy (`family`, `referral`, `members`, `submittedAt`,
+  `printHtml`). **Don't rename or restructure these fields**: the flow
+  reads `printHtml` and `family.lastName` by name. The flow answers
+  HTTP 200 with `{"ok": true}`.
+- **`printHtml` here is a complete, self-contained HTML document**
+  (`pdfDocument()`), not the page fragment the Cloudflare copy gets: the
+  flow turns it into the PDF with OneDrive's "Convert file", which isn't a
+  full browser. It has its own `<style>` block and the same styles inline
+  on each element; no flexbox, grid or `::before`; US Letter with 0.5in
+  margins; the family member boxes are a table, three equal columns; each
+  section is its own bordered box (a one-cell table) with a small gap
+  between; checkboxes are plain text, `[X]` and `[ ]`, in case the
+  converter has no symbol or emoji font. The on-screen Print output and
+  the Cloudflare copy are unchanged.
+- **Never affects what the family sees.** It's sent alongside the
+  Cloudflare copy with its own 30-second timeout and isn't waited on;
+  failures and timeouts are only logged to the browser console. (If the
+  family closes the page the instant "Intake sent" appears, a slow send
+  could be cut off; and a retried Submit sends a second copy.)
 
 ## Release of information (signed in the intake)
 
@@ -430,6 +471,15 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 16.8
+
+- **Submits to Power Automate as well as Cloudflare** (transition). Each
+  Submit also posts the intake to a Power Automate flow that saves it as
+  a PDF in SharePoint, with a self-contained HTML printout built for the
+  PDF converter. What the family sees still depends only on the Cloudflare
+  result; Power Automate results go to the console. The Cloudflare code is
+  marked temporary. See "Power Automate submission".
 
 ### Version 16.7
 
