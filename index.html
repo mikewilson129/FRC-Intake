@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 16.6 — see README.md changelog for what changed in this version -->
+<!-- Version 16.7 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -4037,7 +4037,8 @@ async function sendIntake(){
 
 /* ---- Remote mode (the default; ?office is the tablet): the family finishes on their own device ----
    "Almost done" (release buttons, encouraged but not required) → Submit →
-   "Intake sent". No staff panel, Print or Start over. */
+   "Intake sent". No staff panel or Start over; just a small Print button,
+   in case staff in the office open the plain link by mistake. */
 function remoteFinishScreen(){
   const releases = releaseButtons();
   const rule = finishRule();
@@ -4066,7 +4067,8 @@ function remoteFinishScreen(){
     /* grey until every CFFS/JRI release is signed; tapping it anyway shows the warning */
     nextMuted: unsignedReleasePeople().length > 0,
     canNext: !state.submitting && rule.ok,
-    why: rule.ok ? undefined : rule.why
+    why: rule.ok ? undefined : rule.why,
+    extraNav: remotePrintButton()
   });
 }
 async function remoteSubmit(){
@@ -4088,8 +4090,21 @@ function remoteSentScreen(){
       el("p",null, el("span",{class:"check"},"✓ "),
         "Thank you! Your intake was sent to the FRC. Someone from the FRC will follow up with you."),
       el("p",{class:"subtle"},"You can close this page now.")
-    ]
+    ],
+    extraNav: remotePrintButton()
   });
+}
+/* Small, quiet Print on "Almost done" and "Intake sent", for staff who open
+   the plain link in the office by mistake. Puts the staff copy in the print
+   area only for this print, then puts the "Printing isn't available" notice
+   back (afterprint; the next render also restores it). */
+function remotePrintButton(){
+  return el("button",{class:"btn-quiet", type:"button", style:"padding:8px 14px; font-size:14px;",
+    onclick:()=>{
+      document.getElementById("printRoot").innerHTML = buildPrint();
+      window.addEventListener("afterprint", remotePrintNotice, {once:true});
+      window.print();
+    }}, "Print");
 }
 
 function miniCard(m){

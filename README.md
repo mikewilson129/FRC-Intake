@@ -158,18 +158,23 @@ changes:
     asked again. Not shown when the release buttons are switched off.
   - Success → **"Intake sent"**: "Thank you! Your intake was sent to the
     FRC. Someone from the FRC will follow up with you." / "You can close
-    this page now." No Back, Print, staff panel or Start over; the Notes
+    this page now." No Back, staff panel or Start over; the Notes
     button is hidden (a note typed now wouldn't be sent); closing the page
     no longer asks "Leave site?".
   - Failure (or a 30-second timeout) → "Please try again. If it still
     doesn't work, call the FRC at 978-296-8080." Submit stays available.
-- **No printing.** The staff data-entry copy is only built as the text
-  that gets submitted; it never goes into the page's print area. If the
-  family uses the browser's own Print (or Share > Print), all that prints
-  is "Printing isn't available." — after Submit, "Printing isn't available.
-  Your intake was sent to the FRC." — never the staff copy (with its Needs &
-  Follow-ups box) or the screen. Tablet printing is unchanged.
-- **No print fallback.** So the remote submission (proof of concept — see
+- **Printing: only the small Print button.** "Almost done" and "Intake
+  sent" have a small, plain **Print** button (since Version 16.7), in case
+  staff in the office open the plain link by mistake. It prints the staff
+  data-entry copy (English, same as the tablet's), with the remote wording
+  below ("Submitted from the family's own device", "Completed remotely…")
+  even if it's printed before Submit. Otherwise the staff copy is only
+  built as the text that gets submitted: if the browser's own Print (or
+  Share > Print) is used, all that prints is "Printing isn't available." —
+  after Submit, "Printing isn't available. Your intake was sent to the
+  FRC." — never the staff copy or the screen. Tablet printing is
+  unchanged.
+- **No print fallback for families.** So the remote submission (proof of concept — see
   below) is the only way a remote intake reaches the FRC. If it keeps
   failing, the family is asked to call.
 - **Lines written for the FRC tablet** show a remote version instead. The
@@ -425,6 +430,15 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 16.7
+
+- **Remote mode (the plain link): small Print button back** on "Almost
+  done" and "Intake sent", in case staff in the office open the plain link
+  instead of `?office`. It's a quiet, small button next to Submit (on
+  "Intake sent", on its own) and prints the same staff data-entry copy the
+  tablet does, with the remote wording. The browser's own Print still
+  prints only "Printing isn't available." The tablet is unchanged.
 
 ### Version 16.6
 
