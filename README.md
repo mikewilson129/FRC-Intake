@@ -269,13 +269,52 @@ saves it as a PDF in SharePoint.
   margins; the family member boxes are a table, three equal columns; each
   section is its own bordered box (a one-cell table) with a small gap
   between; checkboxes are plain text, `[X]` and `[ ]`, in case the
-  converter has no symbol or emoji font. The on-screen Print output and
-  the Cloudflare copy are unchanged.
+  converter has no symbol or emoji font; each person's section headings
+  show their name, small and right-aligned; every page's footer shows
+  "Family Intake — {last name}" and "Page X of Y" (CSS page margin boxes:
+  a converter that doesn't support them leaves the footer off). The
+  on-screen Print output and the Cloudflare copy are unchanged.
 - **Never affects what the family sees.** It's sent alongside the
   Cloudflare copy with its own 30-second timeout and isn't waited on;
   failures and timeouts are only logged to the browser console. (If the
   family closes the page the instant "Intake sent" appears, a slow send
   could be cut off; and a retried Submit sends a second copy.)
+
+## Safety resources pop-up
+
+Added in Version 16.9, on the tablet and the remote link alike. When
+someone answers **Disagree** or **Strongly disagree** to any "I feel safe…"
+question (adult: home, work or school, neighborhood; child's own: home,
+school, neighborhood) or **Yes** to "Would you like a domestic violence
+referral?", an in-page box opens:
+
+> **Your safety matters**
+> If you are in danger right now, call 911.
+> *(remote)* We do not see this form right away. It may take up to a week for our staff to read your answers.
+> *(tablet)* You can also talk to a staff member here today.
+> If you need support now, you can reach someone any time, day or night:
+> - Mental health crisis support: Eliot Community Behavioral Health Center (Mobile Crisis), 888-769-5201
+> - 988 Suicide & Crisis Lifeline: call or text 988 *(Call 988 / Text 988 buttons)*
+> - Domestic violence support: SafeLink, 877-785-2020
+>
+> You do not need to change your answer.
+> **[OK, continue]**
+
+- Phone numbers are tap-to-call links (`tel:`); "Text 988" opens a text
+  message (`sms:`). On a device that can't make calls (e.g. a Wi-Fi-only
+  tablet), tapping one may do nothing or offer another app.
+- Shown **once per question per person** (`state.safetyShown`), however the
+  answer changes afterward. It never changes or blocks the answer. No FRC
+  contact info, by design.
+- It's part of the page, not a new browser window, so pop-up blockers
+  don't affect it.
+- The staff printout notes it in that person's S3 Safety section:
+  "Safety resources pop-up shown." (small italic text; hidden on the
+  family's Review screen). Nothing is added to the submitted member data.
+- Translated in Spanish, Portuguese and Haitian Creole (program names stay
+  in English). **Spanish: for staff review; Portuguese and Haitian Creole:
+  DRAFT, need native-speaker review.**
+- Code: `safetyAnswer()`, `safetyPopup()`, `safetyNote()` in `index.html`.
 
 ## Release of information (signed in the intake)
 
@@ -471,6 +510,18 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 16.9
+
+- **Safety resources pop-up** (tablet and remote): on a Disagree/Strongly
+  disagree to any "I feel safe…" question or Yes to the domestic violence
+  referral, shows 911, Eliot Mobile Crisis, 988 and SafeLink, with
+  tap-to-call links. Once per question per person; never changes the
+  answer. Noted on the staff printout. Spanish, Portuguese and Haitian
+  Creole drafts added. See "Safety resources pop-up".
+- **Power Automate PDF:** footer on every page with the family name and
+  "Page X of Y"; each person's section headings show their name on the
+  right.
 
 ### Version 16.8
 
