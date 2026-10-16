@@ -4491,8 +4491,6 @@ const PDF_RULES = [
 /* these become one-cell tables; the gaps around them are spacer lines,
    since converters ignore margins on tables */
 const PDF_BOXES = ['p-cra','p-section','p-staff','p-needs','p-mfb','p-roi'];
-/* a quoted CSS string: safe for any family name, inside a <style> block too */
-function cssString(t){ return '"'+String(t).replace(/[\\"]/g, c=>'\\'+c).replace(/</g,'\\3C ').replace(/[\r\n]+/g,' ')+'"'; }
 function pdfSpacer(px){
   const d = document.createElement("div");
   d.className = "p-gap";
@@ -4552,21 +4550,27 @@ function pdfDocument(bodyHtml){
     d.append(...td.childNodes);
     td.appendChild(d);
   }
-  /* US Letter, 0.5in margins (the WordSection1 lines are the same for Word-based converters).
-     Footer on every page: family name and "Page X of Y", from CSS page margin
-     boxes; a converter without them simply leaves the footer off. */
-  const fam = cssString("Family Intake — "+(state.family.lastName||"(no family name)"));
-  const css = '@page{\nsize:8.5in 11in;\nmargin:0.5in 0.5in 0.65in;\n'+
-    '@bottom-left{\ncontent:'+fam+';\nfont-family:Arial,Helvetica,sans-serif;\nfont-size:9px;\ncolor:#444;\n}\n'+
-    '@bottom-right{\ncontent:"Page " counter(page) " of " counter(pages);\nfont-family:Arial,Helvetica,sans-serif;\nfont-size:9px;\ncolor:#444;\n}\n}\n'+
-    '@page WordSection1{size:8.5in 11in; margin:0.5in 0.5in 0.65in;}\n'+
+  /* US Letter, 0.5in margins. The footer on every page (family name,
+     "Page X of Y") is in Word's own HTML format: the flow's converter
+     (OneDrive "Convert file") is Word-based and ignores CSS page footers.
+     Word lifts the mso-element:footer block into each page's footer and
+     fills in the PAGE / NUMPAGES fields; anything else shows it once, at
+     the end. Tested on the live flow before building it in. */
+  const css = '@page{size:8.5in 11in; margin:0.5in 0.5in 0.75in 0.5in;}\n'+
+    '@page WordSection1{size:8.5in 11.0in; margin:0.5in 0.5in 0.75in 0.5in; mso-header-margin:0.3in; mso-footer-margin:0.3in; mso-footer:f1;}\n'+
     'div.WordSection1{page:WordSection1;}\n'+
+    'p.MsoFooter{margin:0in; font-size:9.0pt; font-family:Arial; color:#444444;}\n'+
     'body{'+PDF_FONT+' font-size:12px; color:#000; background:#fff; margin:0;}\n'+
     PDF_RULES.map(([sel, rule])=>sel+'{'+rule+'}').join('\n')+'\n';
-  return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">'+
+  const field = code => "<!--[if supportFields]><span style='mso-element:field-begin'></span> "+code+
+    " <span style='mso-element:field-separator'></span><![endif]-->1<!--[if supportFields]><span style='mso-element:field-end'></span><![endif]-->";
+  const footer = "<div style='mso-element:footer' id='f1'><p class='MsoFooter'>Family Intake — "+esc(state.family.lastName||"(no family name)")+
+    "<span style='mso-tab-count:1'></span>&nbsp;&nbsp;&nbsp;&nbsp;Page "+field("PAGE")+" of "+field("NUMPAGES")+"</p></div>";
+  return '<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40" lang="en">'+
+    '<head><meta charset="UTF-8"><meta name="ProgId" content="Word.Document"><meta name="Generator" content="Microsoft Word 15">'+
     '<title>Family Intake — '+esc(state.family.lastName||"(no family name)")+'</title>'+
     '<style>\n'+css+'</style></head><body style="'+PDF_FONT+' font-size:12px; color:#000;">'+
-    '<div class="WordSection1">'+holder.innerHTML+'</div></body></html>';
+    '<div class="WordSection1">'+holder.innerHTML+footer+'</div></body></html>';
 }
 /* Remote mode: if the page is printed anyway (browser Print, Share > Print),
    this is all that prints — never the staff copy or the screen. */

@@ -271,8 +271,11 @@ saves it as a PDF in SharePoint.
   between; checkboxes are plain text, `[X]` and `[ ]`, in case the
   converter has no symbol or emoji font; each person's section headings
   show their name, small and right-aligned; every page's footer shows
-  "Family Intake — {last name}" and "Page X of Y" (CSS page margin boxes:
-  a converter that doesn't support them leaves the footer off). The
+  "Family Intake — {last name}" and "Page X of Y". The converter is
+  Word-based and ignores CSS page footers, so the footer is written in
+  Word's own HTML format (an `mso-element:footer` block with PAGE /
+  NUMPAGES fields); tested on the live flow. Anything that isn't Word
+  shows that footer once, at the end of the document instead. The
   on-screen Print output and the Cloudflare copy are unchanged.
 - **Never affects what the family sees.** It's sent alongside the
   Cloudflare copy with its own 30-second timeout and isn't waited on;
