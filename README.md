@@ -7,6 +7,56 @@ FRC's shared tablet (the `?office` link), where staff then print a CRM-ready
 data-entry copy. There is no backend
 required for the core flow — everything lives in one file.
 
+## Next revision checklist
+
+**Go through this list before starting the next set of changes.** Check items
+off (or delete them) as they're done, and add new requests at the bottom of the
+right group. Longer parked ideas live in "Future ideas (not built yet)" near
+the end of this file.
+
+**Form changes to decide or build**
+
+- [ ] **Non-resident adults.** Should every adult added after the first be
+  asked whether they live in the household (e.g. co-parents doing the intake
+  together)? Check with the director first: there's currently no place in the
+  CRM for that answer if a full intake isn't done for them.
+- [ ] **Separate address for a second adult** (e.g. divorced parents at
+  different addresses). Discuss first; it needs a place in the CRM. For now
+  families use the Notes box. See "Future ideas".
+- [ ] **Child questions that can't be skipped.** Decide whether each stays
+  required or gets a Skip / "Not sure" option. See "Future ideas".
+
+**Translations still waiting on review**
+
+- [ ] Safety resources pop-up (Version 16.9): Spanish is for staff review;
+  Portuguese and Haitian Creole are drafts that need a native-speaker review.
+- [ ] Unsigned-release warnings (Version 16.3) and the `release-done.html`
+  page: Spanish, Portuguese and Haitian Creole are drafts.
+- [ ] Version 16 remote-mode and household lines: Portuguese and Haitian
+  Creole are drafts, and so are the Spanish lines changed just before that
+  version was merged.
+- [ ] Haitian Creole is still marked "(beta)" in the language menu.
+
+**Hosting move and clean-up**
+
+- [ ] When the form moves to its new address, work through the
+  "Hosting-move checklist" below (Jotform Thank You redirects, the tablet's
+  `?office` bookmark, the Staff links).
+- [ ] Remove the temporary Cloudflare code (`WORKER_URL`, `SUBMIT_TOKEN`,
+  `submitIntake()`) once the Power Automate submission is confirmed working.
+  Until then, what the family sees after Submit comes only from the
+  Cloudflare result.
+- [ ] Once the repo is private or has moved, regenerate the Power Automate
+  trigger URL and rotate `SUBMIT_TOKEN`. Both are written in `index.html`,
+  which is in a public repo until then (see "Remote submission" and
+  "Power Automate submission" below).
+
+**Process (not form changes)**
+
+- [ ] Set up a test / sandbox site so changes can be tried before they go
+  live.
+- [ ] Understand pull requests, including how they differ from branches.
+
 ## How it's built
 
 - **`index.html`** — the entire app: markup shell, CSS, and JS, in one file.
