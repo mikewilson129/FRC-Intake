@@ -25,6 +25,29 @@ the end of this file.
   families use the Notes box. See "Future ideas".
 - [ ] **Child questions that can't be skipped.** Decide whether each stays
   required or gets a Skip / "Not sure" option. See "Future ideas".
+- [ ] **Fill-in boxes for "Other" answers.** Race, ethnicity, language,
+  gender, pronouns and "who filed the CRA" already have a fill-in box. These
+  "Other" answers don't (checked in Version 16.9), so staff can't tell what
+  was meant: the referral source's "Other State Agency", "Other Local
+  Agency" and "Other Healthcare Provider"; family status; highest education;
+  employment; source of income ("Other Income"); civic involvement (adult and
+  child); the child's educational status; and the family role. Decide which
+  need a box. Each new box also needs a printout line and translations
+  (see "Making changes").
+- [ ] **Map "What brings you in" to the CRM's Reason for visit.** Today the
+  printout lists the quick picks and the family's own words, plus a blank
+  line for staff to write the CRM Reason-for-Visit category (the "S3 —
+  Reason for Visit" box). Map each quick pick (adult and child) to its CRM
+  category and print it, so staff can enter it straight across. Needs the
+  CRM's list of Reason-for-Visit categories.
+- [ ] **Printout order vs. the CRM.** Review the staff printout's section and
+  field order against the order in the CRM, so data entry runs top to
+  bottom. A reference copy of the CRM's order may exist somewhere (not
+  remembered where); find it first.
+- [ ] **Releases at home.** Find a better way for families to sign releases
+  on their own device. Today remote "Almost done" opens the release in a
+  panel with a "Sign release for {first name}" button for each person (see
+  "Release of information"). One idea: plain links instead. Not decided.
 
 **Translations still waiting on review**
 
