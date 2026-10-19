@@ -42,8 +42,16 @@ the end of this file.
   CRM's list of Reason-for-Visit categories.
 - [ ] **Printout order vs. the CRM.** Review the staff printout's section and
   field order against the order in the CRM, so data entry runs top to
-  bottom. A reference copy of the CRM's order may exist somewhere (not
-  remembered where); find it first.
+  bottom. There's no written reference for the CRM's order, so check it
+  against the CRM screens themselves.
+- [ ] **Race on the printout when someone is Hispanic.** The CRM's Race list
+  has no Hispanic option, so staff currently enter N/A. Today a "Yes, …"
+  ethnicity answer auto-checks "Hispanic/Latino" in the on-screen Race list
+  (it can still be unchecked), and the printout shows it as a checked Race.
+  Change the printout only: if Hispanic/Latino is the only race selected,
+  print Race as N/A. Leave the on-screen questions alone. Still to decide:
+  when other races are checked too, should "Hispanic/Latino" be left off the
+  Race line?
 - [ ] **Releases at home.** Find a better way for families to sign releases
   on their own device. Today remote "Almost done" opens the release in a
   panel with a "Sign release for {first name}" button for each person (see
