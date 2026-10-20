@@ -44,17 +44,6 @@ the end of this file.
   field order against the order in the CRM, so data entry runs top to
   bottom. There's no written reference for the CRM's order, so check it
   against the CRM screens themselves.
-- [ ] **Court in Agency Involvement for adults.** Children already work this
-  way: "Which court?" is asked once, on the "Court & safety history" screen,
-  and carried into the printout's S5 — Agency Involvement ("Court: Yes
-  (checked)" and "Which court? (from S3)"), and the child's Agency screen
-  says court is already noted so it isn't asked twice. Adults don't get
-  that: they answer court, which court and why under S3 — Safety, and their
-  S5 has no Court line. Make adults match: carry Court and "Which court?"
-  into the adult S5, and add the same "already noted" line to the adult
-  Agency screen. Decide whether the adult's reason goes in S5 too. Also check
-  the Agency list against the CRM's (it has no Court option, and DTA and
-  MassHealth are in it).
 - [ ] **Race on the printout when someone is Hispanic.** The CRM's Race list
   has no Hispanic option, so staff currently enter N/A. Today a "Yes, …"
   ethnicity answer auto-checks "Hispanic/Latino" in the on-screen Race list
