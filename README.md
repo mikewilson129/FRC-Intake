@@ -16,68 +16,41 @@ the end of this file.
 
 **Form changes to decide or build**
 
-- [ ] **Non-resident adults.** Should every adult added after the first be
-  asked whether they live in the household (e.g. co-parents doing the intake
-  together)? Check with the director first: there's currently no place in the
-  CRM for that answer if a full intake isn't done for them.
-- [ ] **Separate address for a second adult** (e.g. divorced parents at
-  different addresses). Discuss first; it needs a place in the CRM. For now
-  families use the Notes box. See "Future ideas".
-- [ ] **Child questions that can't be skipped.** Decide whether each stays
-  required or gets a Skip / "Not sure" option. See "Future ideas".
-- [ ] **Fill-in boxes for "Other" answers.** Race, ethnicity, language,
-  gender, pronouns and "who filed the CRA" already have a fill-in box. These
-  "Other" answers don't (checked in Version 16.9), so staff can't tell what
-  was meant: the referral source's "Other State Agency", "Other Local
-  Agency" and "Other Healthcare Provider"; family status; highest education;
-  employment; source of income ("Other Income"); civic involvement (adult and
-  child); the child's educational status; and the family role. Decide which
-  need a box. Each new box also needs a printout line and translations
-  (see "Making changes").
-- [ ] **Map "What brings you in" to the CRM's Reason for visit.** Today the
-  printout lists the quick picks and the family's own words, plus a blank
-  line for staff to write the CRM Reason-for-Visit category (the "S3 —
-  Reason for Visit" box). Map each quick pick (adult and child) to its CRM
-  category and print it, so staff can enter it straight across. Needs the
-  CRM's list of Reason-for-Visit categories.
-- [ ] **Printout order vs. the CRM.** Review the staff printout's section and
-  field order against the order in the CRM, so data entry runs top to
-  bottom. There's no written reference for the CRM's order, so check it
-  against the CRM screens themselves.
-- [ ] **Race on the printout when someone is Hispanic.** The CRM's Race list
-  has no Hispanic option, so staff currently enter N/A. Today a "Yes, …"
-  ethnicity answer auto-checks "Hispanic/Latino" in the on-screen Race list
-  (it can still be unchecked), and the printout shows it as a checked Race.
-  Change the printout only (leave the on-screen questions alone):
-  - List everything the person selected for Ethnicity and for Race.
-  - Exception: if they answered Yes to Hispanic on Ethnicity and
-    "Hispanic/Latino" is the **only** Race selected, print Race as N/A.
-  - If they answered Yes to Hispanic, unchecked "Hispanic/Latino", and left
-    Race blank or chose "Choose Not to Answer", print Race as
-    "Choose Not To Answer".
-  - Not covered: someone who isn't Hispanic and leaves Race blank. That
-    prints "None selected" today; assume it stays that way unless told
-    otherwise.
-- [ ] **Short explanation next to the JRI consent.** Families should see why
-  the CFFS/JRI release is needed: the Family Resource Center is a
-  collaboration between Pathways for Children and Children's Friend and
-  Family Services (JRI), and staff from both agencies are employed here. Show
-  it by the "Sign release for…" buttons (tablet "All set!", remote "Almost
-  done"), short enough that people read all of it. Draft (28 words):
-  "Staff from both Pathways for Children and Children's Friend and Family
-  Services (JRI) work together at this Center. To receive support here, this
-  consent needs to be signed." Needs approval from Pathways and JRI, plus
-  Spanish, Portuguese and Haitian Creole versions. **Decide first:** the
-  wording says the consent is required, but today releases are "encouraged
-  but not required" and Submit still works through "Submit anyway". Either
-  keep the notice softer (e.g. "we need") or change what the form allows.
-- [ ] **Releases at home.** Find a better way for families to sign releases
-  on their own device. Today remote "Almost done" opens the release in a
-  panel with a "Sign release for {first name}" button for each person (see
-  "Release of information"). One idea: plain links instead. Not decided.
+- [ ] **Map "What brings you in" to the CRM's Reason for visit.** *(On hold.)*
+  Today the printout lists the quick picks and the family's own words, plus
+  a blank line for staff to write the CRM Reason-for-Visit category (the "S3
+  — Reason for Visit" box). Map each quick pick (adult and child) to its CRM
+  category and print it, so staff can enter it straight across. Still
+  needed: which CRM category each quick pick goes to. The CRM's
+  Reason-for-visit list (from a CRM screenshot, Oct 2026):
+  Afterschool Info · Child Care Info · Child Development / Early
+  Intervention · Continuing Education for Caregiver · DCF Involvement /
+  Support · Domestic Violence Services · Families Displaced by Natural
+  Forces · Family Hardship / Financial Issues · Food Nutrition · Health
+  Crisis / Outbreak · Health/Mental Health Concerns · Housing / Rent ·
+  Immigration / Legal Issues · Job Issues · LGBTQIA + Support · Play Group ·
+  School Issue / School Info · Seeking Information on Parenting / Parenting
+  Education · SNAP Application / Benefit Assistance · Substance Use
+  Concerns · Teen / Young Adult Activities · Transportation · Other
+- [ ] **Printout order vs. the CRM.** The printout order was matched to the
+  CRM before and is very close; one or two individual items may be out of
+  order. Re-check it against the CRM screens (Mike) and note any that need
+  moving.
+- [ ] **Other releases at home.** *(Skipped for now.)* The CFFS/JRI release
+  works at home as intended. Other releases (outside agencies, people) only
+  have a spot on the tablet: the staff panel's suggestions and "+ Complete
+  another release" after Submit (see "Other releases"). Remote mode has no
+  way to do them. Not decided how families should do extra releases at
+  home; they likely wouldn't get filled in right without staff anyway.
 
 **Translations still waiting on review**
 
+- [ ] Version 17 strings (Spanish, Portuguese and Haitian Creole drafts):
+  "Please specify", "Not sure", the address question ("Is this person's
+  address different from the family address?", "State", and the Review
+  labels "Address different from the family's?" / "Address") and the JRI
+  consent notice. The notice says "autorización" / "autorização" /
+  "otorizasyon" to match the release buttons.
 - [ ] Safety resources pop-up (Version 16.9): Spanish is for staff review;
   Portuguese and Haitian Creole are drafts that need a native-speaker review.
 - [ ] Unsigned-release warnings (Version 16.3) and the `release-done.html`
@@ -439,6 +412,13 @@ a full-screen panel inside the intake page, already filled in:
 
 Everything prefilled can still be changed in Jotform.
 
+- **Why it's needed (Version 17):** while anyone listed hasn't signed, a
+  short notice sits above the buttons: "Staff from both Pathways for
+  Children and Children's Friend and Family Services (JRI) work together at
+  this Center. To receive support here, this consent needs to be signed."
+  (`RELEASE_WHY` in `index.html`; update the dictionaries if it changes.)
+  "Submit anyway" / "Continue anyway" still work as before.
+
 - **On for everyone** (tablet and remote) since Version 16.1. To hide the
   buttons again, set `RELEASE_FOR_EVERYONE = false` in `index.html`; staff
   can still test them with the staff-only `?releasetest` links (see
@@ -593,16 +573,6 @@ Since everything is one file, a few conventions keep it maintainable:
   privacy choice on the shared Android tablets at the FRC. A likely shape:
   an "external" (client's own phone) mode that saves progress, and an
   "internal" (shared tablet) mode that keeps today's no-saving behavior.
-- **Child questions that can't be skipped (to review).** Three child-intake
-  questions must be answered before Continue turns on, and have no Skip
-  link: "Is there an active CRA for {name}?" (ages 12+), "Is {name} present
-  and able to answer a few questions directly?" (ages 11+), and "Is {name}
-  currently living with their family?" (all ages). Decide whether each
-  should stay required or get a Skip / "Not sure" option. (CRA mode, added
-  in Version 15, doesn't change them.)
-- **Separate address for a second adult** (e.g. divorced parents at
-  different addresses) — discuss for a future version; needs a place in
-  the CRM. For now, families use the Notes box.
 - **Households with no adult.** "No one else — finish up" needs a completed
   adult intake (plus a child's in CRA mode), so a household with no adults
   entered (e.g. a youth on their own) can't finish.
@@ -616,6 +586,38 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 17
+
+- **Race on the printout (CRM has no Hispanic race).** The printout lists
+  everything selected for Ethnicity and Race, except: Yes to Hispanic with
+  "Hispanic/Latino" as the only race prints Race as **N/A**; Yes to
+  Hispanic with "Hispanic/Latino" unchecked and Race blank or "Choose Not
+  to Answer" prints **Choose Not To Answer**. Printout and submitted copy
+  only; the screens and the family's Review are unchanged. Someone not
+  Hispanic who leaves Race blank still prints "None selected". (`raceOut()`)
+- **"Is this person's address different from the family address?"** On the
+  add-a-person screen, for every adult after the first (shown once the date
+  of birth makes them 18+). Yes opens Street, Apt #, City, State and Zip.
+  Printed on their family-member card and Family Member Info, with the staff
+  reminder to set "Information Different from Primary Contact" = Yes on the
+  Contact Information tab. Sent as `addrDiff` and `addr` on the member.
+  Replaces the "non-resident adults" and "second adult's address" ideas.
+- **"Not sure" for the child's active-CRA question** (ages 12+). Prints
+  "CRA Related Question: Not sure" with a staff line to confirm with the
+  family. "Present to answer directly" and "living with family" stay
+  required.
+- **"Please specify" box under every "Other" answer:** referral source
+  (Other State Agency, Other Local Agency, Other Healthcare Provider),
+  family role, family status, highest education, employment, source of
+  income ("Other Income"), civic involvement (adult and child), and the
+  child's educational status. Prints as e.g. "Other (Book club)"; a blank
+  box prints plain "Other". (`otherBox()`, `oneOut()`, `listOut()`)
+- **JRI consent notice** above the "Sign release for…" buttons (tablet "All
+  set!", remote "Almost done") while anyone hasn't signed. See "Release of
+  information".
+- **Translations:** Spanish, Portuguese and Haitian Creole drafts for all
+  new strings — need review.
 
 ### Version 16.9
 

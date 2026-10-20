@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 16.9 — see README.md changelog for what changed in this version -->
+<!-- Version 17 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -95,6 +95,7 @@
   .divider{border:none; border-top:1px solid var(--line); margin:22px 0;}
   .notice{background:var(--accent-soft); border-radius:10px; padding:13px 15px; font-size:15px; margin:14px 0;}
   .subtle{font-size:14px; color:var(--soft);}
+  .other-box{margin-top:8px;}
   .scale{display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 2px;}
   .scale .opt{flex:1 1 100px; text-align:center; padding:12px 8px; font-size:15px;}
   /* review screen */
@@ -816,6 +817,14 @@ const I18N = { es: {
 "Text 988":"Enviar texto al 988",
 "Domestic violence support: SafeLink, {n}":"Apoyo en violencia doméstica: SafeLink, {n}",
 "You do not need to change your answer.":"No necesita cambiar su respuesta.",
+/* --- V17: Other boxes, CRA Not sure, address question, JRI consent notice — DRAFT, needs review --- */
+"Please specify":"Por favor, especifique",
+"Not sure":"No estoy seguro/a",
+"Is this person's address different from the family address?":"¿La dirección de esta persona es diferente a la dirección de la familia?",
+"State":"Estado",
+"Address different from the family's?":"¿Dirección diferente a la de la familia?",
+"Address":"Dirección",
+"Staff from both Pathways for Children and Children's Friend and Family Services (JRI) work together at this Center. To receive support here, this consent needs to be signed.":"El personal de Pathways for Children y de Children's Friend and Family Services (JRI) trabaja en conjunto en este Centro. Para recibir apoyo aquí, es necesario firmar esta autorización.",
 "OK, continue":"De acuerdo, continuar"
 },
 pt: {
@@ -1405,6 +1414,14 @@ pt: {
 "Text 988":"Enviar mensagem para o 988",
 "Domestic violence support: SafeLink, {n}":"Apoio em violência doméstica: SafeLink, {n}",
 "You do not need to change your answer.":"Você não precisa mudar sua resposta.",
+/* --- V17: Other boxes, CRA Not sure, address question, JRI consent notice — DRAFT, needs review --- */
+"Please specify":"Por favor, especifique",
+"Not sure":"Não tenho certeza",
+"Is this person's address different from the family address?":"O endereço desta pessoa é diferente do endereço da família?",
+"State":"Estado",
+"Address different from the family's?":"Endereço diferente do da família?",
+"Address":"Endereço",
+"Staff from both Pathways for Children and Children's Friend and Family Services (JRI) work together at this Center. To receive support here, this consent needs to be signed.":"A equipe da Pathways for Children e da Children's Friend and Family Services (JRI) trabalha em conjunto neste Centro. Para receber apoio aqui, esta autorização precisa ser assinada.",
 "OK, continue":"OK, continuar"
 },
 ht: {
@@ -1994,6 +2011,14 @@ ht: {
 "Text 988":"Voye tèks bay 988",
 "Domestic violence support: SafeLink, {n}":"Sipò pou vyolans domestik: SafeLink, {n}",
 "You do not need to change your answer.":"Ou pa bezwen chanje repons ou.",
+/* --- V17: Other boxes, CRA Not sure, address question, JRI consent notice — DRAFT, needs review --- */
+"Please specify":"Tanpri presize",
+"Not sure":"Mwen pa sèten",
+"Is this person's address different from the family address?":"Èske adrès moun sa a diferan de adrès fanmi an?",
+"State":"Eta",
+"Address different from the family's?":"Adrès diferan de pa fanmi an?",
+"Address":"Adrès",
+"Staff from both Pathways for Children and Children's Friend and Family Services (JRI) work together at this Center. To receive support here, this consent needs to be signed.":"Anplwaye Pathways for Children ak Children's Friend and Family Services (JRI) travay ansanm nan Sant sa a. Pou w resevwa sipò isit la, fòk otorizasyon sa a siyen.",
 "OK, continue":"OK, kontinye"
 }
 };
@@ -2120,6 +2145,9 @@ const REFERRAL_CATS = [
    {v:"Social Media"},
    {v:"Printed Media"}]}
 ];
+
+/* referral answers that get a "Please specify" box (Version 17) */
+const REFERRAL_OTHER = ["Other State Agency","Other Local Agency","Other Healthcare Provider"];
 
 const GENDER_OPTS = ["Male","Female","Non-Binary, Gender Fluid","Questioning/Not Sure","I Prefer Not to Answer","Tell Us in Your Own Words"];
 const PRONOUN_OPTS = ["He/Him/His","She/Her/Hers","They/Them/Theirs","Ze/Zir/Zirs","I Prefer Not to Answer","Tell Us in Your Own Words"];
@@ -2383,7 +2411,7 @@ const state = {
   notesText:"",    /* single running note, shown via the persistent floating Notes panel */
   family:{lastName:"", phone:"", email:"", householdType:null, living:null, income:null,
     address:{street:"", street2:"", apt:"", city:"", cityAuto:false, state:"Massachusetts", zip:""}},
-  referral:{category:null, value:null},
+  referral:{category:null, value:null, other:""},
   members:[],
   cra:false,       /* CRA mode: finishing needs a completed adult AND child intake */
   otherReleases:0, /* releases signed through the staff panel's "Complete another release" */
@@ -2479,7 +2507,8 @@ function qSetOf(m){
 const SHARED_ANSWER_KEYS = ["role","roleQ","roleDecline","race","raceOther","ethnicity","ethnicityOther",
   "hispanicOrigin","hispAuto","hispUnchecked","language","languageOther","reasonText","reasonPicks",
   "disability","disabTypes","overallHealth","condFlag","conditions","doctor12","dentist12",
-  "court","courtWhich","s4food","s4clothing","agencies","communityFlag","community","civic"];
+  "court","courtWhich","s4food","s4clothing","agencies","communityFlag","community","civic",
+  "roleOther","civicOther"];
 /* Returns true when the person now needs to go through their questions again. */
 function syncQuestionSet(m){
   const now = qSetOf(m), was = m.qset;
@@ -2598,6 +2627,12 @@ function qText(getObj, key, o){
   if(o.bad) inp.classList.add("bad");
   inp.addEventListener("input", ()=>{ getObj[key]=inp.value; if(o.oninput) o.oninput(inp.value, inp); });
   return inp;
+}
+/* Version 17: the "Please specify" box shown under an "Other" answer */
+function otherBox(getObj, key){
+  const i = qText(getObj, key, {ph:"Please specify"});
+  i.classList.add("other-box");
+  return i;
 }
 function qArea(getObj, key, o){
   o=o||{};
@@ -2989,6 +3024,7 @@ SCREENS.refSource = () => {
     body.push(el("p",{class:"hint"},byMode("Now the specific one. This question can't be skipped — ask a staff member if none of these look right.",
       "Now the specific one. This question can't be skipped — if none of these look right, try your best and tell us in the Notes section in your own words.")));
     body.push(qSingle(cat.items, ()=>r.value, v=>r.value=v, {stack:true, toggle:false}));
+    if(REFERRAL_OTHER.includes(r.value)) body.push(otherBox(r, "other"));
   }
   return shell({
     title:"How did you hear about us?",
@@ -3029,9 +3065,27 @@ SCREENS.basics = (ctx) => {
     return out;
   };
   const refresh = ()=>{ const miss = missing(); setNext(!miss.length, stillNeeded(miss)); };
+  /* Version 17: adults after the first — "Is their address different?" Shown
+     once the date of birth makes them 18+; never for the first person ("you"). */
+  const firstPerson = !!ctx.first || (ctx.draft ? state.members.length===0 : state.members.indexOf(m)===0);
+  const addrShown = ()=>{ const ag = ageOf(m); return !firstPerson && ag!==null && ag>=18; };
+  if(!m.addr) m.addr = {street:"", apt:"", city:"", state:"", zip:""};
+  const addrBlock = el("div",{id:"addrWrap", style:"display:"+(addrShown()?"block":"none")+";"},
+    qLabel("Is this person's address different from the family address?"),
+    qSingle(["Yes","No"], ()=>m.addrDiff, v=>m.addrDiff=v),
+    (m.addrDiff==="Yes" ? el("div",null,
+      qText(m.addr,"street",{ph:"Street address"}),
+      el("div",{class:"row2"},
+        el("div",null, qText(m.addr,"apt",{ph:"Apt #"})),
+        el("div",null, qText(m.addr,"city",{ph:"City or town"}))),
+      el("div",{class:"row2"},
+        el("div",null, qText(m.addr,"state",{ph:"State"})),
+        el("div",null, qText(m.addr,"zip",{ph:"Zip"})))) : null));
   const dobField = (key, ph, max)=> qText(m, key, {ph:ph, max:max, oninput:()=>{
       syncDob(m);
       refresh();
+      const aw=document.getElementById("addrWrap");
+      if(aw) aw.style.display = addrShown() ? "block" : "none";
       const warn=document.getElementById("dobWarn");
       if(warn) warn.style.display = ((m.dobM||m.dobD||m.dobY) && !dobValid(m)) ? "block":"none";
     }});
@@ -3065,7 +3119,8 @@ SCREENS.basics = (ctx) => {
       qSingle(PRONOUN_OPTS, ()=>m.pronouns, v=>m.pronouns=v),
       (m.pronouns==="Tell Us in Your Own Words" ? qText(m,"pronounsOther",{ph:"In your own words"}) : null),
       qLabel("Health insurance?"),
-      qSingle(INSURANCE_OPTS, ()=>m.insurance, v=>m.insurance=v, {toggle:false})
+      qSingle(INSURANCE_OPTS, ()=>m.insurance, v=>m.insurance=v, {toggle:false}),
+      addrBlock
     ],
     canNext: basicsComplete(m),
     why: stillNeeded(missing()),
@@ -3326,7 +3381,8 @@ function roleTypeahead(m){
     }
     const roleDisp = (r)=> r==="Other" ? "Other (role)" : r;
     if(a.role){ list.appendChild(el("div",{class:"notice"},"Selected: ", el("b",null,roleDisp(a.role)), " ",
-      el("button",{class:"skiplink", type:"button", onclick:()=>{a.role=null; refresh();}},"change"))); }
+      el("button",{class:"skiplink", type:"button", onclick:()=>{a.role=null; refresh();}},"change")));
+      if(a.role==="Other") list.appendChild(otherBox(a, "roleOther")); }
     if(!a.role){
       for(const r of matches.slice(0,9)){
         list.appendChild(el("button",{class:"opt", type:"button",
@@ -3363,7 +3419,9 @@ function famStatusBlock(m){
       return true;
     });
   }
-  return qMulti(opts.map(v=>FAM_STATUS_INFO[v]?{v:v, info:FAM_STATUS_INFO[v]}:{v:v}), ()=>a.famStatus, {stack:false});
+  return el("div",null,
+    qMulti(opts.map(v=>FAM_STATUS_INFO[v]?{v:v, info:FAM_STATUS_INFO[v]}:{v:v}), ()=>a.famStatus, {stack:false}),
+    (a.famStatus.includes("Other") ? otherBox(a, "famStatusOther") : null));
 }
 /* language tile grid that collapses to the chosen answer */
 function langBlock(a, label){
@@ -3514,8 +3572,10 @@ function adultSteps(m){
       qLabel("Highest level of education completed"),
       qSingleCollapse(EDU_OPTS, ()=>a.edu, v=>a.edu=v, {stack:true}),
       (!a.edu ? skipRow(()=>a.edu, v=>a.edu=v) : null),
+      (a.edu==="Other" ? otherBox(a, "eduOther") : null),
       qLabel("Employment status (check all that apply)"),
-      qMulti(EMPLOY_OPTS, ()=>a.employment, {stack:true})
+      qMulti(EMPLOY_OPTS, ()=>a.employment, {stack:true}),
+      (a.employment.includes("Other") ? otherBox(a, "employmentOther") : null)
     ], canNext:true };},
   /* 6 */
   (m)=>{ if(!a.incomeSrc)a.incomeSrc=[];
@@ -3523,7 +3583,8 @@ function adultSteps(m){
     comfort:comfort("Check anything that applies."),
     body:[
       qLabel("Where does your household income come from? (check all that apply)"),
-      qMulti(INCOME_SRC_OPTS, ()=>a.incomeSrc, {stack:true})
+      qMulti(INCOME_SRC_OPTS, ()=>a.incomeSrc, {stack:true}),
+      (a.incomeSrc.includes("Other Income") ? otherBox(a, "incomeSrcOther") : null)
     ], canNext:true };},
   /* 7 */
   (m)=>{ if(!a.disabTypes)a.disabTypes=[];
@@ -3602,7 +3663,8 @@ function adultSteps(m){
     comfort:comfort("Totally optional — it just helps us learn what families enjoy."),
     body:[
       qLabel("Are you involved with any of the following?"),
-      qMulti(CIVIC_ADULT, ()=>a.civic, {stack:true})
+      qMulti(CIVIC_ADULT, ()=>a.civic, {stack:true}),
+      (a.civic.includes("Other") ? otherBox(a, "civicOther") : null)
     ], canNext:true };}
   ];
 }
@@ -3636,7 +3698,7 @@ function childSteps(m){
     comfort:byMode("If you're not sure, a staff member can help.", "If you're not sure, just try your best."),
     body:[
       qLabel(trn("Is there an active CRA for {n}?", kid()),"CRA stands for Child Requiring Assistance — a type of juvenile court case, sometimes filed by a parent or a school."),
-      qSingle(["Yes","No"], ()=>a.craActive, v=>a.craActive=v, {toggle:false}),
+      qSingle(["Yes","No","Not sure"], ()=>a.craActive, v=>a.craActive=v, {toggle:false}),
       (a.craActive==="Yes" ? el("div",null,
         qLabel("Who filed the CRA application?"),
         qSingle(CRA_FILED_BY, ()=>a.craFiledBy, v=>a.craFiledBy=v),
@@ -3674,6 +3736,7 @@ function childSteps(m){
       qLabel("Educational status"),
       qSingleCollapse(EDU_STATUS_CHILD, ()=>a.eduStatus, v=>a.eduStatus=v, {stack:true}),
       (!a.eduStatus ? skipRow(()=>a.eduStatus, v=>a.eduStatus=v) : null),
+      (a.eduStatus==="Other" ? otherBox(a, "eduStatusOther") : null),
       (!notSchoolAged(a) ? el("div",null,
         qLabel("School name (or last school attended)"),
         qText(a,"schoolName",{ph:"School name"}),
@@ -3856,7 +3919,8 @@ function childSteps(m){
     comfort:comfort("Totally optional — it just helps us learn what kids enjoy."),
     body:[
       qLabel(trn("Is {n} involved with any of the following?", kid())),
-      qMulti(CIVIC_CHILD, ()=>a.civic, {stack:true})
+      qMulti(CIVIC_CHILD, ()=>a.civic, {stack:true}),
+      (a.civic.includes("Other") ? otherBox(a, "civicOther") : null)
     ], canNext:true };}
   ];
 }
@@ -3881,9 +3945,49 @@ function pronounOut(m){ return m.pronouns==="Tell Us in Your Own Words" ? (m.pro
 function servicesOut(m){ return !m.services ? "No" : (m.done ? "Yes" : "Yes (intake not completed)"); }
 function dobOut(m){ if(!m.dob) return "Did Not Answer";
   const p=m.dob.split("-"); return p.length===3 ? (+p[1])+"/"+(+p[2])+"/"+p[0] : m.dob; }
-function listOut(arr, otherText){
+function listOut(arr, otherText, otherV){
   if(!arr||!arr.length) return null;
-  return arr.map(v=> (v==="Other"&&otherText) ? "Other ("+otherText+")" : v);
+  otherV = otherV || "Other";
+  const t = (otherText||"").trim();
+  return arr.map(v=> (v===otherV&&t) ? v+" ("+t+")" : v);
+}
+/* single answer with its "Please specify" text, e.g. "Other (GED class)" */
+function oneOut(v, otherText, otherV){
+  const t = (otherText||"").trim();
+  return (v===(otherV||"Other") && t) ? v+" ("+t+")" : v;
+}
+/* Version 17, printout only: the CRM's Race list has no Hispanic option.
+   Yes to Hispanic + Hispanic/Latino as the only race -> N/A; Yes to Hispanic
+   with Hispanic/Latino unchecked and Race blank or "Choose Not to Answer" ->
+   Choose Not To Answer; otherwise everything selected. */
+function raceOut(a){
+  const race = a.race||[];
+  const hisp = (a.ethnicity||[]).some(v=>v.startsWith("Yes,"));
+  if(hisp){
+    if(race.length===1 && race[0]==="Hispanic/Latino") return ["N/A"];
+    if(!race.includes("Hispanic/Latino") &&
+       (race.length===0 || (race.length===1 && race[0]==="Choose Not to Answer"))) return ["Choose Not To Answer"];
+  }
+  return listOut(race, a.raceOther);
+}
+function referralOut(){
+  const r = state.referral;
+  return REFERRAL_OTHER.includes(r.value) ? oneOut(r.value, r.other, r.value) : r.value;
+}
+/* Version 17: adults after the first are asked whether their address is
+   different from the family's (the CRM has a place for it) */
+function asksAddress(m){ return !isChild(m) && ageOf(m)!==null && state.members.indexOf(m)>0; }
+function addrOut(m){
+  const d = m.addr||{};
+  const city = [d.city, [d.state, d.zip].filter(x=>x&&x.trim()).join(" ")].filter(x=>x&&x.trim()).join(", ");
+  return [d.street, d.apt ? "Apt "+d.apt : "", city].filter(x=>x&&x.trim()).join(", ");
+}
+function addrLines(m){
+  if(!asksAddress(m)) return "";
+  let h = pLine("Address different from the family's?", m.addrDiff);
+  if(m.addrDiff==="Yes") h += pFree("Address", addrOut(m)) +
+    '<div class="p-staff">Staff: on the Contact Information tab, set \u201CInformation Different from Primary Contact\u201D = Yes.</div>';
+  return h;
 }
 function ethOut(a){
   if(!a.ethnicity||!a.ethnicity.length) return null;
@@ -3906,13 +4010,14 @@ function personSections(m, printOrder){
     pLine("Health insurance", m.insurance) +
     pLine("First Name", m.first) +
     pLine("Birthdate", dobOut(m)) +
-    pLine("Services Needed", servicesOut(m));
+    pLine("Services Needed", servicesOut(m)) +
+    addrLines(m);
   if(m.services) fmi += pLine("Initial Contact Date", todayStr());
   S.push({title:"Family Member Info", inner:fmi, range:"basics"});
   if(!m.services) return S;
 
-  let demo = pLine("What's Your Role in the Family", a.roleDecline ? "Decline to answer" : a.role) +
-    pChecks("Race (check all that apply)", listOut(a.race, a.raceOther)) +
+  let demo = pLine("What's Your Role in the Family", a.roleDecline ? "Decline to answer" : oneOut(a.role, a.roleOther)) +
+    pChecks("Race (check all that apply)", printOrder ? raceOut(a) : listOut(a.race, a.raceOther)) +
     pChecks("Ethnicity (check all that apply)", ethOut(a)) +
     pLine("Primary Language", a.language==="Other" ? ("Other ("+(a.languageOther||"?")+")") : a.language);
   if(!child){
@@ -3925,13 +4030,15 @@ function personSections(m, printOrder){
   S.push({title:"Family Member Info — Demographics", inner:demo, range:child?[1,3]:[0,2]});
 
   S.push({title:"Family Status", range:child?[3,3]:[3,3], inner:
-    pChecks("Family Status (check all that apply)", a.famStatus) +
+    pChecks("Family Status (check all that apply)", listOut(a.famStatus, a.famStatusOther)) +
     pLine("Marital Status", child ? "N/A" : a.marital)});
 
   if(child){
     S.push({title:"S2 — CRA Related Questions", range:[0,0], inner:
       pLine("CRA Indicator Last Set On", todayStr()) +
-      pLine("CRA Related Question", a.craActive==="Yes" ? "A CRA Application has been filed for this child" : "No active CRA") +
+      pLine("CRA Related Question", a.craActive==="Yes" ? "A CRA Application has been filed for this child" :
+        (a.craActive==="Not sure" ? "Not sure" : "No active CRA")) +
+      (a.craActive==="Not sure" ? '<div class="p-staff">Family wasn\u2019t sure whether a CRA is active — confirm with the family.</div>' : '') +
       pLine("Application was filed by", a.craActive==="Yes" ?
         (a.craFiledBy==="Other" ? "Other ("+(a.craFiledByOther||"?")+")" : (a.craFiledBy||"Did Not Answer")) : "Not Applicable") +
       (a.craUnder12 ? '<div class="p-staff">Under 12 — CRA question not asked; recorded as no active CRA.</div>' : '') +
@@ -3945,9 +4052,9 @@ function personSections(m, printOrder){
 
   if(!child){
     S.push({title:"S1 — Education/Employment", range:[5,6], inner:
-      pLine("Highest Level of Education Completed", a.edu) +
-      pChecks("Employment Status (check all that apply)", a.employment) +
-      pChecks("Source of Income (check all that apply)", a.incomeSrc)});
+      pLine("Highest Level of Education Completed", oneOut(a.edu, a.eduOther)) +
+      pChecks("Employment Status (check all that apply)", listOut(a.employment, a.employmentOther)) +
+      pChecks("Source of Income (check all that apply)", listOut(a.incomeSrc, a.incomeSrcOther, "Other Income"))});
     let s2 = pLine("Do you have a disability?", a.disability);
     if(a.disability==="Yes") s2 += pChecks("Disability types (check all that apply)", a.disabTypes);
     s2 += pLine("What is your overall physical and mental health?", a.overallHealth) +
@@ -3974,10 +4081,10 @@ function personSections(m, printOrder){
       pFree("Listed", comm.length?comm.join("; "):"—");
     S.push({title:"S5 — Agency Involvement", range:[12,12], inner:s5});
     S.push({title:"S6 — Civic Engagement", range:[13,13], inner:
-      pChecks("Involved with (check all that apply)", a.civic)});
+      pChecks("Involved with (check all that apply)", listOut(a.civic, a.civicOther))});
   } else {
     const nsa = notSchoolAged(a);
-    let s1 = pLine("Educational Status", nsa ? "Other (Not school aged)" : a.eduStatus) +
+    let s1 = pLine("Educational Status", nsa ? "Other (Not school aged)" : oneOut(a.eduStatus, a.eduStatusOther)) +
       pFree("School name/Last School Attended", nsa?"N/A":a.schoolName) +
       pFree("After-School Program (if enrolled)", nsa?"N/A":a.afterSchool) +
       pFree("If referred by School, name of personnel", nsa?"N/A":a.schoolPersonnel) +
@@ -4047,7 +4154,7 @@ function personSections(m, printOrder){
       pFree("Listed", comm.length?comm.join("; "):"—");
     S.push({title:"S5 — Agency Involvement", range:[13,13], inner:s5});
     S.push({title:"S6 — Civic Engagement", range:[14,14], inner:
-      pChecks("Involved with (check all that apply)", a.civic)});
+      pChecks("Involved with (check all that apply)", listOut(a.civic, a.civicOther))});
   }
   return S;
 }
@@ -4286,7 +4393,8 @@ function miniCardLines(m){
     pLine("Health insurance", m.insurance)+
     pLine("First Name", m.first)+
     pLine("Birthday", dobOut(m))+
-    pLine("Services needed", servicesOut(m));
+    pLine("Services needed", servicesOut(m))+
+    addrLines(m);
 }
 
 function needsFor(m){
@@ -4340,7 +4448,7 @@ function buildPrint(forPdf){
     '</div>';
 
   h += '<div class="p-section"><h3>FAMILY — Referral Source (exactly one)</h3>'+
-    pLine("How did you hear about us?", state.referral.value) +
+    pLine("How did you hear about us?", referralOut()) +
     '<div class="p-line">Category chosen '+(REMOTE ? 'by the family' : 'on tablet')+': '+esc(state.referral.category||"—")+'</div></div>';
 
   /* Family member mini-cards — quick reference for CRM entry */
@@ -4606,7 +4714,9 @@ const OTHER_RELEASE_FORM_URL = "https://form.jotform.com/262774481459066";
 /* Jotform translation codes. Haitian Creole (Kreyòl Ayisyen) is "ht" (until
    Version 16.6 the form's Kreyòl translation was under "bzj", Belize Kriol). */
 const RELEASE_JOTFORM_LANG = {en:"en", es:"es", pt:"pt", ht:"ht"};
-const RELEASE_THANKS_MS = 2500;   /* how long "Thank you" shows before the panel closes */
+const RELEASE_THANKS_MS = 2500;
+/* Version 17 draft wording — easy to change; update the dictionaries too */
+const RELEASE_WHY = "Staff from both Pathways for Children and Children's Friend and Family Services (JRI) work together at this Center. To receive support here, this consent needs to be signed.";   /* how long "Thank you" shows before the panel closes */
 /* same people as the printout's Releases box */
 function releasePeople(){ return state.members.filter(m=>m.services && m.done); }
 /* people whose CFFS/JRI release isn't signed yet (none while the buttons are switched off) */
@@ -4634,7 +4744,9 @@ function releaseButtons(){
   if(!people.length) return null;
   /* once signed, the button can't reopen the release (no duplicate signed
      releases in Jotform); on the kiosk, staff can redo it from the staff panel */
-  return el("div",{class:"rel-list"}, ...people.map(m=>el("div",{class:"rel-row"},
+  /* Version 17: why the CFFS/JRI release is needed (shown while anyone hasn't signed) */
+  const why = people.some(m=>!m.releaseSigned) ? el("div",{class:"notice rel-why"}, RELEASE_WHY) : null;
+  return el("div",{class:"rel-list"}, why, ...people.map(m=>el("div",{class:"rel-row"},
     m.releaseSigned
       ? el("button",{class:"btn-quiet rel-signed", type:"button", disabled:true}, "Release signed ✓")
       : el("button",{class:"btn-primary", type:"button", onclick:()=>openRelease(m)},
