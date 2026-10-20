@@ -67,6 +67,7 @@ the end of this file.
   `?office` bookmark, the Staff links).
 - [ ] Remove the temporary Cloudflare code (`WORKER_URL`, `SUBMIT_TOKEN`,
   `submitIntake()`) once the Power Automate submission is confirmed working.
+  *(Waiting: the director's Power Automate permissions aren't set up yet.)*
   Until then, what the family sees after Submit comes only from the
   Cloudflare result.
 - [ ] Once the repo is private or has moved, regenerate the Power Automate
