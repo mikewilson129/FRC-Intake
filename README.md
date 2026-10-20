@@ -48,10 +48,29 @@ the end of this file.
   has no Hispanic option, so staff currently enter N/A. Today a "Yes, …"
   ethnicity answer auto-checks "Hispanic/Latino" in the on-screen Race list
   (it can still be unchecked), and the printout shows it as a checked Race.
-  Change the printout only: if Hispanic/Latino is the only race selected,
-  print Race as N/A. Leave the on-screen questions alone. Still to decide:
-  when other races are checked too, should "Hispanic/Latino" be left off the
-  Race line?
+  Change the printout only (leave the on-screen questions alone):
+  - List everything the person selected for Ethnicity and for Race.
+  - Exception: if they answered Yes to Hispanic on Ethnicity and
+    "Hispanic/Latino" is the **only** Race selected, print Race as N/A.
+  - If they answered Yes to Hispanic, unchecked "Hispanic/Latino", and left
+    Race blank or chose "Choose Not to Answer", print Race as
+    "Choose Not To Answer".
+  - Not covered: someone who isn't Hispanic and leaves Race blank. That
+    prints "None selected" today; assume it stays that way unless told
+    otherwise.
+- [ ] **Short explanation next to the JRI consent.** Families should see why
+  the CFFS/JRI release is needed: the Family Resource Center is a
+  collaboration between Pathways for Children and Children's Friend and
+  Family Services (JRI), and staff from both agencies are employed here. Show
+  it by the "Sign release for…" buttons (tablet "All set!", remote "Almost
+  done"), short enough that people read all of it. Draft (28 words):
+  "Staff from both Pathways for Children and Children's Friend and Family
+  Services (JRI) work together at this Center. To receive support here, this
+  consent needs to be signed." Needs approval from Pathways and JRI, plus
+  Spanish, Portuguese and Haitian Creole versions. **Decide first:** the
+  wording says the consent is required, but today releases are "encouraged
+  but not required" and Submit still works through "Submit anyway". Either
+  keep the notice softer (e.g. "we need") or change what the form allows.
 - [ ] **Releases at home.** Find a better way for families to sign releases
   on their own device. Today remote "Almost done" opens the release in a
   panel with a "Sign release for {first name}" button for each person (see
