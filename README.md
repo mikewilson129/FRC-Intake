@@ -7,6 +7,80 @@ FRC's shared tablet (the `?office` link), where staff then print a CRM-ready
 data-entry copy. There is no backend
 required for the core flow — everything lives in one file.
 
+## Next revision checklist
+
+**Go through this list before starting the next set of changes.** Check items
+off (or delete them) as they're done, and add new requests at the bottom of the
+right group. Longer parked ideas live in "Future ideas (not built yet)" near
+the end of this file.
+
+**Form changes to decide or build**
+
+- [ ] **Map "What brings you in" to the CRM's Reason for visit.** *(On hold.)*
+  Today the printout lists the quick picks and the family's own words, plus
+  a blank line for staff to write the CRM Reason-for-Visit category (the "S3
+  — Reason for Visit" box). Map each quick pick (adult and child) to its CRM
+  category and print it, so staff can enter it straight across. Still
+  needed: which CRM category each quick pick goes to. The CRM's
+  Reason-for-visit list (from a CRM screenshot, Oct 2026):
+  Afterschool Info · Child Care Info · Child Development / Early
+  Intervention · Continuing Education for Caregiver · DCF Involvement /
+  Support · Domestic Violence Services · Families Displaced by Natural
+  Forces · Family Hardship / Financial Issues · Food Nutrition · Health
+  Crisis / Outbreak · Health/Mental Health Concerns · Housing / Rent ·
+  Immigration / Legal Issues · Job Issues · LGBTQIA + Support · Play Group ·
+  School Issue / School Info · Seeking Information on Parenting / Parenting
+  Education · SNAP Application / Benefit Assistance · Substance Use
+  Concerns · Teen / Young Adult Activities · Transportation · Other
+- [ ] **Printout order vs. the CRM.** The printout order was matched to the
+  CRM before and is very close; one or two individual items may be out of
+  order. Re-check it against the CRM screens (Mike) and note any that need
+  moving.
+- [ ] **Other releases at home.** *(Skipped for now.)* The CFFS/JRI release
+  works at home as intended. Other releases (outside agencies, people) only
+  have a spot on the tablet: the staff panel's suggestions and "+ Complete
+  another release" after Submit (see "Other releases"). Remote mode has no
+  way to do them. Not decided how families should do extra releases at
+  home; they likely wouldn't get filled in right without staff anyway.
+
+**Translations still waiting on review**
+
+- [ ] Version 17 strings (Spanish, Portuguese and Haitian Creole drafts):
+  "Please specify", "Not sure", the address question ("Is this person's
+  address different from the family address?", "State", and the Review
+  labels "Address different from the family's?" / "Address") and the JRI
+  consent notice. The notice says "autorización" / "autorização" /
+  "otorizasyon" to match the release buttons.
+- [ ] Safety resources pop-up (Version 16.9): Spanish is for staff review;
+  Portuguese and Haitian Creole are drafts that need a native-speaker review.
+- [ ] Unsigned-release warnings (Version 16.3) and the `release-done.html`
+  page: Spanish, Portuguese and Haitian Creole are drafts.
+- [ ] Version 16 remote-mode and household lines: Portuguese and Haitian
+  Creole are drafts, and so are the Spanish lines changed just before that
+  version was merged.
+- [ ] Haitian Creole is still marked "(beta)" in the language menu.
+
+**Hosting move and clean-up**
+
+- [ ] When the form moves to its new address, work through the
+  "Hosting-move checklist" below (Jotform Thank You redirects, the tablet's
+  `?office` bookmark, the Staff links).
+- [ ] Remove the temporary Cloudflare code (`WORKER_URL`, `SUBMIT_TOKEN`,
+  `submitIntake()`) once the Power Automate submission is confirmed working.
+  *(Waiting: the director's Power Automate permissions aren't set up yet.)*
+  Until then, what the family sees after Submit comes only from the
+  Cloudflare result.
+- [ ] Once the repo is private or has moved, regenerate the Power Automate
+  trigger URL and rotate `SUBMIT_TOKEN`. Both are written in `index.html`,
+  which is in a public repo until then (see "Remote submission" and
+  "Power Automate submission" below).
+
+**Process (not form changes)**
+
+- [ ] Set up a test / sandbox site so changes can be tried before they go
+  live.
+- [ ] Understand pull requests, including how they differ from branches.
+
 ## How it's built
 
 - **`index.html`** — the entire app: markup shell, CSS, and JS, in one file.
@@ -339,6 +413,13 @@ a full-screen panel inside the intake page, already filled in:
 
 Everything prefilled can still be changed in Jotform.
 
+- **Why it's needed (Version 17):** while anyone listed hasn't signed, a
+  short notice sits above the buttons: "Staff from both Pathways for
+  Children and Children's Friend and Family Services (JRI) work together at
+  this Center. To receive support here, this consent needs to be signed."
+  (`RELEASE_WHY` in `index.html`; update the dictionaries if it changes.)
+  "Submit anyway" / "Continue anyway" still work as before.
+
 - **On for everyone** (tablet and remote) since Version 16.1. To hide the
   buttons again, set `RELEASE_FOR_EVERYONE = false` in `index.html`; staff
   can still test them with the staff-only `?releasetest` links (see
@@ -493,16 +574,6 @@ Since everything is one file, a few conventions keep it maintainable:
   privacy choice on the shared Android tablets at the FRC. A likely shape:
   an "external" (client's own phone) mode that saves progress, and an
   "internal" (shared tablet) mode that keeps today's no-saving behavior.
-- **Child questions that can't be skipped (to review).** Three child-intake
-  questions must be answered before Continue turns on, and have no Skip
-  link: "Is there an active CRA for {name}?" (ages 12+), "Is {name} present
-  and able to answer a few questions directly?" (ages 11+), and "Is {name}
-  currently living with their family?" (all ages). Decide whether each
-  should stay required or get a Skip / "Not sure" option. (CRA mode, added
-  in Version 15, doesn't change them.)
-- **Separate address for a second adult** (e.g. divorced parents at
-  different addresses) — discuss for a future version; needs a place in
-  the CRM. For now, families use the Notes box.
 - **Households with no adult.** "No one else — finish up" needs a completed
   adult intake (plus a child's in CRA mode), so a household with no adults
   entered (e.g. a youth on their own) can't finish.
@@ -516,6 +587,38 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 17
+
+- **Race on the printout (CRM has no Hispanic race).** The printout lists
+  everything selected for Ethnicity and Race, except: Yes to Hispanic with
+  "Hispanic/Latino" as the only race prints Race as **N/A**; Yes to
+  Hispanic with "Hispanic/Latino" unchecked and Race blank or "Choose Not
+  to Answer" prints **Choose Not To Answer**. Printout and submitted copy
+  only; the screens and the family's Review are unchanged. Someone not
+  Hispanic who leaves Race blank still prints "None selected". (`raceOut()`)
+- **"Is this person's address different from the family address?"** On the
+  add-a-person screen, for every adult after the first (shown once the date
+  of birth makes them 18+). Yes opens Street, Apt #, City, State and Zip.
+  Printed on their family-member card and Family Member Info, with the staff
+  reminder to set "Information Different from Primary Contact" = Yes on the
+  Contact Information tab. Sent as `addrDiff` and `addr` on the member.
+  Replaces the "non-resident adults" and "second adult's address" ideas.
+- **"Not sure" for the child's active-CRA question** (ages 12+). Prints
+  "CRA Related Question: Not sure" with a staff line to confirm with the
+  family. "Present to answer directly" and "living with family" stay
+  required.
+- **"Please specify" box under every "Other" answer:** referral source
+  (Other State Agency, Other Local Agency, Other Healthcare Provider),
+  family role, family status, highest education, employment, source of
+  income ("Other Income"), civic involvement (adult and child), and the
+  child's educational status. Prints as e.g. "Other (Book club)"; a blank
+  box prints plain "Other". (`otherBox()`, `oneOut()`, `listOut()`)
+- **JRI consent notice** above the "Sign release for…" buttons (tablet "All
+  set!", remote "Almost done") while anyone hasn't signed. See "Release of
+  information".
+- **Translations:** Spanish, Portuguese and Haitian Creole drafts for all
+  new strings — need review.
 
 ### Version 16.9
 
