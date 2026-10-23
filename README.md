@@ -77,6 +77,10 @@ the end of this file.
 
 **Hosting move and clean-up**
 
+- [ ] Remove the temporary second Power Automate flow
+  (`POWER_AUTOMATE_URL_2`, Version 17.2) when it's no longer needed. Its
+  URL is also public until the repo is private; include it in the URL
+  rotation below.
 - [ ] When the form moves to its new address, work through the
   "Hosting-move checklist" below (Jotform Thank You redirects, the tablet's
   `?office` bookmark, the Staff links).
@@ -372,6 +376,17 @@ saves it as a PDF in SharePoint.
   family closes the page the instant "Intake sent" appears, a slow send
   could be cut off; and a retried Submit sends a second copy.)
 
+### Second flow (temporary, Version 17.2)
+
+Every Submit also posts the same copy (same fields, same self-contained
+`printHtml`) to a second Power Automate flow, `POWER_AUTOMATE_URL_2`. It's
+temporary and follows the same rules: the URL's `sig=` is the access key,
+results only go to the console (`Power Automate (2nd flow)`), and it never
+affects what the family sees. So during the transition each Submit goes to
+three places: Cloudflare, the first flow, and the second flow. Remove
+`POWER_AUTOMATE_URL_2` and its line in `sendPowerAutomateCopy()` when it's
+no longer needed.
+
 ## Safety resources pop-up
 
 Added in Version 16.9, on the tablet and the remote link alike. When
@@ -602,6 +617,13 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 17.2
+
+- **Temporary third destination on Submit:** the same copy the Power
+  Automate flow gets also goes to a second Power Automate flow
+  (`POWER_AUTOMATE_URL_2`). Not waited on; results only in the console. See
+  "Second flow (temporary)". Nothing changes on screen.
 
 ### Version 17.1
 
