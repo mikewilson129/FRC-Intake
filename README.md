@@ -16,6 +16,17 @@ the end of this file.
 
 **Form changes to decide or build**
 
+- [ ] **Child intakes: waiting on further guidance.** Families have been
+  doing full intakes for every child, which isn't needed. Version 17.1 is
+  the stopgap (pop-up, new household hint, CRA-age outline); a fuller
+  change is waiting on guidance. **Possible revert:** Version 17.1 replaced
+  the household-screen hint (tablet and family links). The old wording, in
+  case it should come back: "Complete an intake for a child when they need
+  direct referrals of their own, such as mental health services or
+  extracurricular activities." It also dropped "child care" from the green
+  note after an adult's intake (old: "Food, clothing, basic needs, and child
+  care requests are covered by your intake — you don't need one for your
+  child for those."). Both old lines are still in the dictionaries.
 - [ ] **Map "What brings you in" to the CRM's Reason for visit.** *(On hold.)*
   Today the printout lists the quick picks and the family's own words, plus
   a blank line for staff to write the CRM Reason-for-Visit category (the "S3
@@ -45,6 +56,10 @@ the end of this file.
 
 **Translations still waiting on review**
 
+- [ ] Version 17.1 strings (Spanish, Portuguese and Haitian Creole drafts):
+  the child-intake pop-up and its buttons ("Skip for now", "Continue with
+  {name}'s intake"), the new household hint, the "CRA-aged child (11–17)"
+  label, and the green note without "child care".
 - [ ] Version 17 strings (Spanish, Portuguese and Haitian Creole drafts):
   "Please specify", "Not sure", the address question ("Is this person's
   address different from the family address?", "State", and the Review
@@ -587,6 +602,33 @@ Since everything is one file, a few conventions keep it maintainable:
   drift from the CRM field labels.
 
 ## Changelog
+
+### Version 17.1
+
+Stopgap for families doing full intakes for every child (more guidance to
+come — see the checklist).
+
+- **Pop-up before a child's intake (family links only, not `?office`).**
+  Tapping "Start intake" for a child shows: "You don't need a full intake
+  for {name}. Only complete one if {name} will need childcare while you
+  attend a parenting class. If you're not sure, skip it for now." —
+  **Skip for now** (the prominent button; stays on the household list) or
+  **Continue with {name}'s intake**. Regular mode: every child. CRA mode:
+  only once a child's intake is complete (the first one is still
+  required). Not shown for "Continue intake" on a child already started.
+  (`childIntakeAlert()`, `startIntake()`)
+- **New household-screen hint (tablet and family links, not in CRA mode):**
+  "You only need to complete an intake for a child if they will need
+  childcare while you attend a parenting class. If you're not sure, skip
+  their intake for now." Replaces the "direct referrals of their own" line.
+- **Green note after an adult's intake** no longer says child care is
+  covered: "Food, clothing, and basic needs requests are covered by your
+  intake — you don't need one for your child for those."
+- **CRA mode on family links:** children aged 11–17 get a grey outline and
+  a small "CRA-aged child (11–17)" label on the household list, as a
+  suggestion. (`craAgeHint()`)
+- **Translations:** Spanish, Portuguese and Haitian Creole drafts — need
+  review.
 
 ### Version 17
 
