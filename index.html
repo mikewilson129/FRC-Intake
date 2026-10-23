@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 17 — see README.md changelog for what changed in this version -->
+<!-- Version 17.1 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -92,6 +92,9 @@
   .check{color:var(--good); font-weight:700; font-size:18px;}
   .roster-item.suggest{border-color:var(--accent); background:var(--accent-soft); box-shadow:0 0 0 2px rgba(34,104,92,.18);}
   .suggest-badge{display:block; font-size:13.5px; font-weight:700; color:var(--accent); margin-bottom:3px;}
+  /* Version 17.1: CRA mode (family links) — children 11-17, a quiet suggestion */
+  .roster-item.cra-age{border:2px solid #9AA5A2;}
+  .cra-age-badge{display:block; font-size:13px; font-weight:600; color:var(--soft); margin-bottom:3px;}
   .divider{border:none; border-top:1px solid var(--line); margin:22px 0;}
   .notice{background:var(--accent-soft); border-radius:10px; padding:13px 15px; font-size:15px; margin:14px 0;}
   .subtle{font-size:14px; color:var(--soft);}
@@ -396,7 +399,7 @@ const I18N = { es: {
 "A green check means that person's intake is complete.":"Una marca verde significa que la admisión de esa persona está completa.",
 "Do you need to complete an intake for anyone else in your family today?":"¿Necesita completar una admisión para alguien más de su familia hoy?",
 "Complete an intake for a child when they need direct referrals of their own, such as mental health services or extracurricular activities.":"Complete una admisión para un niño cuando necesite referencias directas propias, como servicios de salud mental o actividades extracurriculares.",
-"Food, clothing, basic needs, and child care requests are covered by your intake — you don't need one for your child for those.":"Las solicitudes de comida, ropa, necesidades básicas y cuidado infantil quedan cubiertas por su admisión — no necesita una para su hijo/a para eso.",
+"Food, clothing, and basic needs requests are covered by your intake — you don't need one for your child for those.":"Las solicitudes de comida, ropa y necesidades básicas quedan cubiertas por su admisión — no necesita una para su hijo/a para eso.",
 "If you're unsure, just ask a staff member — that's what we're here for.":"Si tiene dudas, pregunte a un miembro del personal — para eso estamos.",
 "No one else — finish up":"Nadie más — terminar",
 "One suggestion first":"Primero, una sugerencia",
@@ -825,6 +828,12 @@ const I18N = { es: {
 "Address different from the family's?":"¿Dirección diferente a la de la familia?",
 "Address":"Dirección",
 "Staff from both Pathways for Children and Children's Friend and Family Services (JRI) work together at this Center. To receive support here, this consent needs to be signed.":"El personal de Pathways for Children y de Children's Friend and Family Services (JRI) trabaja en conjunto en este Centro. Para recibir apoyo aquí, es necesario firmar esta autorización.",
+/* --- V17.1: child-intake pop-up, household hint, CRA-age label — DRAFT, needs review --- */
+"You don't need a full intake for {n}. Only complete one if {n} will need childcare while you attend a parenting class. If you're not sure, skip it for now.":"No necesita una admisión completa para {n}. Solo complete una si {n} va a necesitar cuidado infantil mientras usted asiste a una clase para padres. Si no está seguro/a, omítala por ahora.",
+"Continue with {n}'s intake":"Continuar con la admisión de {n}",
+"Skip for now":"Omitir por ahora",
+"You only need to complete an intake for a child if they will need childcare while you attend a parenting class. If you're not sure, skip their intake for now.":"Solo necesita completar una admisión para un niño si va a necesitar cuidado infantil mientras usted asiste a una clase para padres. Si no está seguro/a, omita su admisión por ahora.",
+"CRA-aged child (11–17)":"Niño/a en edad de CRA (11–17)",
 "OK, continue":"De acuerdo, continuar"
 },
 pt: {
@@ -995,7 +1004,7 @@ pt: {
 "A green check means that person's intake is complete.":"Um visto verde significa que a admissão daquela pessoa está completa.",
 "Do you need to complete an intake for anyone else in your family today?":"Você precisa preencher uma admissão para mais alguém da sua família hoje?",
 "Complete an intake for a child when they need direct referrals of their own, such as mental health services or extracurricular activities.":"Preencha uma admissão para uma criança quando ela precisar de encaminhamentos próprios, como serviços de saúde mental ou atividades extracurriculares.",
-"Food, clothing, basic needs, and child care requests are covered by your intake — you don't need one for your child for those.":"Pedidos de alimentos, roupas, necessidades básicas e creche já estão cobertos pela sua admissão — você não precisa de uma para seu filho para isso.",
+"Food, clothing, and basic needs requests are covered by your intake — you don't need one for your child for those.":"Pedidos de alimentos, roupas e necessidades básicas já estão cobertos pela sua admissão — você não precisa de uma para seu filho para isso.",
 "If you're unsure, just ask a staff member — that's what we're here for.":"Se tiver dúvida, pergunte a um membro da equipe — estamos aqui para isso.",
 "No one else — finish up":"Mais ninguém — finalizar",
 "One suggestion first":"Primeiro, uma sugestão",
@@ -1422,6 +1431,12 @@ pt: {
 "Address different from the family's?":"Endereço diferente do da família?",
 "Address":"Endereço",
 "Staff from both Pathways for Children and Children's Friend and Family Services (JRI) work together at this Center. To receive support here, this consent needs to be signed.":"A equipe da Pathways for Children e da Children's Friend and Family Services (JRI) trabalha em conjunto neste Centro. Para receber apoio aqui, esta autorização precisa ser assinada.",
+/* --- V17.1: child-intake pop-up, household hint, CRA-age label — DRAFT, needs review --- */
+"You don't need a full intake for {n}. Only complete one if {n} will need childcare while you attend a parenting class. If you're not sure, skip it for now.":"Você não precisa de uma admissão completa para {n}. Só preencha uma se {n} precisar de cuidado infantil enquanto você participa de uma aula para pais. Se não tiver certeza, pule por enquanto.",
+"Continue with {n}'s intake":"Continuar com a admissão de {n}",
+"Skip for now":"Pular por enquanto",
+"You only need to complete an intake for a child if they will need childcare while you attend a parenting class. If you're not sure, skip their intake for now.":"Você só precisa preencher uma admissão para uma criança se ela precisar de cuidado infantil enquanto você participa de uma aula para pais. Se não tiver certeza, pule a admissão dela por enquanto.",
+"CRA-aged child (11–17)":"Criança em idade de CRA (11–17)",
 "OK, continue":"OK, continuar"
 },
 ht: {
@@ -1592,7 +1607,7 @@ ht: {
 "A green check means that person's intake is complete.":"Yon mak vèt vle di admisyon moun sa a konplè.",
 "Do you need to complete an intake for anyone else in your family today?":"Èske ou bezwen ranpli yon admisyon pou yon lòt moun nan fanmi ou jodi a?",
 "Complete an intake for a child when they need direct referrals of their own, such as mental health services or extracurricular activities.":"Ranpli yon admisyon pou yon timoun lè li bezwen pwòp referans pa li, tankou sèvis sante mantal oswa aktivite ekstrakourikilè.",
-"Food, clothing, basic needs, and child care requests are covered by your intake — you don't need one for your child for those.":"Demann pou manje, rad, bezwen debaz, ak gadri deja kouvri nan admisyon pa ou — ou pa bezwen youn pou pitit ou pou sa yo.",
+"Food, clothing, and basic needs requests are covered by your intake — you don't need one for your child for those.":"Demann pou manje, rad, ak bezwen debaz deja kouvri nan admisyon pa ou — ou pa bezwen youn pou pitit ou pou sa yo.",
 "If you're unsure, just ask a staff member — that's what we're here for.":"Si ou pa sèten, jis mande yon manm anplwaye — se pou sa nou la.",
 "No one else — finish up":"Pa gen lòt moun — fini",
 "One suggestion first":"Yon sijesyon anvan",
@@ -2019,6 +2034,12 @@ ht: {
 "Address different from the family's?":"Adrès diferan de pa fanmi an?",
 "Address":"Adrès",
 "Staff from both Pathways for Children and Children's Friend and Family Services (JRI) work together at this Center. To receive support here, this consent needs to be signed.":"Anplwaye Pathways for Children ak Children's Friend and Family Services (JRI) travay ansanm nan Sant sa a. Pou w resevwa sipò isit la, fòk otorizasyon sa a siyen.",
+/* --- V17.1: child-intake pop-up, household hint, CRA-age label — DRAFT, needs review --- */
+"You don't need a full intake for {n}. Only complete one if {n} will need childcare while you attend a parenting class. If you're not sure, skip it for now.":"Ou pa bezwen yon admisyon konplè pou {n}. Ranpli youn sèlman si {n} ap bezwen gadri pandan w ap patisipe nan yon klas pou paran. Si ou pa sèten, sote l pou kounye a.",
+"Continue with {n}'s intake":"Kontinye ak admisyon {n}",
+"Skip for now":"Sote pou kounye a",
+"You only need to complete an intake for a child if they will need childcare while you attend a parenting class. If you're not sure, skip their intake for now.":"Ou bezwen ranpli yon admisyon pou yon timoun sèlman si li ap bezwen gadri pandan w ap patisipe nan yon klas pou paran. Si ou pa sèten, sote admisyon li pou kounye a.",
+"CRA-aged child (11–17)":"Timoun ki gen laj CRA (11–17)",
 "OK, continue":"OK, kontinye"
 }
 };
@@ -3182,14 +3203,16 @@ function rosterList(withActions, suggestId){
       }
     }
     const left = el("div");
+    const craAge = craAgeHint(m);
     if(suggested) left.appendChild(el("span",{class:"suggest-badge"},"★ Is this you? Start here"));
+    if(craAge) left.appendChild(el("span",{class:"cra-age-badge"},"CRA-aged child (11–17)"));
     left.appendChild(el("div",{class:"roster-name"}, fullName(m)||"(no name yet)"));
     left.appendChild(el("div",{class:"roster-sub"}, sub.join(" · ")));
     if(withActions && !state.cra && m.done && !isChild(m) && m.id===state.lastDoneAdultId){
       left.appendChild(el("div",{class:"roster-sub", style:"margin-top:4px; color:var(--accent);"},
-        "Food, clothing, basic needs, and child care requests are covered by your intake — you don't need one for your child for those."));
+        "Food, clothing, and basic needs requests are covered by your intake — you don't need one for your child for those."));
     }
-    items.appendChild(el("div",{class:"roster-item"+(suggested?" suggest":"")}, left, right));
+    items.appendChild(el("div",{class:"roster-item"+(suggested?" suggest":"")+(craAge?" cra-age":"")}, left, right));
   }
   return items;
 }
@@ -3211,7 +3234,29 @@ function enterIntakeAt(m, targetIdx, editEnd, extraCtx){
   }
   goTo("intake", Object.assign(mkCtx(targetIdx), extraCtx||{}));
 }
+/* Version 17.1 (family links only — not ?office): before a child's intake is
+   started, say most children don't need one. Regular mode: every child. CRA
+   mode: only once a child's intake is complete (the first one is required). */
+function childIntakeAlert(m){
+  if(!REMOTE || !isChild(m) || m.services) return false;
+  return !state.cra || state.members.some(x=>x.done && isChild(x));
+}
+/* Version 17.1: CRA mode on family links — outline children aged 11-17 */
+function craAgeHint(m){
+  if(!REMOTE || !state.cra) return false;
+  const ag = ageOf(m);
+  return ag!==null && ag>=11 && ag<=17;
+}
 function startIntake(m){
+  if(childIntakeAlert(m)){
+    const n = displayName(m);
+    return confirmBox(
+      trn("You don't need a full intake for {n}. Only complete one if {n} will need childcare while you attend a parenting class. If you're not sure, skip it for now.", n),
+      trn("Continue with {n}'s intake", n), "Skip for now", ()=>startIntakeNow(m), true);
+  }
+  startIntakeNow(m);
+}
+function startIntakeNow(m){
   const anyDone = state.members.some(x=>x.done);
   if(isChild(m) && !anyDone){
     goTo("redirect",{mid:m.id});
@@ -3278,7 +3323,8 @@ SCREENS.rosterSelect = (ctx) => {
   }
   if(anyDone){
     body.push(qLabel("Do you need to complete an intake for anyone else in your family today?"));
-    if(!state.cra) body.push(el("p",{class:"hint"},"Complete an intake for a child when they need direct referrals of their own, such as mental health services or extracurricular activities."));
+    /* Version 17.1 wording; the earlier line is kept in README in case it's reverted */
+    if(!state.cra) body.push(el("p",{class:"hint"},"You only need to complete an intake for a child if they will need childcare while you attend a parenting class. If you're not sure, skip their intake for now."));
   }
   if(state.cra && !rule.ok){
     body.push(el("div",{class:"notice", style:"font-weight:600;"},
