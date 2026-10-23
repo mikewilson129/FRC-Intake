@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Version 17.1 — see README.md changelog for what changed in this version -->
+<!-- Version 17.2 — see README.md changelog for what changed in this version -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2096,22 +2096,28 @@ async function submitIntake(payload){
    button: its result is only logged to the console and never changes what
    the family sees. Never throws. */
 const POWER_AUTOMATE_URL = "https://default6a4d2f0228674e458696badb4e0eb2.87.environment.api.powerplatform.com/powerautomate/automations/direct/cu/25/workflows/ea04d5d9f9cf4046b9121b2c22cb8317/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=qdPIv464bOZfWElmIxffAJQqOHv35AAJ0eDldHbVmTk";
-async function submitPowerAutomate(payload){
+/* TEMPORARY (Version 17.2): a second Power Automate flow gets the same copy
+   as POWER_AUTOMATE_URL. Same rules: the URL is the only access key, results
+   go to the console only, never affects what the family sees. Remove this
+   URL and its call in sendPowerAutomateCopy() when it's no longer needed. */
+const POWER_AUTOMATE_URL_2 = "https://default6a4d2f0228674e458696badb4e0eb2.87.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/27/workflows/b5176cd2611e42b8b7cac3cc29228ade/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=f-D1FDRIm-YSZIfZGpE_R1VDGQ0M6Qbm-geVMTpHtWc";
+async function submitPowerAutomate(payload, url, label){
+  url = url || POWER_AUTOMATE_URL; label = label || "Power Automate";
   const ctrl = new AbortController();
   const timer = setTimeout(()=>ctrl.abort(), SUBMIT_TIMEOUT_MS);
   try{
-    const res = await fetch(POWER_AUTOMATE_URL, {
+    const res = await fetch(url, {
       method:"POST",
       headers:{ "Content-Type":"application/json" },
       body: JSON.stringify(payload),
       signal: ctrl.signal
     });
     const result = await res.json().catch(()=>({}));
-    if(!res.ok || !result.ok) console.error("Power Automate submission failed:", res.status, result);
-    else console.log("Power Automate submission OK");
+    if(!res.ok || !result.ok) console.error(label+" submission failed:", res.status, result);
+    else console.log(label+" submission OK");
   }catch(err){
-    if(err.name==="AbortError") console.error("Power Automate submission timed out after "+(SUBMIT_TIMEOUT_MS/1000)+"s");
-    else console.error("Network error submitting to Power Automate:", err);
+    if(err.name==="AbortError") console.error(label+" submission timed out after "+(SUBMIT_TIMEOUT_MS/1000)+"s");
+    else console.error("Network error submitting to "+label+":", err);
   }finally{
     clearTimeout(timer);
   }
@@ -4346,7 +4352,9 @@ async function sendIntake(){
    self-contained document (pdfDocument). Any error here is logged only. */
 function sendPowerAutomateCopy(payload){
   try{
-    submitPowerAutomate({...payload, printHtml: pdfDocument(buildPrint(true))});
+    const copy = {...payload, printHtml: pdfDocument(buildPrint(true))};
+    submitPowerAutomate(copy);
+    submitPowerAutomate(copy, POWER_AUTOMATE_URL_2, "Power Automate (2nd flow)");   /* TEMPORARY — see POWER_AUTOMATE_URL_2 */
   }catch(err){
     console.error("Power Automate copy not sent:", err);
   }
